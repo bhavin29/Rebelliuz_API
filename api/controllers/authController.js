@@ -58,6 +58,8 @@ res.status(401).json({ message: 'Unauthorized user!' });
     }
 };
 
+//Test Commit
+
 // authenticate JWT
 exports.authenticateJWT = (req, res, next) => {
     const authHeader = req.headers.authorization;
