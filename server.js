@@ -7,6 +7,7 @@ const express = require('express')
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
+//directory page as global
 global.__basedir = __dirname;
 
 let app = express();
