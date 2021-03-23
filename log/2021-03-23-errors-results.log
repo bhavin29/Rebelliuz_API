@@ -1,0 +1,19 @@
+2021-03-23 11:45:36 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 11:47:14 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 11:49:10 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 11:50:29 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 11:51:56 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 11:53:11 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 11:54:47 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 11:56:12 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 11:58:03 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 13:12:43 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 13:29:30 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 13:46:26 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 13:47:15 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. Wronge password.
+2021-03-23 13:49:25 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. Wronge password.
+2021-03-23 13:49:45 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. Wronge password.
+2021-03-23 13:49:53 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 13:50:00 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. Wronge password.
+2021-03-23 13:52:25 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. Wronge password.
+2021-03-23 13:52:37 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. Wronge password.

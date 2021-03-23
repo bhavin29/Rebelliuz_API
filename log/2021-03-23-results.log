@@ -1,0 +1,93 @@
+2021-03-23 09:41:11 info: a request has been made with the following uuid [936bfedb-c3d2-4fab-93ad-b7753160761c] /api/auth/register PostmanRuntime/7.26.2 undefined
+2021-03-23 09:41:42 info: a request has been made with the following uuid [ded23bc1-745c-429e-9eaf-3667b0166c05] /api/auth/register PostmanRuntime/7.26.2 undefined
+2021-03-23 09:42:20 info: a request has been made with the following uuid [31cd2618-9709-4a26-9ba2-9463108c9a4c] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 09:43:05 info: a request has been made with the following uuid [3428f3e1-8ebc-4f19-a5a2-1b59ce12220e] /api/bio/ PostmanRuntime/7.26.2 undefined
+2021-03-23 09:43:16 info: a request has been made with the following uuid [b88e4cb8-0a51-4e88-a4f1-0843b16069b6] /api/bio/ PostmanRuntime/7.26.2 undefined
+2021-03-23 09:43:16 warn: Bio list sucess
+2021-03-23 09:43:27 info: a request has been made with the following uuid [14f0378a-799e-44de-ba20-7928f3e26def] /api/bio/60571e615243a08518052d7 PostmanRuntime/7.26.2 undefined
+2021-03-23 09:44:17 info: a request has been made with the following uuid [193da589-d067-419d-9e1a-46b6a0d8b7e1] /api/bio/60571e615243a08518052d73 PostmanRuntime/7.26.2 undefined
+2021-03-23 09:57:11 info: a request has been made with the following uuid [263d669f-61da-42a8-b37e-23b0c08e3d3d] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 10:01:05 info: a request has been made with the following uuid [dbe71a4f-3170-4685-b4d8-c9e898f00c08] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 10:01:12 info: a request has been made with the following uuid [11df2503-a0ca-43a7-901f-267e07a03675] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 10:58:14 info: a request has been made with the following uuid [4a039c07-a6bb-449e-80ef-f791c4b4677c] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:00:14 info: a request has been made with the following uuid [81fb2106-acb1-4978-a34e-adca8e1da4ba] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:05:26 info: a request has been made with the following uuid [3afed3c7-4dbf-4c20-9a29-b45e40ae0dbe] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:06:44 info: a request has been made with the following uuid [c1c6e1f8-4e02-4e0b-86f9-3c4319659b65] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:07:16 info: a request has been made with the following uuid [070e90bd-2b3f-4632-a51f-9a6d85295ce1] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:08:06 info: a request has been made with the following uuid [32554535-4ef2-4bf9-b43d-0f216a451526] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:08:46 info: a request has been made with the following uuid [71b629e7-75d0-4049-a6cd-30b63d0a6aa7] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:09:22 info: a request has been made with the following uuid [729e96ca-a865-4169-911a-7f1bc3ac7d57] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:10:01 info: a request has been made with the following uuid [b1706d85-f39b-4bfa-b18d-b09b0d2e535a] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:11:18 info: a request has been made with the following uuid [21be2048-2f71-4929-b21a-2c2a673590fa] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:12:26 info: a request has been made with the following uuid [a68fc967-0442-4c10-8369-3e71f32fb8eb] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:27:16 info: a request has been made with the following uuid [be2b39ac-ce89-4a70-a037-e49851a9ed92] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:30:20 info: a request has been made with the following uuid [34071961-bada-4389-bcca-47154f50a70f] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:30:50 info: a request has been made with the following uuid [68850e9d-374c-4057-975a-2f3b22fd028e] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:31:42 info: a request has been made with the following uuid [f7a754bb-8f76-4e03-880f-ab5f79389bc8] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:35:59 info: a request has been made with the following uuid [7e2ac555-e76e-463c-88fc-4815bc98bb22] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:45:29 info: a request has been made with the following uuid [36f27dcb-8db3-4795-99e4-e7489aac76b3] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:45:36 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 11:47:07 info: a request has been made with the following uuid [c899d016-1f5d-44fc-ad5b-1287e230e68f] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:47:14 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 11:49:01 info: a request has been made with the following uuid [cee2c1a3-1c3a-4904-8b2e-b09eca307d6a] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:49:10 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 11:50:29 info: a request has been made with the following uuid [315d5141-806b-4927-b19b-216930b81822] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:50:29 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 11:51:56 info: a request has been made with the following uuid [f4fd9f3a-25d0-4e81-85dc-db059d9b7e42] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:51:56 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 11:53:11 info: a request has been made with the following uuid [47a067a9-e888-472e-98ac-4ceb22c5b768] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:53:11 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 11:54:47 info: a request has been made with the following uuid [fa572715-b2e2-49ac-8175-89594d3751ca] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:54:47 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 11:56:12 info: a request has been made with the following uuid [036ab107-53ed-40b2-a7d6-4a9cfbb3d539] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:56:12 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 11:58:03 info: a request has been made with the following uuid [a6cb3df8-7ca8-4a51-9733-c90b56615f6a] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 11:58:03 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 13:12:43 info: a request has been made with the following uuid [b19a9b2d-5e02-410a-ad75-5de6df65e709] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:12:43 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 13:13:06 info: a request has been made with the following uuid [12a1b9d1-f7ae-48f9-88cc-582d0b572abe] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:17:07 info: a request has been made with the following uuid [654f7c4f-0365-440d-86b3-b7293d7fbe44] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:17:17 info: a request has been made and proccessed successfully at: Tue Mar 23 2021 13:17:17 GMT+0530 (India Standard Time)
+2021-03-23 13:20:22 info: a request has been made with the following uuid [44375b69-916d-4124-937b-b2b4e404152b] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:20:28 info: a request has been made and proccessed successfully at: Tue Mar 23 2021 13:20:28 GMT+0530 (India Standard Time)
+2021-03-23 13:21:22 info: a request has been made with the following uuid [ba0c6d09-dc59-40d1-ab8b-311d1064462b] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:21:22 info: a request has been made and proccessed successfully at: Tue Mar 23 2021 13:21:22 GMT+0530 (India Standard Time)
+2021-03-23 13:22:50 info: a request has been made with the following uuid [3746ad1b-1d7d-4362-8fd1-49fc7085b336] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:22:50 info: a request has been made and proccessed successfully at: Tue Mar 23 2021 13:22:50 GMT+0530 (India Standard Time)
+2021-03-23 13:23:58 info: a request has been made with the following uuid [4a15f0d3-babf-4ce6-b062-9f9b6a04997b] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:23:58 info: a request has been made and proccessed successfully at: Tue Mar 23 2021 13:23:58 GMT+0530 (India Standard Time)
+2021-03-23 13:26:08 info: a request has been made with the following uuid [f5c2810a-02a6-4118-84eb-b401680b6d18] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:26:08 info: a request has been made and proccessed successfully at: Tue Mar 23 2021 13:26:08 GMT+0530 (India Standard Time)
+2021-03-23 13:28:04 info: a request has been made with the following uuid [302768c2-9219-4585-8eb3-b883146529bd] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:28:04 info: a request has been made and proccessed successfully at: Tue Mar 23 2021 13:28:04 GMT+0530 (India Standard Time)
+2021-03-23 13:29:23 info: a request has been made with the following uuid [2ace42bc-72ab-4c9a-9244-d855172302cf] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:29:23 info: a request has been made and proccessed successfully at: Tue Mar 23 2021 13:29:23 GMT+0530 (India Standard Time)
+2021-03-23 13:29:30 info: a request has been made with the following uuid [9609487d-e4e3-4366-9ad6-9d9a0fea1bf4] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:29:30 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 13:33:28 info: a request has been made with the following uuid [143fe5cd-f6c9-471d-a32a-7cd2b38ba30d] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:36:22 info: a request has been made with the following uuid [f155ef68-bef4-4ef9-a25f-d3c266127a43] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:39:44 info: a request has been made with the following uuid [d64a13e8-cfb6-4589-bfe5-4d35eb646fa0] /api/auth/register PostmanRuntime/7.26.2 undefined
+2021-03-23 13:43:56 info: a request has been made with the following uuid [0275c0d3-d406-4c75-a597-1cee1c94865a] /api/auth/register PostmanRuntime/7.26.2 undefined
+2021-03-23 13:46:26 info: a request has been made with the following uuid [b355c05a-440a-44b4-a7a2-c2334f0b7f4d] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:46:26 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 13:46:32 info: a request has been made with the following uuid [01f2b13c-19d4-473d-ab62-d436a503d679] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:46:32 info: a request has been made and proccessed successfully at: Tue Mar 23 2021 13:46:32 GMT+0530 (India Standard Time)
+2021-03-23 13:47:15 info: a request has been made with the following uuid [15815f99-541b-401d-8c10-bab8e2724699] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:47:15 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. Wronge password.
+2021-03-23 13:48:47 info: a request has been made with the following uuid [f1cb705b-069d-49b0-87c3-5c78a2ecb111] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:49:25 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. Wronge password.
+2021-03-23 13:49:37 info: a request has been made with the following uuid [9246729f-9813-42a9-bc18-aa83ade95e63] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:49:45 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. Wronge password.
+2021-03-23 13:49:53 info: a request has been made with the following uuid [c286cb06-1152-4e68-8770-a0e1585d7d66] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:49:53 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. User not found.
+2021-03-23 13:50:00 info: a request has been made with the following uuid [544bc8a3-60cf-47fb-8c7a-ce198bfee03b] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:50:00 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. Wronge password.
+2021-03-23 13:52:04 info: a request has been made with the following uuid [73723a70-82d0-4954-a69a-fab7ffacbffe] /api/auth/register PostmanRuntime/7.26.2 undefined
+2021-03-23 13:52:24 info: a request has been made with the following uuid [36997681-33b3-487d-8cf6-40d12a738662] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:52:25 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. Wronge password.
+2021-03-23 13:52:31 info: a request has been made with the following uuid [eab8a4a0-e885-40f9-8c4d-e4f8449af22f] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:52:31 info: a request has been made and proccessed successfully at: Tue Mar 23 2021 13:52:31 GMT+0530 (India Standard Time)
+2021-03-23 13:52:37 info: a request has been made with the following uuid [1eb6a69f-0a6e-43b5-aee9-8dc020d69add] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:52:37 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. Wronge password.
+2021-03-23 13:52:43 info: a request has been made with the following uuid [8f912738-21cd-4e19-80df-0c20cf4038be] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-23 13:52:43 info: a request has been made and proccessed successfully at: Tue Mar 23 2021 13:52:43 GMT+0530 (India Standard Time)
