@@ -9,7 +9,7 @@ const User = require("../models/userModel");
 const accessTokenSecret = 'vasturebelliuzhsepur';
 
 // User Register function
-    exports.register = (req, res) => {
+ exports.register = (req, res) => {
     let newUser = new User(req.body);
         newUser.hash_password =   bcrypt.hashSync(req.body.password, 10); // req.body.password;
     newUser.save((err, user) => {
@@ -28,11 +28,13 @@ const accessTokenSecret = 'vasturebelliuzhsepur';
     }, (err, user) => {
         if (err) throw err;
             if (!user) {
-                requestHandler.sendError(req,res, 422, 'Authentication failed. Email not found.','  { "password": { "message" : "The email is not valid."} }');
+                errMessage = '{ "password": { "message" : "The email is not valid."} }';
+                requestHandler.sendError(req,res, 422, 'Authentication failed. Email not found.',JSON.parse(errMessage));
             }
             else if (user) {
                 if (!user.comparePassword(req.body.password)) {  
-                    requestHandler.sendError(req,res, 422, 'Authentication failed. Wrong password.','  { "password": { "message" : "The password is not valid."} }');
+                    errMessage = '{ "password": { "message" : "The password is not valid."} }';
+                    requestHandler.sendError(req,res, 422, 'Authentication failed. Wrong password.',JSON.parse(errMessage));
                 } else {
                 var sign =  jwt.sign({ email: user.email, fullName: user.fullName, _id: user._id }, accessTokenSecret);
                 var data = { 

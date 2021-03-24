@@ -11,10 +11,9 @@ router.get('/', function(req, res) {
 
 //Import Bio Controller
 var bioController = require('../controllers/bioController');
-var  userController = require('../controllers/authController');
-var  uploadController = require('../controllers/uploadController');
-
-
+var userController = require('../controllers/authController');
+var userIntroController = require('../controllers/userIntroController');
+const auth = require('../../utils/auth');
 
 // Bio routes
 router.route('/bio')
@@ -27,7 +26,6 @@ router.route('/bio/:bio_id')
     .put(bioController.update)
     .delete(bioController.delete);
 
-
  // post request for user registration
  router.route("/auth/register")
        .post(userController.register);
@@ -35,8 +33,11 @@ router.route('/bio/:bio_id')
 // post request for user log in  
 router.route("/auth/sign_in")
       .post(userController.signIn);
- 
-router.route("/upload").post(uploadController.upload);
+
+
+router.route("/user/intro")
+        .get(auth.isAuthunticated,userIntroController.view)
+        .post(auth.isAuthunticated,userIntroController.upload);
 
 
 //Export API routes

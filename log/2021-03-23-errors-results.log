@@ -17,3 +17,29 @@
 2021-03-23 13:50:00 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. Wronge password.
 2021-03-23 13:52:25 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. Wronge password.
 2021-03-23 13:52:37 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. Wronge password.
+2021-03-23 21:38:20 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: undefined
+2021-03-23 21:41:02 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: undefined
+2021-03-23 21:44:10 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Error: Not Authorized to access this resource!
+2021-03-23 21:45:27 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Error: Not Authorized to access this resource!
+2021-03-23 21:45:43 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Error: Not Authorized to access this resource!
+2021-03-23 21:47:08 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: 
+2021-03-23 21:47:56 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: 
+2021-03-23 21:48:04 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Error: Not Authorized to access this resource!
+2021-03-23 21:48:25 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Error: Not Authorized to access this resource!
+2021-03-23 21:54:17 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: {}
+2021-03-23 21:55:17 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: {}
+2021-03-23 21:56:29 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: {}
+2021-03-23 21:56:45 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: {}
+2021-03-23 21:58:20 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: {}
+2021-03-23 22:00:06 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: {}
+2021-03-23 22:02:56 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Error catch
+2021-03-23 22:05:22 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. Email not found.
+2021-03-23 22:06:48 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. Email not found.
+2021-03-23 22:06:58 error: error ,Error during processing request: http://localhost:3000/api/auth/sign_in details message: Authentication failed. Wrong password.
+2021-03-23 22:07:41 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Error catch
+2021-03-23 22:08:56 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Error catch
+2021-03-23 22:10:08 error: error ,Error during processing request: http://undefined/api/user/intro details message: Error catch
+2021-03-23 22:11:13 error: error ,Error during processing request: http://undefined/api/user/intro details message: Error catch
+2021-03-23 22:14:57 error: error ,Error during processing request: http://undefined/api/user/intro details message: Error catch
+2021-03-23 22:21:43 error: error ,Error during processing request: http://undefined/api/user/intro details message: Error catch
+2021-03-23 23:35:09 error: error ,Error during processing request: http://undefined/api/user/intro details message: Error catch

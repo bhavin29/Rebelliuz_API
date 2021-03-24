@@ -1,0 +1,9 @@
+2021-03-24 10:02:38 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Error catch
+2021-03-24 10:06:33 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Error catch
+2021-03-24 10:09:52 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Error catch
+2021-03-24 10:10:03 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Error catch
+2021-03-24 10:10:55 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Error catch
+2021-03-24 10:11:57 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Error catch
+2021-03-24 10:45:57 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: No data for user introduction
+2021-03-24 10:46:41 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: No data for user introduction
+2021-03-24 10:50:33 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Error catch

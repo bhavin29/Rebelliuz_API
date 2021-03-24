@@ -1,0 +1,52 @@
+2021-03-24 00:15:51 info: a request has been made with the following uuid [942378e7-3ef7-4fba-9a75-6fa835be711b] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 09:41:38 info: a request has been made with the following uuid [c9a68e2a-ec86-4656-9e44-9d6367934f24] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 09:42:35 info: a request has been made with the following uuid [b9a6efce-77d9-47ff-a7b7-51f1c7bf6501] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 09:44:01 info: a request has been made with the following uuid [47a992e8-a9fd-4521-b122-1544e71030b5] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 09:45:04 info: a request has been made with the following uuid [65472ba0-d8c2-4c09-a560-22b62a666a75] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 09:46:25 info: a request has been made with the following uuid [1bf9658e-0374-45f5-b1be-b4bb6f7d1f69] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 09:47:40 info: a request has been made with the following uuid [3f3cf9cf-499b-4dec-a57d-87657ed576ca] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 09:48:53 info: a request has been made with the following uuid [97299a98-61ed-49b6-bf73-5d6554c3ffc6] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 09:49:19 info: a request has been made with the following uuid [0f2c5631-7ecb-456e-9037-1301028986b0] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 09:50:23 info: a request has been made with the following uuid [b6ef933c-783f-4286-a2da-df2b04d6dca4] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 09:57:25 info: a request has been made with the following uuid [3df82a22-02bf-459f-9a26-3eb4e48d3e50] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:01:50 info: a request has been made with the following uuid [6f426211-9cc7-4825-b5bb-083636a22826] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:06:23 info: a request has been made with the following uuid [4c28d381-77a4-4bb1-8d7f-cdb821f985fc] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:08:36 info: a request has been made with the following uuid [3d24256d-bc4e-43ad-990b-42cd1e19c404] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:09:58 info: a request has been made with the following uuid [ba56d326-0d93-4d66-8aeb-3616765f6fd5] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:10:36 info: a request has been made with the following uuid [39a058fd-d7a8-4fd3-b54c-56bff011c714] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:11:01 info: a request has been made with the following uuid [3b4876ed-e955-4762-b68d-1bdd0b880da2] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:12:06 info: a request has been made with the following uuid [36d71123-5ddb-4877-9482-e89bc943dfd2] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:13:16 info: a request has been made with the following uuid [7a714b1d-b585-4998-a0d4-8d82cdf98a81] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:16:12 info: a request has been made with the following uuid [a5e4ccc0-c401-4a4e-b56b-dfff77a00469] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:24:01 info: a request has been made with the following uuid [4e63bb8a-0857-4a04-aa2c-aecde5a8d270] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:24:18 info: a request has been made and proccessed successfully at: Wed Mar 24 2021 10:24:18 GMT+0530 (India Standard Time)
+2021-03-24 10:30:31 info: a request has been made with the following uuid [77dfca55-25c9-4d77-9430-3c82c332db8e] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:31:19 info: a request has been made with the following uuid [75a2b784-5f1a-44f2-a09b-dea73031f100] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:31:28 info: a request has been made and proccessed successfully at: Wed Mar 24 2021 10:31:28 GMT+0530 (India Standard Time)
+2021-03-24 10:32:21 info: a request has been made with the following uuid [0de7cebd-031b-489a-9265-727e2fb349d0] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:32:30 info: a request has been made and proccessed successfully at: Wed Mar 24 2021 10:32:30 GMT+0530 (India Standard Time)
+2021-03-24 10:33:27 info: a request has been made with the following uuid [5656e4d4-bb44-4af4-abd7-1d5daca835fa] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:33:34 info: a request has been made and proccessed successfully at: Wed Mar 24 2021 10:33:34 GMT+0530 (India Standard Time)
+2021-03-24 10:34:15 info: a request has been made with the following uuid [7bd22e56-966d-4609-bc01-26926ecd8a50] /api/auth/register PostmanRuntime/7.26.2 undefined
+2021-03-24 10:34:43 info: a request has been made with the following uuid [13276b91-1822-4e3b-9796-2d5bdd0d28a3] /api/auth/sign_in PostmanRuntime/7.26.2 undefined
+2021-03-24 10:34:43 info: a request has been made and proccessed successfully at: Wed Mar 24 2021 10:34:43 GMT+0530 (India Standard Time)
+2021-03-24 10:36:16 info: a request has been made with the following uuid [16e929fd-6b04-4041-8f80-0b2d0afb3ce1] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:36:30 info: a request has been made and proccessed successfully at: Wed Mar 24 2021 10:36:30 GMT+0530 (India Standard Time)
+2021-03-24 10:36:41 info: a request has been made with the following uuid [7c131b69-2885-4079-b184-c51cdeac0ec7] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:36:52 info: a request has been made and proccessed successfully at: Wed Mar 24 2021 10:36:52 GMT+0530 (India Standard Time)
+2021-03-24 10:37:39 info: a request has been made with the following uuid [24e931f7-1b51-41dc-b891-6877d4a1beff] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:45:57 info: a request has been made with the following uuid [0143e7d3-f5c9-4e68-a196-d29e3b7ee859] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:46:20 info: a request has been made with the following uuid [da95bdca-e354-4399-a680-c9681f54da3a] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:46:32 info: a request has been made with the following uuid [38ba8a32-956c-44f3-9fcc-2c74c04f4881] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:46:34 info: a request has been made and proccessed successfully at: Wed Mar 24 2021 10:46:34 GMT+0530 (India Standard Time)
+2021-03-24 10:46:41 info: a request has been made with the following uuid [428041c2-0a4b-4611-a6ed-0b20628f7392] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:47:32 info: a request has been made with the following uuid [035e4011-3b40-492f-a083-3bbc955aa119] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:48:53 info: a request has been made with the following uuid [41f6070d-c4b5-4dcd-bcfa-2003fa244c5a] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:49:17 info: a request has been made and proccessed successfully at: Wed Mar 24 2021 10:49:17 GMT+0530 (India Standard Time)
+2021-03-24 10:49:58 info: a request has been made with the following uuid [a00b7d8f-472f-4847-882a-d86c7b533496] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:50:00 info: a request has been made and proccessed successfully at: Wed Mar 24 2021 10:50:00 GMT+0530 (India Standard Time)
+2021-03-24 10:50:12 info: a request has been made with the following uuid [257154b8-81fa-4923-8728-6b791c76adf1] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:50:19 info: a request has been made and proccessed successfully at: Wed Mar 24 2021 10:50:19 GMT+0530 (India Standard Time)
+2021-03-24 10:50:33 info: a request has been made with the following uuid [1c71c1af-236f-4aa7-ae03-f8c7538f79ad] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:50:44 info: a request has been made with the following uuid [fe255d56-ae27-46cb-ac13-a5b69280ae62] /api/user/intro PostmanRuntime/7.26.2 undefined
+2021-03-24 10:50:44 info: a request has been made and proccessed successfully at: Wed Mar 24 2021 10:50:44 GMT+0530 (India Standard Time)
