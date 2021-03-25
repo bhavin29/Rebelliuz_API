@@ -35,6 +35,6 @@ module.exports = {
 		from_email: process.env.FROM_EMAIL || 'alaa.mezian.mail@gmail.com',
 	},
 	general:{
-		content_path : process.env.CONTENT_PATH || 'D:\\Bhavin\\MyProject\\Rebelliuz\\Development\\Source\\Rebelliuz_API',
+		content_path : process.env.CONTENT_PATH || 'D:\\Bhavin\\MyProject\\Rebelliuz\\Publish\\Content',
 	}
 };

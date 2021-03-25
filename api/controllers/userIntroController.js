@@ -1,3 +1,5 @@
+const config = require('../../config/appconfig');
+const fs = require('fs');
 const uploadFile = require('../../utils/upload.js');
 UserIntro = require('../models/userIntroModel');
 const RequestHandler = require('../../utils/RequestHandler');
@@ -34,6 +36,15 @@ const upload = async (req, res) => {
       }
       else if (userIntro) {
           //save and check errors
+          var oldvFilename = userIntro.vFilename;
+
+          try {
+            fs.unlinkSync(config.general.content_path + "/users/intro/" + oldvFilename)
+            //file removed
+            } catch(err) {
+              console.error(err)
+          }
+                  
           userIntro.vFilename = global.vFilename;
           userIntro.save(function (err) {
             if (err){
@@ -68,8 +79,6 @@ try{
   requestHandler.sendError(req,res, 500, 'View user introduction',(errMessage));
 }
 };
-
-
 
 //get file list form the specific folder path
 const getListFiles = (req, res) => {

@@ -9,13 +9,13 @@ const maxSize = 2 * 1024 * 1024;
 
 let storage = multer.diskStorage({
   destination: (req, file, cb) => {
-     cb(null,  config.general.content_path + "/uploads/");
+     cb(null,  config.general.content_path + "/users/intro/");
     //cb(null, config.general.content_path );
     },
   filename: (req, file, cb) => {
     global.vFilename = stringCode.generateString() + "_" + Date.now() + '.' + mime.extension(file.mimetype);
-    console.log(stringCode.generateString() + "_" + Date.now() + '.' + mime.extension(file.mimetype));
-    cb(null, stringCode.generateString() + "_" + Date.now() + '.' + mime.extension(file.mimetype));
+    console.log(global.vFilename);
+    cb(null, global.vFilename);
   },
 });
 

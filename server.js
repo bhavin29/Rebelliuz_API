@@ -6,6 +6,7 @@ const  jwt  =  require('jsonwebtoken');
 const express = require('express')
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const serveIndex = require('serve-index');
 
 //directory page as global
 global.__basedir = __dirname;
@@ -32,6 +33,12 @@ let app = express();
 
 //Import routes
 let apiRoutes = require("./api/routes/routes")
+
+app.use('/videointro', express.static(config.general.content_path + '/Users/intro'));
+app.use('/videoanswer', express.static(config.general.content_path + '/Users/answers'));
+
+//app.use('/uploads', serveIndex(config.general.content_path + '/uploads'));
+//app.use('/images',exp.directory(__dirname + '/public/images'));
 
 //configure bodyparser to hande the post requests
 app.use(bodyParser.urlencoded({
