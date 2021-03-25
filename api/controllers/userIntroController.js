@@ -47,14 +47,14 @@ const upload = async (req, res) => {
   });
   
   } catch (err) {
-    res.status(500).send({
-      message: `Could not upload the file: ${req.file.filename}. ${err}`,
-    });
+    errMessage = { "Fileupload": { "message" : err.message } };
+    requestHandler.sendError(req,res, 500, 'Could not upload the file',(errMessage));
   }
 };
 
 // View User Intro
 view = function (req, res) {
+try{
   UserIntro.findOne( { email: global.email}, function (err, userIntro) {
       if (err){
         errMessage = '{ "intro": { "message" : "No data found."} }';
@@ -63,7 +63,12 @@ view = function (req, res) {
         requestHandler.sendSuccess(res,'User introduction Detail.',200,userIntro);
       }
   });
+} catch (err) {
+  errMessage = { "View": { "message" : err.message } };
+  requestHandler.sendError(req,res, 500, 'View user introduction',(errMessage));
+}
 };
+
 
 
 //get file list form the specific folder path
@@ -103,8 +108,6 @@ const download = (req, res) => {
     }
   });
 };
-
-
 
 module.exports = {
   upload,

@@ -1,14 +1,17 @@
+const config = require('../config/appconfig');
 const util = require("util");
 const path = require('path');
 const mime = require('mime-types');
 const multer = require("multer");
-const stringCode = require('../utils/stringUtil');
+const stringCode = require('./stringUtil');
 const maxSize = 2 * 1024 * 1024;
+//config.general.content_path
 
 let storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, __basedir + "/uploads/");
-  },
+     cb(null,  config.general.content_path + "/uploads/");
+    //cb(null, config.general.content_path );
+    },
   filename: (req, file, cb) => {
     global.vFilename = stringCode.generateString() + "_" + Date.now() + '.' + mime.extension(file.mimetype);
     console.log(stringCode.generateString() + "_" + Date.now() + '.' + mime.extension(file.mimetype));

@@ -10,6 +10,7 @@ const accessTokenSecret = 'vasturebelliuzhsepur';
 
 // User Register function
  exports.register = (req, res) => {
+try{
     let newUser = new User(req.body);
         newUser.hash_password =   bcrypt.hashSync(req.body.password, 10); // req.body.password;
     newUser.save((err, user) => {
@@ -19,10 +20,17 @@ const accessTokenSecret = 'vasturebelliuzhsepur';
    user.hash_password = undefined;
     res.status(201).json(user);
     });
+
+} catch (err) {
+    errMessage = { "Register": { "message" : err.message } };
+    requestHandler.sendError(req,res, 500, 'User Registration',(errMessage));
+  }
+  
 };
 
 // User Sign function
     exports.signIn = (req, res) => {
+try{
     User.findOne({
     email: req.body.email
     }, (err, user) => {
@@ -47,6 +55,10 @@ const accessTokenSecret = 'vasturebelliuzhsepur';
             }
        }
     });
+  } catch (err) {
+    errMessage = { "SignIn": { "message" : err.message } };
+    requestHandler.sendError(req,res, 500, 'User Signin',(errMessage));
+  }
 };
 
 // User Register function
