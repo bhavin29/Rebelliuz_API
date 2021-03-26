@@ -1,5 +1,0 @@
-2021-03-25 14:51:06 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Error catch
-2021-03-25 15:13:15 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Could not upload the file
-2021-03-25 15:16:30 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Could not upload the file
-2021-03-25 15:23:53 error: error ,Error during processing request: http://localhost:3000/api/auth/register details message: User Registration
-2021-03-25 15:30:25 error: error ,Error during processing request: http://localhost:3000/api/user/intro details message: Could not upload the file

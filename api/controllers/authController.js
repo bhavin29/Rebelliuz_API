@@ -6,6 +6,7 @@ const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
 
 const User = require("../models/userModel");
+const UserIntro = require("../models/userIntroModel");
 const accessTokenSecret = 'vasturebelliuzhsepur';
 
 // User Register function
@@ -17,7 +18,6 @@ try{
     if (err) {
     res.status(500).send({ message: err });
     }
-   user.hash_password = undefined;
     res.status(201).json(user);
     });
 
@@ -31,6 +31,20 @@ try{
 // User Sign function
     exports.signIn = (req, res) => {
 try{
+    newuserintro =  new UserIntro();       
+    UserIntro.findOne({ email: req.body.email},(err, userintro)=>{
+        if (err) throw err;
+
+        if(userintro)
+        {
+            newuserintro = userintro;
+        }
+        else
+        {
+            newuserintro = {};
+        }
+    });
+
     User.findOne({
     email: req.body.email
     }, (err, user) => {
@@ -44,14 +58,20 @@ try{
                     errMessage = '{ "password": { "message" : "The password is not valid."} }';
                     requestHandler.sendError(req,res, 422, 'Authentication failed. Wrong password.',JSON.parse(errMessage));
                 } else {
-                var sign =  jwt.sign({ email: user.email, fullName: user.fullName, _id: user._id }, accessTokenSecret);
+               var sign =  jwt.sign({ email: user.email, displayname : user.displayname, _id: user._id }, accessTokenSecret);
+ //               var sign =  jwt.sign({ user }, accessTokenSecret);
+
+                user = JSON.stringify(user);
+                user = JSON.parse(user);
+                user['userintro'] = JSON.parse(JSON.stringify(newuserintro));
+ 
                 var data = { 
                             "access_token" : sign ,
                             "refresh_token" : "",
                             "expire_time" : "2d",
-                            "user" : { "fullName" : user.fullName, "email" : user.email } 
+                            "user" : user,
                     };  
-                requestHandler.sendSuccess(res,'User successfully logged in.',200,data);
+                requestHandler.sendSuccess(res,'User successfully logged in.',200,(data));
             }
        }
     });

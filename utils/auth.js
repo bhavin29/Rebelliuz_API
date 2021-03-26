@@ -4,9 +4,7 @@ const config = require('../config/appconfig');
 const RequestHandler = require('../utils/RequestHandler');
 const Logger = require('../utils/logger');
 
-global.userId=0;
-global.email="";
-
+global.decoded =undefined;
 
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
@@ -42,8 +40,7 @@ function verifyToken(req, res, next) {
 				requestHandler.throwError(401, 'Unauthorized', 'please provide a vaid token ,your token might be expired')();
 			}
 			req.decoded = decoded;
-			global.userId = decoded._id;
-			global.email = decoded.email;
+			global.decoded = decoded;
 			next();
 		});
 	} catch (err) {

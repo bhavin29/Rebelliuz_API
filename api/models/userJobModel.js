@@ -15,4 +15,4 @@ const  UserIntroSchema = new  Schema({
 });
 
 // Create and export User model
-module.exports = mongoose.model("user_intro", UserIntroSchema);
+module.exports = mongoose.model("user_job", UserIntroSchema);

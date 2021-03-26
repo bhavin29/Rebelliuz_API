@@ -16,14 +16,15 @@ const upload = async (req, res) => {
       return res.status(400).send({ message: "Please upload a file!" });
     }
 
-    UserIntro.findOne({ email: global.email},(err,userIntro)=>{
+    UserIntro.findOne({ email: global.decoded.email},(err,userIntro)=>{
       if (err) throw err;
       if (!userIntro) {
           //insert
           var userintro = new UserIntro();
-          userintro.userId = global.userId;
+         
+          userintro.userId = global.decoded._id;
+          userintro.email = global.decoded.email;
           userintro.vFilename = global.vFilename;
-          userintro.email = global.email;
 
           userintro.save(function (err) {
             if (err){
@@ -44,8 +45,8 @@ const upload = async (req, res) => {
             } catch(err) {
               console.error(err)
           }
-                  
           userIntro.vFilename = global.vFilename;
+
           userIntro.save(function (err) {
             if (err){
               errMessage = '{ "intro": { "message" : "User introdcution is not saved!!"} }';
