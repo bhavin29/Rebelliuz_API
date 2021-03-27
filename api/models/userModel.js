@@ -69,6 +69,8 @@ const  UserSchema = new  Schema({
     location: { type :  String, default: null },
     rating: { type :  Number , default: null },
     user_verified: { type :  Number  , default: null },
+    created_on: { type: Date, default: Date.now },
+    created_by: { type: Number, default: 0 }
  });
 
 //Create a Schema method to compare password 
