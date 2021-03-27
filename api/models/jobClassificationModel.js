@@ -12,7 +12,7 @@ const  JobClassificationSchema = new  Schema({
     order: { type: Number, unique: true, trim: true, required:  true },
     isactive: { type: Boolean, trim:true, required:true } ,
     createdOn: { type: Date, default: Date.now },
-    createdBy: { type: Date, default: Date.now }
+    created_by: { type: Number, default: 0 }
 });
 
 // Create and export User model
