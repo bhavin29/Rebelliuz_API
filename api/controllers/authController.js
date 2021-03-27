@@ -16,9 +16,10 @@ try{
         newUser.hash_password =   bcrypt.hashSync(req.body.password, 10); // req.body.password;
     newUser.save((err, user) => {
     if (err) {
-    res.status(500).send({ message: err });
+        errMessage = '{ "register": { "message" : "Smothing went worng."} }';
+        requestHandler.sendError(req,res, 422, err.message,JSON.parse(errMessage));
     }
-    res.status(201).json(user);
+    requestHandler.sendSuccess(res,'User register sucessfully in.',200,(user));
     });
 
 } catch (err) {

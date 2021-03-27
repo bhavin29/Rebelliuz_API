@@ -11,20 +11,29 @@ const logger = new Logger();
 
 //For index
 exports.index = function (req, res) {
+    logger.log('Bio connected Successfully', 'info');
+
     Bio.get(function (err, bio) {
         if (err)
+        {
+            logger.log('Bio fail ' +  err.message , 'warn'); 
+
             res.json({
                 status: "error",
-                message: err
+                message: err.message
             });
+        }
+        else
+        {
+            logger.log('Bio list success' +  JSON.stringify(bio) , 'warn'); 
 
-        logger.log('Bio list sucess', 'warn');    
-        res.json({
-            statuscode : 200,
-            status: "success",
-            message: "Got Bio Successfully!",
-            data: bio       
-        });
+            res.json({
+                statuscode : 200,
+                status: "success",
+                message: "Got Bio Successfully!",
+                data: bio       
+            });
+    }
     });
 };
 
@@ -61,9 +70,10 @@ exports.add = function (req, res) {
 
     //Save and check error
     bio.save(function (err) {
-        if (err)
+        if (err){
+            logger.log('Bio ADD  ' +  err.message , 'warn'); 
             res.json(err);
-
+        }
             res.json({
                 statuscode : 200,
                 message: "New Bio Added!",

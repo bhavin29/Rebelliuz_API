@@ -10,14 +10,11 @@ module.exports = {
 		env: process.env.NODE_ENV || 'development',
 	},
 	db: {
-		port: process.env.DB_PORT || 27017,
-		database: process.env.DB_NAME || 'iLrn',
-		password: process.env.DB_PASS || 'password',
-		username: process.env.DB_USER || 'postgres',
-		host: process.env.DB_HOST || '127.0.0.1',
-		dbPath: process.env.DB_PATH || 'mongodb://localhost/firstrest',
-		dialect: 'mongodb',
-		logging: true,
+		port: process.env.DB_PORT || 27016,
+	//	dbPath: process.env.DB_PATH || 'mongodb://localhost/firstrest',
+		dbPath: process.env.DB_PATH || 'mongodb+srv://test:test123@cluster0.e9yvt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority?authSource=admin&ssl=true' ,
+								//		mongodb+srv://test:test123@cluster0.e9yvt.mongodb.net/test?authSource=admin&replicaSet=atlas-djkmu0-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true
+
 	},
 	winiston: {
 		logpath: '/iLrnLogs/logs/',
