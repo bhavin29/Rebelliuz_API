@@ -8,7 +8,6 @@ const  Schema = mongoose.Schema;
 
 // Create Schema Instance for User and add properties
 const  UserJobSchema = new  Schema({
-    job_id: { type: String,  required:  true },
     user_id: { type: String, required:  true },
     job_category_id: { type: String,  required:  true },
     job_classification_id: { type: String,  required:  true },
@@ -19,10 +18,12 @@ const  UserJobSchema = new  Schema({
     cv_filename: { type: String, unique: true, trim: true, required:  true },
     expected_salary_start: { type: Number,  required:  true },
     expected_salary_end: { type: Number, required:true } ,
-    video_status: { type: Number, default: 0 },
+    video_status: { type: Number, default: 1 },
+    progress: { type: Number, default: 0 },
+    isactive: { type: Boolean, default: 1 },
     created_on: { type: Date, default: Date.now },
     created_by: { type: Number, default: 0 }
 });
 
-// Create and export User model
+// Create and export User Job model
 module.exports = mongoose.model("user_job", UserJobSchema);

@@ -1,6 +1,6 @@
 const config = require('../../config/appconfig');
 const fs = require('fs');
-const uploadFile = require('../../utils/upload.js');
+const uploadFile = require('../../utils/uploadIntro.js');
 const UserIntro = require('../models/userIntroModel');
 const RequestHandler = require('../../utils/RequestHandler');
 const Logger = require('../../utils/logger');

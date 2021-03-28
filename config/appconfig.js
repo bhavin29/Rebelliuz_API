@@ -11,10 +11,8 @@ module.exports = {
 	},
 	db: {
 		port: process.env.DB_PORT || 27016,
-	//	dbPath: process.env.DB_PATH || 'mongodb://localhost/firstrest',
-		dbPath: process.env.DB_PATH || 'mongodb+srv://test:test123@cluster0.e9yvt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority?authSource=admin&ssl=true' ,
-								//		mongodb+srv://test:test123@cluster0.e9yvt.mongodb.net/test?authSource=admin&replicaSet=atlas-djkmu0-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true
-
+		dbPath: process.env.DB_PATH || 'mongodb://localhost/firstrest',
+	//	dbPath: process.env.DB_PATH || 'mongodb+srv://test:test123@cluster0.e9yvt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority?authSource=admin&ssl=true' ,
 	},
 	winiston: {
 		logpath: '/iLrnLogs/logs/',

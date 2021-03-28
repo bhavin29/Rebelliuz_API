@@ -74,6 +74,7 @@ app.use(cors());
 let apiRoutes = require("./api/routes/routes")
 
 app.use('/videointro', express.static(config.general.content_path + '/Users/intro'));
+app.use('/jobcv', express.static(config.general.content_path + '/Users/jobcv'));
 app.use('/videoanswer', express.static(config.general.content_path + '/Users/answers'));
 
 //configure bodyparser to hande the post requests

@@ -13,7 +13,11 @@ router.get('/', function(req, res) {
 var bioController = require('../controllers/bioController');
 var userController = require('../controllers/authController');
 var userIntroController = require('../controllers/userIntroController');
+var userJobController = require('../controllers/userJobController');
+var userJobAnswerController = require('../controllers/userJobAnswerController');
+
 const auth = require('../../utils/auth');
+const userJobAnswerModel = require('../models/userJobAnswerModel');
 
 // Bio routes
 router.route('/bio')
@@ -38,6 +42,14 @@ router.route("/auth/sign_in")
 router.route("/user/intro")
         .get(auth.isAuthunticated,userIntroController.view)
         .post(auth.isAuthunticated,userIntroController.upload);
+
+
+router.route("/user/job")
+        .get(auth.isAuthunticated,userJobController.view)
+        .post(auth.isAuthunticated,userJobController.upload);
+
+router.route("/user/jobanswer")
+        .post(auth.isAuthunticated,userJobAnswerController.upload);
 
 
 //Export API routes
