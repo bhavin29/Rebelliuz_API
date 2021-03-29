@@ -12,7 +12,8 @@ const mongoose = require('mongoose');
 //connect to mongoose
 const dbPath = config.db.dbPath;
 
-var uri = dbPath;//"mongodb://localhost:27017/kennel";
+/*
+var uri = dbPath;
 
 mongoose.connect(uri, { useUnifiedTopology: true, useNewUrlParser: true });
 
@@ -22,16 +23,10 @@ connection.once("open", function() {
   console.log("MongoDB database connection established successfully");
   logger.log('MongoDB database connection established successfully', 'info');
 });
+*/
 
-
-/*const options = {useNewUrlParser: true, useUnifiedTopology: true}//, keepAlive: true, keepAliveInitialDelay: 300000, useCreateIndex: true}
+const options = {useNewUrlParser: true, useUnifiedTopology: true}//, keepAlive: true, keepAliveInitialDelay: 300000, useCreateIndex: true}
 const mongo = mongoose.connect(dbPath, options);
-
-function myFunc(arg) {
-    console.log(`arg was => ${arg}`);
-  }
-  
-setTimeout(myFunc, 50000, 'funky');
 
 mongo.then(() => {
     console.log('connected');
@@ -40,12 +35,6 @@ mongo.then(() => {
     console.log(error, 'error');
     logger.log(error, 'error');
 });
-
-setTimeout(myFunc, 50000, 'funky');
-
-var db=mongoose.connection;
-
-setTimeout(myFunc, 50000, 'funky');
 
 //Check DB Connection
 if (!db)
@@ -58,14 +47,12 @@ else
     console.log("DB Connected Successfully");
     logger.log('DB connected Successfully', 'info');
 }
-*/
+
 
 //directory page as global
 global.__basedir = __dirname;
 
 let app = express();
-
-
 
 //Enabled CROS
 app.use(cors());
