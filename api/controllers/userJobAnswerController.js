@@ -1,6 +1,6 @@
 const config = require('../../config/appconfig');
 const fs = require('fs');
-const uploadFile = require('../../utils/uploadJobAnswer.js');
+const uploadFileAnswer = require('../../utils/uploadJobAnswer');
 const UserJobAnswer = require('../models/userJobAnswerModel');
 const RequestHandler = require('../../utils/RequestHandler');
 const Logger = require('../../utils/logger');
@@ -10,7 +10,9 @@ const requestHandler = new RequestHandler(logger);
 //upload and save/update user intro
 const upload = async (req, res) => {
   try {
-    await new uploadFile(req, res);
+    logger.log('1','info');
+    await new uploadFileAnswer(req, res);
+    logger.log('23','info');
 
     if (req.file == undefined) {
         errMessage = '{ "intro": { "message" : "Please upload a file!"} }';
@@ -21,6 +23,7 @@ const upload = async (req, res) => {
         errMessage = '{ "intro": { "message" : "Please enter mandatory field."} }';
         return requestHandler.sendError(req,res, 422, 'Please enter mandatory field.',JSON.parse(errMessage));
     }
+    logger.log('2','info');
 
     UserJobAnswer.findOne({ user_id: global.decoded._id, job_category_id: req.body.job_category_id, job_question_id: req.body.job_question_id},(err,userJobAnswer)=>{
       if (err) throw err;
@@ -32,11 +35,11 @@ const upload = async (req, res) => {
           userjobanswer.video_filename = global.video_filename;
           userjobanswer.job_category_id=req.body.job_category_id;
           userjobanswer.job_question_id=req.body.job_question_id;
- 
+  logger.log('3','info');
+
           userjobanswer.save(function (err) {
             if (err){
               errMessage = '{ "intro": { "message" : "User job answer is not saved!!"} }';
-            //  requestHandler.sendError(req,res, 422, 'Somthing worng with user job',JSON.parse(errMessage));
               requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
             } else {
               requestHandler.sendSuccess(res,'User job answer save successfully.',200,userjobanswer);
@@ -53,6 +56,7 @@ const upload = async (req, res) => {
             } catch(err) {
               console.error(err)
           }
+          logger.log('4','info');
         
           userJobAnswer.video_filename = global.video_filename;
 
@@ -77,7 +81,7 @@ const upload = async (req, res) => {
 jobValidation = function (req){
  
     var result = 0;
-    if (req.body.job_questions_id == undefined || req.body.job_category_id == undefined ) {
+    if (req.body.job_question_id == undefined || req.body.job_category_id == undefined ) {
         result = 1;
       }
  };

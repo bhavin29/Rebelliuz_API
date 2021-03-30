@@ -16,8 +16,16 @@ var userIntroController = require('../controllers/userIntroController');
 var userJobController = require('../controllers/userJobController');
 var userJobAnswerController = require('../controllers/userJobAnswerController');
 
+//MAsters
+var jobCategoryController = require('../controllers/master/JobCategoryController');
+var  jobClassificationController = require('../controllers/master/jobClassificationController');
+var jobExperinceController = require('../controllers/master/jobExperinceController');
+var jobTypeController = require('../controllers/master/jobTypeController');
+var jobSkillController = require('../controllers/master/jobSkillController');
+var JobQuestionController = require('../controllers/master/jobQuestionController');
+
+
 const auth = require('../../utils/auth');
-const userJobAnswerModel = require('../models/userJobAnswerModel');
 
 // Bio routes
 router.route('/bio')
@@ -38,11 +46,9 @@ router.route('/bio/:bio_id')
 router.route("/auth/sign_in")
       .post(userController.signIn);
 
-
 router.route("/user/intro")
         .get(auth.isAuthunticated,userIntroController.view)
         .post(auth.isAuthunticated,userIntroController.upload);
-
 
 router.route("/user/job")
         .get(auth.isAuthunticated,userJobController.view)
@@ -51,6 +57,30 @@ router.route("/user/job")
 router.route("/user/jobanswer")
         .post(auth.isAuthunticated,userJobAnswerController.upload);
 
+//Master
+router.route("/masters/jobcategory")
+   .get(auth.isAuthunticated,jobCategoryController.index)
+   .post(auth.isAuthunticated,jobCategoryController.add);
+        
+router.route("/masters/jobclassification")
+   .get(auth.isAuthunticated,jobClassificationController.index)
+   .post(auth.isAuthunticated,jobClassificationController.add);
+
+router.route("/masters/jobexperince")
+   .get(auth.isAuthunticated,jobExperinceController.index)
+   .post(auth.isAuthunticated,jobExperinceController.add);
+
+router.route("/masters/jobskill")
+   .get(auth.isAuthunticated,jobSkillController.index)
+   .post(auth.isAuthunticated,jobSkillController.add);
+
+router.route("/masters/jobtype")
+   .get(auth.isAuthunticated,jobTypeController.index)
+   .post(auth.isAuthunticated,jobTypeController.add);
+
+router.route("/masters/jobquestion")
+   .get(auth.isAuthunticated,JobQuestionController.index)
+   .post(auth.isAuthunticated,JobQuestionController.add);
 
 //Export API routes
 module.exports = router;

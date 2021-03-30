@@ -67,7 +67,7 @@ const upload = async (req, res) => {
 // View User Intro
 view = function (req, res) {
 try{
-  UserIntro.findOne( { email: global.email}, function (err, userIntro) {
+  UserIntro.findOne( { email: global.decoded.email}, function (err, userIntro) {
       if (err){
         errMessage = '{ "intro": { "message" : "No data found."} }';
         requestHandler.sendError(req,res, 422, 'No data for user introduction',JSON.parse(errMessage));

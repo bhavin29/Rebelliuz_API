@@ -2,6 +2,9 @@ const config = require('../../config/appconfig');
 const fs = require('fs');
 const uploadFile = require('../../utils/uploadJobCV.js');
 const UserJob = require('../models/userJobModel');
+const JobQuestion = require('../models/master/jobQuestionModel');
+//const UserJob = require('../models/userJobModel');
+//const db = require('../models');
 const RequestHandler = require('../../utils/RequestHandler');
 const Logger = require('../../utils/logger');
 const logger = new Logger();
@@ -104,9 +107,8 @@ const upload = async (req, res) => {
   }
 };
 
-
 jobValidation = function (req){
- 
+
     var result = 0;
     if (req.body.job_id == undefined || req.body.job_category_id == undefined ||  req.body.job_classification_id == undefined ||  
         req.body.job_experience_id == undefined || req.body.Job_type_ids == undefined ||  req.body.job_skills_ids == undefined ||  
@@ -119,30 +121,123 @@ jobValidation = function (req){
 
 // View User Intro
 view = function (req, res) {
-try{
-    UserJob.find( { user_id: global.decoded._id}, function (err, userJob) {
-      if (err){
-        errMessage = '{ "intro": { "message" : "No data found."} }';
-        requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));
-      } else {
-         
-        
-
-
-
-
-
-        var data = { 
-            "userjob" : userJob,
-          };  
-        requestHandler.sendSuccess(res,'User job detail.',200,data);
-      }
-  });
+  try{
+   jq = new JobQuestion();
+   var uj = new UserJob();
+   
+   UserJob = callUserJob();
+console.log(UserJob);
+ 
 } catch (err) {
   errMessage = { "View": { "message" : err.message } };
   requestHandler.sendError(req,res, 500, 'View user job detail',(errMessage));
 }
 };
+
+callUserJob = function(){
+  UserJob.find( { user_id: global.decoded._id}, function (err, userJob) {
+    if (err){
+      errMessage = '{ "intro": { "message" : "No data found."} }';
+      requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));
+    } 
+    else {
+      return userJob;
+      //callJobQuestion(req,res,userJob);
+    }
+  });
+}
+
+
+callJobQuestion = function(req,res,userJob){
+        JobQuestion.find(function (err, jobQuestion) {
+          if (err){
+            errMessage = '{ "intro": { "message" : "No data found."} }';
+            requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));
+          } 
+          callJobAnswer(req,res,userJob,jobQuestion);
+     });  
+  }
+
+callJobAnswer = function(req,res,userJob,jobQuestion)
+{
+
+  userJob[0] = JSON.stringify(userJob[0]);
+  userJob[0] = JSON.parse(userJob[0]);
+  userJob[0]['jobanswer'] = JSON.parse(JSON.stringify(jobQuestion));
+
+  userJob[1] = JSON.stringify(userJob[1]);
+  userJob[1] = JSON.parse(userJob[1]);
+  userJob[1]['jobanswer'] = JSON.parse(JSON.stringify(jobQuestion));
+
+  var data = { 
+    "userjob" :userJob
+  };  
+
+  //////
+  requestHandler.sendSuccess(res,'User job detail.',200,data);
+
+}
+
+/*
+view = function (req, res) {
+
+var mongoose = require('mongoose');
+var db = mongoose.connection;
+
+var Schema = mongoose.Schema;
+
+//db.on('error', console.error);
+
+db.once('open', function () {
+
+console.log("db connect");
+
+var collectionOne = [];
+var collectionTwo = [];
+
+  if(!err) {
+      console.log("We are connected");
+    }
+
+    db.collection("user_job", function(err, collection) {
+      collection.find().sort({order_num: 1}).toArray(function(err, result) {
+        if (err) {
+          throw err;
+        } else {
+          for (i=0; i<result.length; i++) {
+            collectionOne[i] = result[i];
+          }
+        }
+      });
+
+      db.collection("job_question", function(err, collection) {
+        collection.find().sort({order_num: 1}).toArray(function(err, result) {
+          if (err) {
+            throw err;
+          } else {
+            for (i=0; i<result.length; i++) {
+              collectionTwo[i] = result[i];
+            }
+          }
+        });
+      });
+      
+      var data = 
+      {
+        "c1" : collectionOne,
+        "c2" : collectionTwo
+
+      }
+      requestHandler.sendSuccess(res,'User job detail.',200,data);
+    });
+
+
+});
+
+
+
+}
+*/
 
 module.exports = {
   upload,

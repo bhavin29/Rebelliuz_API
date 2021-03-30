@@ -36,6 +36,8 @@ mongo.then(() => {
     logger.log(error, 'error');
 });
 
+var db=mongoose.connection;
+
 //Check DB Connection
 if (!db)
 {

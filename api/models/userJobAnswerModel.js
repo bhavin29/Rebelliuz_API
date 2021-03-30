@@ -12,7 +12,7 @@ const  UserJobAnswerSchema = new  Schema({
     job_category_id: { type: String,  required:  true },
     job_question_id: { type: String,  required:  true },
     video_filename: { type: String, unique: true, trim: true, required:  true },
-    video_old_filename: { type: String, unique: true, trim: true },
+    video_old_filename: { type: String },
     video_status: { type: Number, default: 1 },
     created_on: { type: Date, default: Date.now },
     created_by: { type: Number, default: 0 }
