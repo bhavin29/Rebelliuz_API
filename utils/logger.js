@@ -5,7 +5,7 @@ const DailyRotate = require('winston-daily-rotate-file');
 const config = require('../config/appconfig');
 
 const { env } = config.app;
-const logDir = 'log';
+const logDir = config.general.log_path + 'log';
 
 let infoLogger;
 let errorLogger;

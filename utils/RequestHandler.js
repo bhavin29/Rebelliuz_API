@@ -25,7 +25,7 @@ class RequestHandler {
 
 	sendError(req, res, status, message,error) {
 		this.logger.log(`error ,Error during processing request: ${`${req.protocol}://${req.get('host')}${req.originalUrl}`} details message: ${message}`, 'error');
-		return res.status(status).json({ success: "false",  message: message, status : status, error : JSON.parse(error)
+		return res.status(status).json({ success: "false",  message: message, status : status, error : error
 				 });
  	}
 

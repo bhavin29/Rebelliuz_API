@@ -10,20 +10,15 @@ module.exports = {
 		env: process.env.NODE_ENV || 'development',
 	},
 	db: {
-		port: process.env.DB_PORT || 27017,
-		database: process.env.DB_NAME || 'iLrn',
-		password: process.env.DB_PASS || 'password',
-		username: process.env.DB_USER || 'postgres',
-		host: process.env.DB_HOST || '127.0.0.1',
+		port: process.env.DB_PORT || 27016,
 		dbPath: process.env.DB_PATH || 'mongodb://localhost/firstrest',
-		dialect: 'mongodb',
-		logging: true,
+	//	dbPath: process.env.DB_PATH || 'mongodb+srv://test:test123@cluster0.e9yvt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority?authSource=admin&ssl=true' ,
 	},
 	winiston: {
 		logpath: '/iLrnLogs/logs/',
 	},
 	auth: {
-		jwt_secret: process.env.JWT_SECRET,
+		jwt_secret: process.env.JWT_SECRET || 'vasturebelliuzhsepur',
 		jwt_expiresin: process.env.JWT_EXPIRES_IN || '1d',
 		saltRounds: process.env.SALT_ROUND || 10,
 		refresh_token_secret: process.env.REFRESH_TOKEN_SECRET || 'VmVyeVBvd2VyZnVsbFNlY3JldA==',
@@ -34,5 +29,8 @@ module.exports = {
 		api_user: process.env.USERNAME,
 		from_email: process.env.FROM_EMAIL || 'alaa.mezian.mail@gmail.com',
 	},
-
+	general:{
+		content_path : process.env.CONTENT_PATH || 'D:\\Bhavin\\MyProject\\Rebelliuz\\Publish\\Content',
+		log_path : process.env.LOG_PATH || 'D:\\Bhavin\\MyProject\\Rebelliuz\\Publish\\',
+	}
 };

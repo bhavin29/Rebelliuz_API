@@ -4,6 +4,8 @@ const config = require('../config/appconfig');
 const RequestHandler = require('../utils/RequestHandler');
 const Logger = require('../utils/logger');
 
+global.decoded =undefined;
+
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
 function getTokenFromHeader(req) {
@@ -38,10 +40,11 @@ function verifyToken(req, res, next) {
 				requestHandler.throwError(401, 'Unauthorized', 'please provide a vaid token ,your token might be expired')();
 			}
 			req.decoded = decoded;
+			global.decoded = decoded;
 			next();
 		});
 	} catch (err) {
-		requestHandler.sendError(req, res, err);
+		requestHandler.sendError(req, res, err.status,  "Error catch",err);
 	}
 }
 
