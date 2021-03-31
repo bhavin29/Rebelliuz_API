@@ -61,10 +61,18 @@ router.route("/user/jobanswer")
 router.route("/masters/jobcategory")
    .get(auth.isAuthunticated,jobCategoryController.index)
    .post(auth.isAuthunticated,jobCategoryController.add);
-        
+
+router.route("/masters/jobcategory/:jobCategoryId")
+   .get(auth.isAuthunticated,jobCategoryController.view)
+   .put(auth.isAuthunticated,jobCategoryController.update);
+
 router.route("/masters/jobclassification")
    .get(auth.isAuthunticated,jobClassificationController.index)
    .post(auth.isAuthunticated,jobClassificationController.add);
+
+router.route("/masters/jobclassification/:jobclassificationId")
+   .get(auth.isAuthunticated,jobClassificationController.view)
+   .put(auth.isAuthunticated,jobClassificationController.update);
 
 router.route("/masters/jobexperince")
    .get(auth.isAuthunticated,jobExperinceController.index)
