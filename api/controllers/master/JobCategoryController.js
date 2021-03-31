@@ -5,15 +5,12 @@ const Logger = require('../../../utils/logger');
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
 
-
-const limit_ = 5;
-
 exports.index = async function (req, res) {
     let aggregate_options = [];
 
     //PAGINATION
     let page = parseInt(req.query.page) || 1;
-    let limit = parseInt(req.query.rowsPerPage) || limit_;
+    let limit = parseInt(req.query.rowsPerPage) || global.rows_per_page;
 
     //set the options for pagination
     const options = {
@@ -64,28 +61,7 @@ exports.index = async function (req, res) {
     }
 };
 
-//For index
-// exports.index = function (req, res) {
-// try
-//     {
-//     JobCategory.find(function (err, JobCategory) {
-//         if (err)
-//         {
-//             errMessage = '{ "Job Category": { "message" : "Job category is not getting data!!"} }';
-//             requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
-//         }
-//         else
-//         {
-//             requestHandler.sendSuccess(res,'Got Job category data successfully.',200,JobCategory);
-//         }
-//     });
-//     } catch (err) {
-//     errMessage = { "Job Question GET": { "message" : err.message } };
-//     requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
-//     }
-// };
-
-//For creating new bio
+//For creating new job category
 exports.add = function (req, res) {
 try
     {
@@ -112,7 +88,6 @@ try
     }
 };
 
-
 // View jobCategory
 exports.view = function (req, res) {
     try
@@ -133,7 +108,6 @@ exports.view = function (req, res) {
     requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
     }
 };
-
 
 // Update jobCategory
 exports.update = function (req, res) {

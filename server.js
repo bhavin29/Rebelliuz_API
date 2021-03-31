@@ -12,19 +12,6 @@ const mongoose = require('mongoose');
 //connect to mongoose
 const dbPath = config.db.dbPath;
 
-/*
-var uri = dbPath;
-
-mongoose.connect(uri, { useUnifiedTopology: true, useNewUrlParser: true });
-
-const connection = mongoose.connection;
-
-connection.once("open", function() {
-  console.log("MongoDB database connection established successfully");
-  logger.log('MongoDB database connection established successfully', 'info');
-});
-*/
-
 const options = {useNewUrlParser: true, useUnifiedTopology: true}//, keepAlive: true, keepAliveInitialDelay: 300000, useCreateIndex: true}
 const mongo = mongoose.connect(dbPath, options);
 
@@ -50,10 +37,9 @@ else
     logger.log('DB connected Successfully', 'info');
 }
 
-
 //directory page as global
 global.__basedir = __dirname;
-
+global.rows_per_page = config.general.rows_per_page;
 let app = express();
 
 //Enabled CROS
