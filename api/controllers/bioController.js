@@ -66,7 +66,7 @@ exports.add = function (req, res) {
     bio.name = req.body.name? req.body.name: bio.name;
     bio.email = req.body.email;
     bio.phone = req.body.phone;
-    bio.address = req.body.address;
+    bio.address = req.body.address; 
 
     //Save and check error
     bio.save(function (err) {

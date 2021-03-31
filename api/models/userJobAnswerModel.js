@@ -13,10 +13,12 @@ const  UserJobAnswerSchema = new  Schema({
     job_question_id: { type: String,  required:  true },
     video_filename: { type: String, unique: true, trim: true, required:  true },
     video_old_filename: { type: String },
-    video_status: { type: Number, default: 1 },
+    video_answer_status: { type: Number, default: 1 },
     created_on: { type: Date, default: Date.now },
     created_by: { type: Number, default: 0 }
 });
+
+//video_answer_status : 1 - pending, 2- completed
 
 // Create and export User Job model
 module.exports = mongoose.model("user_job_answer", UserJobAnswerSchema);

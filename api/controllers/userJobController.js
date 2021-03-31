@@ -2,9 +2,8 @@ const config = require('../../config/appconfig');
 const fs = require('fs');
 const uploadFile = require('../../utils/uploadJobCV.js');
 const UserJob = require('../models/userJobModel');
+const UserJobAnswer = require('../models/userJobAnswerModel');
 const JobQuestion = require('../models/master/jobQuestionModel');
-//const UserJob = require('../models/userJobModel');
-//const db = require('../models');
 const RequestHandler = require('../../utils/RequestHandler');
 const Logger = require('../../utils/logger');
 const logger = new Logger();
@@ -122,31 +121,26 @@ jobValidation = function (req){
 // View User Intro
 view = function (req, res) {
   try{
-   jq = new JobQuestion();
-   var uj = new UserJob();
-   
-   UserJob = callUserJob();
-console.log(UserJob);
- 
-} catch (err) {
-  errMessage = { "View": { "message" : err.message } };
-  requestHandler.sendError(req,res, 500, 'View user job detail',(errMessage));
-}
+
+    callUserJob(req,res);
+
+  } catch (err) {
+      errMessage = { "View": { "message" : err.message } };
+      requestHandler.sendError(req,res, 500, 'View user job detail',(errMessage));
+    }
 };
 
-callUserJob = function(){
+callUserJob = function(req,res){
   UserJob.find( { user_id: global.decoded._id}, function (err, userJob) {
     if (err){
       errMessage = '{ "intro": { "message" : "No data found."} }';
       requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));
     } 
     else {
-      return userJob;
-      //callJobQuestion(req,res,userJob);
+      callJobQuestion(req,res,userJob);
     }
   });
 }
-
 
 callJobQuestion = function(req,res,userJob){
         JobQuestion.find(function (err, jobQuestion) {
@@ -154,30 +148,70 @@ callJobQuestion = function(req,res,userJob){
             errMessage = '{ "intro": { "message" : "No data found."} }';
             requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));
           } 
-          callJobAnswer(req,res,userJob,jobQuestion);
+          callUserJobAnswer(req,res,userJob,jobQuestion);
      });  
   }
 
-callJobAnswer = function(req,res,userJob,jobQuestion)
-{
-
-  userJob[0] = JSON.stringify(userJob[0]);
-  userJob[0] = JSON.parse(userJob[0]);
-  userJob[0]['jobanswer'] = JSON.parse(JSON.stringify(jobQuestion));
-
-  userJob[1] = JSON.stringify(userJob[1]);
-  userJob[1] = JSON.parse(userJob[1]);
-  userJob[1]['jobanswer'] = JSON.parse(JSON.stringify(jobQuestion));
-
-  var data = { 
-    "userjob" :userJob
-  };  
-
-  //////
-  requestHandler.sendSuccess(res,'User job detail.',200,data);
-
+callUserJobAnswer = function(req,res,userJob,jobQuestion){
+    UserJobAnswer.find({ user_id : global.decoded._id },function (err, userJobAnswer) {
+      if (err){
+        errMessage = '{ "intro": { "message" : "No data found."} }';
+        requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));
+      } 
+      callJobAnswer(req,res,userJob,jobQuestion,userJobAnswer);
+ });  
 }
 
+callJobAnswer = function(req,res,userJob,jobQuestion,userJobAnswer){
+    var jobanswer=[];
+    var i=0,j=0;
+
+    for (var item of userJob){
+
+      const job_id = userJob[i].job_category_id;
+      j=0;
+      jobanswer=[];
+      for (var item of jobQuestion){
+        if (item.job_category_id == job_id)
+        {
+          jobanswer[j] = item; 
+          jobanswer[j] = JSON.stringify(jobanswer[j]);
+          jobanswer[j] = JSON.parse(jobanswer[j]);
+          jobanswer[j]['video_filename'] = '';
+          jobanswer[j]['video_answer_status'] = 1;
+          
+          for (var answer of userJobAnswer){
+            if (answer.job_category_id == job_id && answer.job_question_id == item._id.toString()){
+              console.log(answer.job_question_id);
+              console.log(answer.video_filename);
+              console.log(answer.video_status);
+              jobanswer[j]['video_filename'] = answer.video_filename;
+              jobanswer[j]['video_answer_status'] = answer.video_answer_status;
+            }
+/*            else
+            {
+              jobanswer[j]['video_filename'] = '';
+              jobanswer[j]['video_status'] = 1;
+            }*/
+          }
+
+        j = j+1;
+        }
+    }
+
+    userJob[i] = JSON.stringify(userJob[i]);
+    userJob[i] = JSON.parse(userJob[i]);
+    userJob[i]['jobanswer'] = JSON.parse(JSON.stringify(jobanswer));
+      
+    i=i+1;
+  }
+  
+  var data = { 
+        "userjob" :userJob
+  };  
+
+  requestHandler.sendSuccess(res,'User job detail.',200,data);
+}
 /*
 view = function (req, res) {
 

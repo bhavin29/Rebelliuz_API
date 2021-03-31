@@ -10,9 +10,7 @@ const requestHandler = new RequestHandler(logger);
 //upload and save/update user intro
 const upload = async (req, res) => {
   try {
-    logger.log('1','info');
     await new uploadFileAnswer(req, res);
-    logger.log('23','info');
 
     if (req.file == undefined) {
         errMessage = '{ "intro": { "message" : "Please upload a file!"} }';
@@ -23,7 +21,6 @@ const upload = async (req, res) => {
         errMessage = '{ "intro": { "message" : "Please enter mandatory field."} }';
         return requestHandler.sendError(req,res, 422, 'Please enter mandatory field.',JSON.parse(errMessage));
     }
-    logger.log('2','info');
 
     UserJobAnswer.findOne({ user_id: global.decoded._id, job_category_id: req.body.job_category_id, job_question_id: req.body.job_question_id},(err,userJobAnswer)=>{
       if (err) throw err;
@@ -35,7 +32,7 @@ const upload = async (req, res) => {
           userjobanswer.video_filename = global.video_filename;
           userjobanswer.job_category_id=req.body.job_category_id;
           userjobanswer.job_question_id=req.body.job_question_id;
-  logger.log('3','info');
+          userjobanswer.video_answer_status = 2;
 
           userjobanswer.save(function (err) {
             if (err){
@@ -56,10 +53,10 @@ const upload = async (req, res) => {
             } catch(err) {
               console.error(err)
           }
-          logger.log('4','info');
         
           userJobAnswer.video_filename = global.video_filename;
-
+          userJobAnswer.video_answer_status = 2;
+          
           userJobAnswer.save(function (err) {
             if (err){
               errMessage = '{ "intro": { "message" : "User job answer is not saved!!"} }';

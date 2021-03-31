@@ -25,5 +25,8 @@ const  UserJobSchema = new  Schema({
     created_by: { type: Number, default: 0 }
 });
 
+//video_status : 1 - pending 2 - partial ,3- completed
+
+
 // Create and export User Job model
 module.exports = mongoose.model("user_job", UserJobSchema);
