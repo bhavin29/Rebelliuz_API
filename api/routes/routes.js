@@ -78,17 +78,32 @@ router.route("/masters/jobexperince")
    .get(auth.isAuthunticated,jobExperinceController.index)
    .post(auth.isAuthunticated,jobExperinceController.add);
 
+router.route("/masters/jobexperince/:jobexperinceId")
+   .get(auth.isAuthunticated,jobExperinceController.view)
+   .put(auth.isAuthunticated,jobExperinceController.update);
+
 router.route("/masters/jobskill")
    .get(auth.isAuthunticated,jobSkillController.index)
    .post(auth.isAuthunticated,jobSkillController.add);
+
+router.route("/masters/jobskill/:jobskillId")
+   .get(auth.isAuthunticated,jobSkillController.view)
+   .put(auth.isAuthunticated,jobSkillController.update);
 
 router.route("/masters/jobtype")
    .get(auth.isAuthunticated,jobTypeController.index)
    .post(auth.isAuthunticated,jobTypeController.add);
 
+router.route("/masters/jobtype/:jobtypeId")
+   .get(auth.isAuthunticated,jobTypeController.view)
+   .put(auth.isAuthunticated,jobTypeController.update);
+
 router.route("/masters/jobquestion")
    .get(auth.isAuthunticated,JobQuestionController.index)
    .post(auth.isAuthunticated,JobQuestionController.add);
 
+router.route("/masters/jobquestion/:jobquestionId")
+   .get(auth.isAuthunticated,JobQuestionController.view)
+   .put(auth.isAuthunticated,JobQuestionController.update);
 //Export API routes
 module.exports = router;
