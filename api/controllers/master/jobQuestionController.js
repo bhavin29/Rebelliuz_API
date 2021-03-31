@@ -5,7 +5,6 @@ const Logger = require('../../../utils/logger');
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
 
-
 exports.index = async function (req, res) {
     let aggregate_options = [];
 
@@ -38,7 +37,6 @@ exports.index = async function (req, res) {
     let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? -1 : 1;
     aggregate_options.push({$sort: {"question": sortOrder}});
 
-
     // Set up the aggregation
     const myAggregate = JobQuestion.aggregate(aggregate_options);
 
@@ -61,28 +59,6 @@ exports.index = async function (req, res) {
         requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
     }
 };
-
-//For index
-// exports.index = function (req, res) {
-// try
-//     {
-//     JobQuestion.find(function (err, jobquestion) {
-//         if (err)
-//         {
-//             errMessage = '{ "Job Question": { "message" : "Job question is not getting data!!"} }';
-//             requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
-//         }
-//         else
-//         {
-//             requestHandler.sendSuccess(res,'Got Job question data successfully.',200,jobquestion);
-//         }
-//     });
-
-//     } catch (err) {
-//     errMessage = { "Job Question GET": { "message" : err.message } };
-//     requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
-//     }
-// };
 
 //For creating new bio
 exports.add = function (req, res) {

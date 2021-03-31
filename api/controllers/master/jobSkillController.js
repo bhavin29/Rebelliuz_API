@@ -5,7 +5,6 @@ const Logger = require('../../../utils/logger');
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
 
-
 exports.index = async function (req, res) {
     let aggregate_options = [];
 
@@ -38,7 +37,6 @@ exports.index = async function (req, res) {
     let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? -1 : 1;
     aggregate_options.push({$sort: {"jobskill_name": sortOrder}});
 
-
     // Set up the aggregation
     const myAggregate = JobSkill.aggregate(aggregate_options);
 
@@ -61,7 +59,6 @@ exports.index = async function (req, res) {
         requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
     }
 };
-
 
 //For creating new bio
 exports.add = function (req, res) {
@@ -89,7 +86,6 @@ try
     requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
     }
 };
-
 
 // View JobSkill
 exports.view = function (req, res) {

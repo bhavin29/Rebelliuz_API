@@ -37,7 +37,6 @@ exports.index = async function (req, res) {
     let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? -1 : 1;
     aggregate_options.push({$sort: {"jobexperince_name": sortOrder}});
 
-
     // Set up the aggregation
     const myAggregate = JobExperince.aggregate(aggregate_options);
 

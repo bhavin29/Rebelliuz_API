@@ -6,7 +6,6 @@ const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
 
 //For index
-
 exports.index = async function (req, res) {
     let aggregate_options = [];
 
@@ -39,7 +38,6 @@ exports.index = async function (req, res) {
     let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? -1 : 1;
     aggregate_options.push({$sort: {"jobtype_name": sortOrder}});
 
-
     // Set up the aggregation
     const myAggregate = JobType.aggregate(aggregate_options);
 
@@ -63,9 +61,7 @@ exports.index = async function (req, res) {
     }
 };
 
-
-
-//For creating new bio
+//For creating new job type
 exports.add = function (req, res) {
 try
     {
@@ -91,7 +87,6 @@ try
     requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
     }
 };
-
 
 // View JobType
 exports.view = function (req, res) {
