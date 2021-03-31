@@ -2,7 +2,7 @@
    
 // Import mongoose 
 const  mongoose = require("mongoose");
-
+const aggregatePaginate = require('mongoose-aggregate-paginate-v2');
 // Declare schema and assign Schema class
 const  Schema = mongoose.Schema;
 
@@ -14,6 +14,8 @@ const  JobExperinceSchema = new  Schema({
     created_on: { type: Date, default: Date.now },
     created_by: { type: Number, default: 0 }
 });
+
+JobExperinceSchema.plugin(aggregatePaginate);
 
 // Create and export User model
 module.exports = mongoose.model("job_experince", JobExperinceSchema);

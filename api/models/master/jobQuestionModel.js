@@ -2,7 +2,7 @@
    
 // Import mongoose 
 const  mongoose = require("mongoose");
-
+const aggregatePaginate = require('mongoose-aggregate-paginate-v2');
 // Declare schema and assign Schema class
 const  Schema = mongoose.Schema;
 
@@ -17,5 +17,6 @@ const JobQuestionSchema = new  Schema({
     created_by: { type: Number, default: 0 }
 });
 
+JobQuestionSchema.plugin(aggregatePaginate);
 // Create and export User model
 module.exports = mongoose.model("job_questions", JobQuestionSchema);
