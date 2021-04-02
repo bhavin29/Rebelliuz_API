@@ -2,6 +2,7 @@
    
 // Import mongoose 
 const  mongoose = require("mongoose");
+const aggregatePaginate = require('mongoose-aggregate-paginate-v2');
 
 // Declare schema and assign Schema class
 const  Schema = mongoose.Schema;
@@ -29,5 +30,6 @@ const  UserReferenceSchema = new  Schema({
     created_by: { type: Number, default: 0 }
 });
 
-// Create and export User Job model
-module.exports = mongoose.model("user_job", UserReferenceSchema);
+UserReferenceSchema.plugin(aggregatePaginate);
+
+module.exports = mongoose.model("user_reference", UserReferenceSchema);

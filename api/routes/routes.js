@@ -15,8 +15,9 @@ var userController = require('../controllers/authController');
 var userIntroController = require('../controllers/userIntroController');
 var userJobController = require('../controllers/userJobController');
 var userJobAnswerController = require('../controllers/userJobAnswerController');
+var userReferenceController = require('../controllers/userReferenceController');
 
-//MAsters
+//Masters
 var jobCategoryController = require('../controllers/master/JobCategoryController');
 var  jobClassificationController = require('../controllers/master/jobClassificationController');
 var jobExperinceController = require('../controllers/master/jobExperinceController');
@@ -105,5 +106,12 @@ router.route("/masters/jobquestion")
 router.route("/masters/jobquestion/:jobquestionId")
    .get(auth.isAuthunticated,JobQuestionController.view)
    .put(auth.isAuthunticated,JobQuestionController.update);
+
+router.route("/user/reference")
+   .get(auth.isAuthunticated,userReferenceController.view)
+   .post(auth.isAuthunticated,userReferenceController.add)
+   .delete(auth.isAuthunticated,userReferenceController.remove);
+
+
 //Export API routes
 module.exports = router;
