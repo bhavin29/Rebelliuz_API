@@ -59,6 +59,7 @@ router.route("/user/job")
 router.route("/user/jobanswer")
         .post(auth.isAuthunticated,userJobAnswerController.upload);
 
+
 //Master
 router.route("/masters/jobcategory")
    .get(auth.isAuthunticated,jobCategoryController.index)
@@ -126,7 +127,7 @@ router.route("/masters/testquestion/:testquestionId")
 
 router.route("/masters/usertest")
    .get(auth.isAuthunticated,userTestController.index)
-   .post(auth.isAuthunticated,userTestController.add);   
+   .post(auth.isAuthunticated,userTestController.add);
 
 router.route("/user/reference")
    .get(auth.isAuthunticated,userReferenceController.view)
