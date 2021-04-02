@@ -108,35 +108,5 @@ router.route("/masters/jobquestion/:jobquestionId")
    .get(auth.isAuthunticated,JobQuestionController.view)
    .put(auth.isAuthunticated,JobQuestionController.update);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
-router.route("/user/reference")
-   .get(auth.isAuthunticated,userReferenceController.view)
-   .post(auth.isAuthunticated,userReferenceController.add)
-   .delete(auth.isAuthunticated,userReferenceController.remove);
-
-
 //Export API routes
 module.exports = router;
