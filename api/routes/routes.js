@@ -108,5 +108,25 @@ router.route("/masters/jobquestion/:jobquestionId")
    .get(auth.isAuthunticated,JobQuestionController.view)
    .put(auth.isAuthunticated,JobQuestionController.update);
 
+router.route("/masters/test")
+   .get(auth.isAuthunticated,TestController.index)
+   .post(auth.isAuthunticated,TestController.add);
+
+router.route("/masters/test/:testId")
+   .get(auth.isAuthunticated,TestController.view)
+   .put(auth.isAuthunticated,TestController.update);
+
+router.route("/masters/testquestion")
+   .get(auth.isAuthunticated,TestQuestionController.index)
+   .post(auth.isAuthunticated,TestQuestionController.add);
+
+router.route("/masters/testquestion/:testquestionId")
+   .get(auth.isAuthunticated,TestQuestionController.view)
+   .put(auth.isAuthunticated,TestQuestionController.update);
+
+router.route("/masters/usertest")
+   .get(auth.isAuthunticated,userTestController.index)
+   .post(auth.isAuthunticated,userTestController.add);   
+
 //Export API routes
 module.exports = router;
