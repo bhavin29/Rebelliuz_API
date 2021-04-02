@@ -15,6 +15,7 @@ var userController = require('../controllers/authController');
 var userIntroController = require('../controllers/userIntroController');
 var userJobController = require('../controllers/userJobController');
 var userJobAnswerController = require('../controllers/userJobAnswerController');
+var userTestController = require('../controllers/userTestController');
 
 var userReferenceController = require('../controllers/userReferenceController');
 
@@ -25,8 +26,8 @@ var jobExperinceController = require('../controllers/master/jobExperinceControll
 var jobTypeController = require('../controllers/master/jobTypeController');
 var jobSkillController = require('../controllers/master/jobSkillController');
 var JobQuestionController = require('../controllers/master/jobQuestionController');
-
-
+var TestController = require('../controllers/master/testController');
+var TestQuestionController = require('../controllers/master/testQuestionController');
 const auth = require('../../utils/auth');
 
 // Bio routes

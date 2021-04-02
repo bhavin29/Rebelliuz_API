@@ -3,6 +3,8 @@
 // Import mongoose 
 const  mongoose = require("mongoose");
 
+const aggregatePaginate = require('mongoose-aggregate-paginate-v2');
+
 // Declare schema and assign Schema class
 const  Schema = mongoose.Schema;
 
@@ -18,6 +20,8 @@ const  TestQuestionSchema = new  Schema({
     created_on: { type: Date, default: Date.now },
     created_by: { type: Number, default: 0 }
 });
+
+TestQuestionSchema.plugin(aggregatePaginate);
 
 // Create and export User model
 module.exports = mongoose.model("test_questions", TestQuestionSchema);
