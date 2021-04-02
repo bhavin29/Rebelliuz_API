@@ -128,5 +128,10 @@ router.route("/masters/usertest")
    .get(auth.isAuthunticated,userTestController.index)
    .post(auth.isAuthunticated,userTestController.add);   
 
+router.route("/user/reference")
+   .get(auth.isAuthunticated,userReferenceController.view)
+   .post(auth.isAuthunticated,userReferenceController.add)
+   .delete(auth.isAuthunticated,userReferenceController.remove);
+
 //Export API routes
 module.exports = router;
