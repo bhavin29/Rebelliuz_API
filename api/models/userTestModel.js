@@ -8,7 +8,8 @@ const  Schema = mongoose.Schema;
 
 // Create Schema add properties
 const  UserTestSchema = new  Schema({
-    user_id: { type: String, unique: true, trim: true, required:  true },
+    user_id: { type: String, trim: true, required:  true },
+    test_id: { type: String, trim: true, required:  true },
     test_question_id: { type: String, unique: true, trim: true, required:  true },
     answer1: { type: Boolean,  trim: true, required:  true },
     answer2: { type: Boolean,  trim: true, required:  true },

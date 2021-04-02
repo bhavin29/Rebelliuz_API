@@ -15,6 +15,7 @@ var userController = require('../controllers/authController');
 var userIntroController = require('../controllers/userIntroController');
 var userJobController = require('../controllers/userJobController');
 var userJobAnswerController = require('../controllers/userJobAnswerController');
+var userTestController = require('../controllers/userTestController');
 
 //MAsters
 var jobCategoryController = require('../controllers/master/JobCategoryController');
@@ -23,8 +24,8 @@ var jobExperinceController = require('../controllers/master/jobExperinceControll
 var jobTypeController = require('../controllers/master/jobTypeController');
 var jobSkillController = require('../controllers/master/jobSkillController');
 var JobQuestionController = require('../controllers/master/jobQuestionController');
-
-
+var TestController = require('../controllers/master/testController');
+var TestQuestionController = require('../controllers/master/testQuestionController');
 const auth = require('../../utils/auth');
 
 // Bio routes
@@ -105,5 +106,26 @@ router.route("/masters/jobquestion")
 router.route("/masters/jobquestion/:jobquestionId")
    .get(auth.isAuthunticated,JobQuestionController.view)
    .put(auth.isAuthunticated,JobQuestionController.update);
+
+router.route("/masters/test")
+   .get(auth.isAuthunticated,TestController.index)
+   .post(auth.isAuthunticated,TestController.add);
+
+router.route("/masters/test/:testId")
+   .get(auth.isAuthunticated,TestController.view)
+   .put(auth.isAuthunticated,TestController.update);
+
+router.route("/masters/testquestion")
+   .get(auth.isAuthunticated,TestQuestionController.index)
+   .post(auth.isAuthunticated,TestQuestionController.add);
+
+router.route("/masters/testquestion/:testquestionId")
+   .get(auth.isAuthunticated,TestQuestionController.view)
+   .put(auth.isAuthunticated,TestQuestionController.update);
+
+router.route("/masters/usertest")
+   .get(auth.isAuthunticated,userTestController.index)
+   .post(auth.isAuthunticated,userTestController.add);
+   
 //Export API routes
 module.exports = router;
