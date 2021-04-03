@@ -31,7 +31,6 @@ const  BussinesJobSchema = new  Schema({
     isactive: { type: Boolean, default: 1 },
     created_on: { type: Date, default: Date.now },
     created_by: { type: Number, default: 0 }
-
 });
 
 // Create and export User model

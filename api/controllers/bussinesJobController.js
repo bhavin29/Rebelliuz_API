@@ -1,8 +1,12 @@
 /*
+as per BussinesJobModel
+GET may have musltiple jobs. 
 
-GET [ list of all job with parameter isactive]
-GET by ID for list all data for update
-POST: create and update. ap will dissied to create or update
 
+GET:
+    api/bussines/{bussines_id}
+    api/bussines/{bussines_id}?isactive=0
+POST
+    api/bussines [ manage insert/update]
 
 */
