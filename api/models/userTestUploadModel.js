@@ -17,4 +17,4 @@ const  TestUploadSchema = new  Schema({
 });
 
 // Create and export User model
-module.exports = mongoose.model("tests", TestUploadSchema);
+module.exports = mongoose.model("user_test_upload", TestUploadSchema);

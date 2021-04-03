@@ -51,6 +51,7 @@ let apiRoutes = require("./api/routes/routes")
 app.use('/videointro', express.static(config.general.content_path + '/Users/intro'));
 app.use('/jobcv', express.static(config.general.content_path + '/Users/jobcv'));
 app.use('/videoanswer', express.static(config.general.content_path + '/Users/answers'));
+app.use('/test', express.static(config.general.content_path + '/Users/test'));
 
 //configure bodyparser to hande the post requests
 app.use(bodyParser.urlencoded({

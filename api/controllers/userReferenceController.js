@@ -8,7 +8,10 @@ const requestHandler = new RequestHandler(logger);
 add = function (req, res) {
  try {
         UserReference.findOne({ owner_id: global.decoded._id, user_id : req.body.user_id },(err,userReference)=>{
-      if (err) throw err;
+      if (err) {
+        errMessage = '{ "intro": { "message" : "User reference is not saved!!"} }';
+        requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
+      }
       if (!userReference) {
           //insert
           var userreference = new UserReference();

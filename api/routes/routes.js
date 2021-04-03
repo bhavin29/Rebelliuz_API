@@ -21,7 +21,7 @@ var userReferenceController = require('../controllers/userReferenceController');
 
 //Masters
 var jobCategoryController = require('../controllers/master/JobCategoryController');
-var  jobClassificationController = require('../controllers/master/jobClassificationController');
+var jobClassificationController = require('../controllers/master/jobClassificationController');
 var jobExperinceController = require('../controllers/master/jobExperinceController');
 var jobTypeController = require('../controllers/master/jobTypeController');
 var jobSkillController = require('../controllers/master/jobSkillController');
@@ -48,18 +48,6 @@ router.route('/bio/:bio_id')
 // post request for user log in  
 router.route("/auth/sign_in")
       .post(userController.signIn);
-
-router.route("/user/intro")
-        .get(auth.isAuthunticated,userIntroController.view)
-        .post(auth.isAuthunticated,userIntroController.upload);
-
-router.route("/user/job")
-        .get(auth.isAuthunticated,userJobController.view)
-        .post(auth.isAuthunticated,userJobController.upload);
-
-router.route("/user/jobanswer")
-        .post(auth.isAuthunticated,userJobAnswerController.upload);
-
 
 //Master
 router.route("/masters/jobcategory")
@@ -126,14 +114,33 @@ router.route("/masters/testquestion/:testquestionId")
    .get(auth.isAuthunticated,TestQuestionController.view)
    .put(auth.isAuthunticated,TestQuestionController.update);
 
-router.route("/masters/usertest")
+//user   
+router.route("/user/intro")
+  .get(auth.isAuthunticated,userIntroController.view)
+  .post(auth.isAuthunticated,userIntroController.upload);
+
+router.route("/user/job")
+  .get(auth.isAuthunticated,userJobController.view)
+  .post(auth.isAuthunticated,userJobController.upload);
+
+router.route("/user/jobanswer")
+   .post(auth.isAuthunticated,userJobAnswerController.upload);
+
+router.route("/user/test")
    .get(auth.isAuthunticated,userTestController.index)
    .post(auth.isAuthunticated,userTestController.add);
+
+router.route("/user/test/upload")
+   .get(auth.isAuthunticated,userTestController.index)
+   .post(auth.isAuthunticated,userTestController.addupload);
 
 router.route("/user/reference")
    .get(auth.isAuthunticated,userReferenceController.view)
    .post(auth.isAuthunticated,userReferenceController.add)
    .delete(auth.isAuthunticated,userReferenceController.remove);
+
+//Bussines
+
 
 //Export API routes
 module.exports = router;

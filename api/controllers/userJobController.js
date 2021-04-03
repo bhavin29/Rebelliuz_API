@@ -14,10 +14,10 @@ const upload = async (req, res) => {
   try {
     await new uploadFile(req, res);
 
-    if (req.file == undefined) {
+   /* if (req.file == undefined) {
         errMessage = '{ "intro": { "message" : "Please upload a file!"} }';
         return requestHandler.sendError(req,res, 422, 'Please upload a file!',JSON.parse(errMessage));
-    }
+    }*/
     if (jobValidation(req))
     {
         errMessage = '{ "intro": { "message" : "Please enter mandatory field."} }';
@@ -85,6 +85,9 @@ const upload = async (req, res) => {
 
            if(req.body.expected_salary_end != undefined)
             userJob.expected_salary_end=req.body.expected_salary_end;
+
+            if(req.body.culture_values_id != undefined)
+            userJob.culture_values_id=req.body.culture_values_id;
 
             if(req.body.isactive != undefined)
             userJob.isactive=req.body.isactive;
@@ -188,11 +191,6 @@ callJobAnswer = function(req,res,userJob,jobQuestion,userJobAnswer){
               jobanswer[j]['video_filename'] = answer.video_filename;
               jobanswer[j]['video_answer_status'] = answer.video_answer_status;
             }
-/*            else
-            {
-              jobanswer[j]['video_filename'] = '';
-              jobanswer[j]['video_status'] = 1;
-            }*/
           }
 
         j = j+1;
@@ -212,66 +210,6 @@ callJobAnswer = function(req,res,userJob,jobQuestion,userJobAnswer){
 
   requestHandler.sendSuccess(res,'User job detail.',200,data);
 }
-/*
-view = function (req, res) {
-
-var mongoose = require('mongoose');
-var db = mongoose.connection;
-
-var Schema = mongoose.Schema;
-
-//db.on('error', console.error);
-
-db.once('open', function () {
-
-console.log("db connect");
-
-var collectionOne = [];
-var collectionTwo = [];
-
-  if(!err) {
-      console.log("We are connected");
-    }
-
-    db.collection("user_job", function(err, collection) {
-      collection.find().sort({order_num: 1}).toArray(function(err, result) {
-        if (err) {
-          throw err;
-        } else {
-          for (i=0; i<result.length; i++) {
-            collectionOne[i] = result[i];
-          }
-        }
-      });
-
-      db.collection("job_question", function(err, collection) {
-        collection.find().sort({order_num: 1}).toArray(function(err, result) {
-          if (err) {
-            throw err;
-          } else {
-            for (i=0; i<result.length; i++) {
-              collectionTwo[i] = result[i];
-            }
-          }
-        });
-      });
-      
-      var data = 
-      {
-        "c1" : collectionOne,
-        "c2" : collectionTwo
-
-      }
-      requestHandler.sendSuccess(res,'User job detail.',200,data);
-    });
-
-
-});
-
-
-
-}
-*/
 
 module.exports = {
   upload,

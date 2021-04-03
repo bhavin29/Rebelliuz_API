@@ -16,7 +16,7 @@ const  UserJobSchema = new  Schema({
     job_skill_ids: { type: String, required:  true },
     culture_values_id: { type: String, required:  true },    
     short_description: { type: String, required:  true },
-    cv_filename: { type: String, unique: true, trim: true, required:  true },
+    cv_filename: { type: String, unique: true, trim: true },
     expected_salary_start: { type: Number,  required:  true },
     expected_salary_end: { type: Number, required:true } ,
     video_status: { type: Number, default: 1 },
