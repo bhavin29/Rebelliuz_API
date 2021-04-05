@@ -16,8 +16,8 @@ var userIntroController = require('../controllers/userIntroController');
 var userJobController = require('../controllers/userJobController');
 var userJobAnswerController = require('../controllers/userJobAnswerController');
 var userTestController = require('../controllers/userTestController');
-
 var userReferenceController = require('../controllers/userReferenceController');
+var bussinesJobController = require('../controllers/bussinesJobController');
 
 //Masters
 var jobCategoryController = require('../controllers/master/JobCategoryController');
@@ -140,6 +140,9 @@ router.route("/user/reference")
    .delete(auth.isAuthunticated,userReferenceController.remove);
 
 //Bussines
+router.route("/bussines/job/:bussinesid")
+  .get(auth.isAuthunticated,bussinesJobController.view)
+  .post(auth.isAuthunticated,bussinesJobController.upload);
 
 
 //Export API routes

@@ -55,7 +55,7 @@ exports.index = async function (req, res) {
             }
         });
     }   
-    catch (err) {
+        catch (err) {
         errMessage = { "Job Category GET": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
     }
