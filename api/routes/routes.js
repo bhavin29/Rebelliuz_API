@@ -151,8 +151,14 @@ router.route("/bussines/jobuser/:bussinesid")
   .post(auth.isAuthunticated,bussinesJobUserController.add);
 
 router.route("/bussines/jobanswer/:bussinesid")
-  .get(auth.isAuthunticated,bussinesJobUserAnswerController.view)
+  .get(auth.isAuthunticated,bussinesJobUserAnswerController.view);
  // .post(auth.isAuthunticated,bussinesJobUserAnswerController.add);
+
+ router.route("/bussines/jobanswer/comments/:bussinesid")
+  .get(auth.isAuthunticated,bussinesJobUserAnswerController.viewcomments)
+  .post(auth.isAuthunticated,bussinesJobUserAnswerController.addcomments)
+  .post(auth.isAuthunticated,bussinesJobUserAnswerController.addrating)
+  .post(auth.isAuthunticated,bussinesJobUserAnswerController.addread);
 
   
 

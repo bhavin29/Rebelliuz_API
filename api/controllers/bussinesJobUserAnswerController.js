@@ -1,28 +1,5 @@
 /*
 
-GET:
-    job_category_id
-    search_user_id
-    bussines_id
-    bussines_user_Id
-    response:
-        job [
-            "jobanswer"[
-                {
-
-                }
-            ]
-            "comments"[
-            {
-
-            }
-            ]
-        ]
-GET: 
- /bussiensid/comments 
-    job_category_id
-    search_user_id
-
 POST:
  /read [ to track overall progress]
  /rating  
@@ -33,11 +10,123 @@ const config = require('../../config/appconfig');
 const fs = require('fs');
 const BussinesJob = require('../models/bussinesJobModel');
 const BussinesJobUserAnswer = require('../models/bussinesJobUserAnswerModel');
+const BussinesJobUserComments = require('../models/bussinesJobUserCommentsModel');
+const UserJobAnswer = require('../models/userJobAnswerModel');
 const JobQuestion = require('../models/master/jobQuestionModel');
+
 const RequestHandler = require('../../utils/RequestHandler');
 const Logger = require('../../utils/logger');
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
+
+addrating = function(req,res){
+  try
+  {
+  BussinesJobUserAnswer.findOne({ bussines_id : req.params.bussinesid, job_category_id : req.body.job_category_id,
+    search_user_id : req.body.search_user_id, bussines_user_id :global.decoded._id },(err,bussinesJobUserAnswer)=>{
+    if (err) throw err;
+    if (!bussinesJobUserAnswer) {
+        //insert
+        var bussinesjobUseranswer = new BussinesJobUserAnswer();
+       
+        bussinesjobUseranswer.job_category_id = req.body.job_category_id;
+        bussinesjobUseranswer.bussines_job_id = req.body.bussines_job_id;
+        bussinesjobUseranswer.bussines_user_id = global.decoded._id;
+        bussinesjobUseranswer.search_user_id = req.body.search_user_id;
+        bussinesjobUseranswer.job_question_id = req.body.job_question_id;
+        bussinesjobUseranswer.rating = req.body.rating;
+ 
+        bussinesjobUseranswer.save(function (err) {
+          if (err){
+            errMessage = '{ "intro": { "message" : "Rating is not saved!!"} }';
+            requestHandler.sendError(req,res, 422, 'Somthing worng with user introduction',JSON.parse(errMessage));
+          } else {
+            requestHandler.sendSuccess(res,'Rating added successfully.',200,bussinesjobUseranswer);
+          }
+      });
+    }
+    else if (bussinesJobUserAnswer) {
+ 
+      bussinesjobUseranswer.rating = req.body.rating;
+
+      bussinesJobUserAnswer.save(function (err) {
+          if (err){
+            errMessage = '{ "intro": { "message" : "Rating is not saved!!"} }';
+            requestHandler.sendError(req,res, 422, 'Somthing worng with user introduction',JSON.parse(errMessage));
+          } else {
+            requestHandler.sendSuccess(res,'Rating file update successfully.',200,bussinesJobUserAnswer);
+          }
+        });
+   }
+});
+  
+  addread = function(req,res){
+  try
+  {
+    bussinesJobUserComments = new BussinesJobUserComments();
+      bussinesJobUserComments.bussines_id=req.params.bussinesid;
+      bussinesJobUserComments.bussines_user_id= global.decoded._id;
+  
+      bussinesJobUserComments.job_category_id=req.body.job_category_id;
+      bussinesJobUserComments.bussines_job_id=req.body.bussines_job_id;
+      bussinesJobUserComments.search_user_id=req.body.search_user_id;
+      bussinesJobUserComments.comments=req.body.comments;
+  
+      bussinesJobUserComments.save(function (err) {
+        if (err){
+                errMessage = '{ "intro": { "message" : "Comments  is not saved!!"} }';
+                requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
+        } else 
+        {
+                requestHandler.sendSuccess(res,'Comments save successfully.',200,bussinesJobUserComments);
+        }
+      });
+    } catch (err) {
+      errMessage = { "View": { "message" : err.message } };
+      requestHandler.sendError(req,res, 500, 'Comments detail',(errMessage));
+    }
+  }
+  
+  addcomments = function(req,res){
+try
+{
+  bussinesJobUserComments = new BussinesJobUserComments();
+    bussinesJobUserComments.bussines_id=req.params.bussinesid;
+    bussinesJobUserComments.bussines_user_id= global.decoded._id;
+
+    bussinesJobUserComments.job_category_id=req.body.job_category_id;
+    bussinesJobUserComments.bussines_job_id=req.body.bussines_job_id;
+    bussinesJobUserComments.search_user_id=req.body.search_user_id;
+    bussinesJobUserComments.comments=req.body.comments;
+
+    bussinesJobUserComments.save(function (err) {
+      if (err){
+              errMessage = '{ "intro": { "message" : "Comments  is not saved!!"} }';
+              requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
+      } else 
+      {
+              requestHandler.sendSuccess(res,'Comments save successfully.',200,bussinesJobUserComments);
+      }
+    });
+  } catch (err) {
+    errMessage = { "View": { "message" : err.message } };
+    requestHandler.sendError(req,res, 500, 'Comments detail',(errMessage));
+  }
+}
+
+viewcomments = function(req,res){
+  BussinesJobUserComments.find( { bussines_id: req.params.bussinesid, job_category_id : req.body.job_category_id, search_user_id : req.body.search_user_id }, 
+    function (err, bussinesJobUserComments) {
+    if (err){
+      errMessage = '{ "intro": { "message" : "No data found."} }';
+      requestHandler.sendError(req,res, 422, 'No data for comments',JSON.parse(errMessage));
+    } 
+    else {
+      requestHandler.sendSuccess(res,'Comments.',200,bussinesJobUserComments);
+    }
+  });
+}
+
 
 // View User Intro
 view = function (req, res) {
@@ -79,11 +168,35 @@ view = function (req, res) {
           errMessage = '{ "intro": { "message" : "No data found."} }';
           requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));
         } 
-        callJobAnswer(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer);
+        callUserJobAnswer(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer);
    });  
   }
   
-  callJobAnswer = function(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer){
+  callUserJobAnswer = function(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer){
+    UserJobAnswer.find({ user_id : req.body.search_user_id, job_category_id :req.body.job_category_id },
+        function (err, userJobAnswer) {
+    if (err){
+      errMessage = '{ "intro": { "message" : "No data found."} }';
+      requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));
+    } 
+    Callcomments(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer);
+});  
+}
+
+Callcomments = function(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer){
+  BussinesJobUserComments.find( { bussines_id: req.params.bussinesid, job_category_id : req.body.job_category_id, search_user_id : req.body.search_user_id }, 
+    function (err, bussinesJobUserComments) {
+    if (err){
+      errMessage = '{ "intro": { "message" : "No data found."} }';
+      requestHandler.sendError(req,res, 422, 'No data for comments',JSON.parse(errMessage));
+    } 
+    else {
+      callJobAnswer(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer,bussinesJobUserComments);
+    }
+  });
+}
+
+callJobAnswer = function(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer,bussinesJobUserComments){
       var jobanswer=[];
       var i=0,j=0;
   
@@ -99,24 +212,34 @@ view = function (req, res) {
             jobanswer[j] = JSON.stringify(jobanswer[j]);
             jobanswer[j] = JSON.parse(jobanswer[j]);
             jobanswer[j]['video_filename'] = '';
+            jobanswer[j]['rating'] = '';
             
             for (var answer of bussinesJobUserAnswer){
               if (answer.job_category_id == job_id && answer.job_question_id == item._id.toString()){
                 console.log(answer.job_question_id);
                 console.log(answer.video_filename);
                 console.log(answer.video_status);
-                jobanswer[j]['video_filename'] = answer.video_filename;
+                jobanswer[j]['rating'] = answer.rating;
               }
             }
   
-          j = j+1;
+            for (var useranswer of userJobAnswer){
+              if (useranswer.job_category_id == job_id && useranswer.job_question_id == item._id.toString()){
+                console.log(answer.job_question_id);
+                console.log(useranswer.video_filename);
+                console.log(useranswer.video_status);
+                jobanswer[j]['video_filename'] = useranswer.video_filename;
+              }
+            }
+
+            j = j+1;
           }
       }
   
       bussinesJob[i] = JSON.stringify(bussinesJob[i]);
       bussinesJob[i] = JSON.parse(bussinesJob[i]);
       bussinesJob[i]['jobanswer'] = JSON.parse(JSON.stringify(jobanswer));
-        
+      bussinesJob[i]['comments'] = JSON.parse(JSON.stringify(bussinesJobUserComments));
       i=i+1;
     }
     
@@ -128,6 +251,10 @@ view = function (req, res) {
   }
   
   module.exports = {
-    view
+    view,
+    addcomments,
+    viewcomments,
+    addrating,
+    addread
   };
   

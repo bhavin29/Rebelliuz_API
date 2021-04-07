@@ -16,11 +16,11 @@ const upload = async (req, res) => {
         errMessage = '{ "intro": { "message" : "Please upload a file!"} }';
         return requestHandler.sendError(req,res, 422, 'Please upload a file!',JSON.parse(errMessage));
     }
-    if (jobValidation(req))
+ /*   if (jobValidation(req))
     {
         errMessage = '{ "intro": { "message" : "Please enter mandatory field."} }';
         return requestHandler.sendError(req,res, 422, 'Please enter mandatory field.',JSON.parse(errMessage));
-    }
+    }*/
 
     UserJobAnswer.findOne({ user_id: global.decoded._id, job_category_id: req.body.job_category_id, job_question_id: req.body.job_question_id},(err,userJobAnswer)=>{
       if (err) throw err;

@@ -51,7 +51,7 @@ let apiRoutes = require("./api/routes/routes")
 //users
 app.use('/videointro', express.static(config.general.content_path + '/Users/intro'));
 app.use('/jobcv', express.static(config.general.content_path + '/Users/jobcv'));
-app.use('/videoanswer', express.static(config.general.content_path + '/Users/answers'));
+app.use('/videoanswer', express.static(config.general.content_path + '/Users/answer'));
 app.use('/test', express.static(config.general.content_path + '/Users/test'));
 
 //company-bussines
