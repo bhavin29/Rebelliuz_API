@@ -9,8 +9,8 @@ const  Schema = mongoose.Schema;
 // Create Schema Instance for User and add properties
 const  BussinesJobUserAnswerSchema = new  Schema({
     bussines_id: { type: String, required:  true },
-    bussines_job_id: { type: String, required:  true },
     job_category_id: { type: String, required:  true },
+    bussines_job_id: { type: String, required:  true },
     bussines_user_id: { type: String, required:  true },
     search_user_id: { type: String, required:  true },
     job_question_id: { type: String, required:  true },
