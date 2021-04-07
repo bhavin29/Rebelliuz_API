@@ -18,11 +18,12 @@ const upload = async (req, res) => {
         errMessage = '{ "intro": { "message" : "Please upload a file!"} }';
         return requestHandler.sendError(req,res, 422, 'Please upload a file!',JSON.parse(errMessage));
     }*/
-    if (jobValidation(req))
-    {
-        errMessage = '{ "intro": { "message" : "Please enter mandatory field."} }';
-        return requestHandler.sendError(req,res, 422, 'Please enter mandatory field.',JSON.parse(errMessage));
-    }
+
+    // if (jobValidation(req))
+    // {
+    //     errMessage = '{ "intro": { "message" : "Please enter mandatory field."} }';
+    //     return requestHandler.sendError(req,res, 422, 'Please enter mandatory field.',JSON.parse(errMessage));
+    // }
 
     UserJob.findOne({ user_id: global.decoded._id, job_category_id: req.body.job_category_id},(err,userJob)=>{
       if (err) throw err;
@@ -31,7 +32,7 @@ const upload = async (req, res) => {
           var userjob = new UserJob();
          
           userjob.user_id = global.decoded._id;
-          userjob.cv_filename = global.cv_filename;
+          // userjob.cv_filename = global.cv_filename;
 
           userjob.job_category_id=req.body.job_category_id;
           userjob.job_classification_id=req.body.job_classification_id;
@@ -41,6 +42,7 @@ const upload = async (req, res) => {
           userjob.short_description=req.body.short_description;
           userjob.expected_salary_start=req.body.expected_salary_start;
           userjob.expected_salary_end=req.body.expected_salary_end;
+          userjob.culture_values_id=req.body.culture_values_id;
 
           userjob.save(function (err) {
             if (err){

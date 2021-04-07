@@ -128,9 +128,9 @@ BussinesJob.aggregate([
                             [
                               { $eq: [ "$job_category_id",  "$$user_job_category_id" ] },
                               { $eq: [ "$job_classification_id",  "$$user_job_classification_id" ] },
-                             { $eq: [ "$job_experience_id",  "$$user_job_experience_id" ] },
-                        /*      { $in: [ "$Job_type_ids",  "$$user_Job_type_ids" ] },
-                              { $in: [ "$job_skill_ids",  "$$user_job_skill_ids" ] },*/
+                              { $eq: [ "$job_experience_id",  "$$user_job_experience_id" ] },
+                              { $in: [ "$Job_type_ids",  "$user_Job_type_ids".split(",") ] },
+                        /*      { $in: [ "$job_skill_ids",  "$$user_job_skill_ids" ] },*/
                               //     { $gte: [ "$instock", "$$order_qty" ] }
                             ]
                          }
