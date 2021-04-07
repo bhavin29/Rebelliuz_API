@@ -14,7 +14,7 @@ const CountrySchema = new  Schema({
     created_by: { type: Number, default: 0 }
 });
 
-CultureValuesSchema.plugin(aggregatePaginate);
+CountrySchema.plugin(aggregatePaginate);
 
 // Create and export User model
 module.exports = mongoose.model("countries", CountrySchema);
