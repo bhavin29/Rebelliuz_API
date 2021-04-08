@@ -30,6 +30,9 @@ var jobSkillController = require('../controllers/master/jobSkillController');
 var JobQuestionController = require('../controllers/master/jobQuestionController');
 var TestController = require('../controllers/master/testController');
 var TestQuestionController = require('../controllers/master/testQuestionController');
+var CountryController = require('../controllers/master/countryController');
+var CultureValuesController = require('../controllers/master/cultureValuesController');
+var LocationController = require('../controllers/master/locationController');
 const auth = require('../../utils/auth');
 
 // Bio routes
@@ -115,6 +118,30 @@ router.route("/masters/testquestion")
 router.route("/masters/testquestion/:testquestionId")
    .get(auth.isAuthunticated,TestQuestionController.view)
    .put(auth.isAuthunticated,TestQuestionController.update);
+
+router.route("/masters/country")
+   .get(auth.isAuthunticated,CountryController.index)
+   .post(auth.isAuthunticated,CountryController.add);
+
+router.route("/masters/country/:countryId")
+   .get(auth.isAuthunticated,CountryController.view)
+   .put(auth.isAuthunticated,CountryController.update);
+
+router.route("/masters/cultureValues")
+   .get(auth.isAuthunticated,CultureValuesController.index)
+   .post(auth.isAuthunticated,CultureValuesController.add);
+
+router.route("/masters/cultureValues/:cultureValuesId")
+   .get(auth.isAuthunticated,CultureValuesController.view)
+   .put(auth.isAuthunticated,CultureValuesController.update);
+
+router.route("/masters/location")
+   .get(auth.isAuthunticated,LocationController.index)
+   .post(auth.isAuthunticated,LocationController.add);
+
+router.route("/masters/location/:locationId")
+   .get(auth.isAuthunticated,LocationController.view)
+   .put(auth.isAuthunticated,LocationController.update);
 
 //user   
 router.route("/user/intro")
