@@ -14,6 +14,7 @@ const  BussinesJobUserSchema = new  Schema({
     search_user_id: { type: String, required:  true },
     search_status: { type: Number, default: 0 },
     overall_rating: { type: Number, default: 0 },
+    overall_progress: { type: Number, default: 0 },
     created_on: { type: Date, default: Date.now },
     created_by: { type: Number, default: 0 }
 });
