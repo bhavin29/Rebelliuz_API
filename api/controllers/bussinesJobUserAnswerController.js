@@ -227,18 +227,21 @@ view = function (req, res) {
         requestHandler.sendError(req,res, 422, 'No data for bussines job',JSON.parse(errMessage));
       } 
       else {
-        callJobQuestion(req,res,bussinesJob);
+        callBussinesJobQuestion(req,res,bussinesJob);
       }
     });
   }
   
-  callJobQuestion = function(req,res,bussinesJob){
+  callBussinesJobQuestion = function(req,res,bussinesJob){
         JobQuestion.find({job_category_id : req.body.job_category_id},function (err, jobQuestion) {
             if (err){
               errMessage = '{ "intro": { "message" : "No data found."} }';
               requestHandler.sendError(req,res, 422, 'No data for job questions',JSON.parse(errMessage));
-            } 
+            }
+            else
+            { 
             callBussinesJobUserAnswer(req,res,bussinesJob,jobQuestion);
+            }
        });  
     }
   

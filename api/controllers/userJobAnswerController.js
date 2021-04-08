@@ -1,13 +1,15 @@
 const config = require('../../config/appconfig');
 const fs = require('fs');
+
 const uploadFileAnswer = require('../../utils/uploadJobAnswer');
 const UserJobAnswer = require('../models/userJobAnswerModel');
+const UserJob = require('../models/userJobModel');
+const JobQuestion = require('../models/master/jobQuestionModel');
+
 const RequestHandler = require('../../utils/RequestHandler');
 const Logger = require('../../utils/logger');
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
-const UserJob = require('../models/userJobModel');
-const JobQuestion = require('../models/master/jobQuestionModel');
 
 //upload and save/update user intro
 const upload = async (req, res) => {
@@ -41,8 +43,7 @@ const upload = async (req, res) => {
               errMessage = '{ "intro": { "message" : "User job answer is not saved!!"} }';
               requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
             } else {
-              requestHandler.sendSuccess(res,'User job answer save successfully.',200,userjobanswer);
-              //requestHandler.sendSuccess(res,'User job answer save successfully.',200,callUserJob());
+              callAnsUserJob(req,res);
             }
         });
       }
@@ -65,8 +66,7 @@ const upload = async (req, res) => {
               errMessage = '{ "intro": { "message" : "User job answer is not saved!!"} }';
               requestHandler.sendError(req,res, 422, 'Somthing worng with user job answer',JSON.parse(errMessage));
             } else {
-              requestHandler.sendSuccess(res,'User job answer updated successfully.',200,userJobAnswer);
-              //requestHandler.sendSuccess(res,'User job answer updated successfully.',200,callUserJob());
+              callAnsUserJob(req,res);
             }
           });
      }
@@ -78,7 +78,6 @@ const upload = async (req, res) => {
   }
 };
 
-
 jobValidation = function (req){
  
     var result = 0;
@@ -87,36 +86,39 @@ jobValidation = function (req){
       }
  };
 
- callUserJob = function(){
-  UserJob.find( { user_id: global.decoded._id}, function (err, userJob) {
+ callAnsUserJob = function(req,res){
+    UserJob.find( { user_id: global.decoded._id}, function (err, userJob) {
     if (err){
-     return errMessage = '{ "intro": { "message" : "No data found."} }';
+      errMessage = '{ "intro": { "message" : "No data found."} }';
+      requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));
     } 
     else {
-      callJobQuestion(userJob);
+      callAnsJobQuestion(req,res,userJob);
     }
   });
 }
 
-callJobQuestion = function(userJob){
-        JobQuestion.find(function (err, jobQuestion) {
+callAnsJobQuestion = function(req,res,userJob){
+        JobQuestion.find({ job_category_id : req.body.job_category_id },function (err, jobQuestion) {
           if (err){
-            return errMessage = '{ "intro": { "message" : "No data found."} }';
+            errMessage = '{ "intro": { "message" : "No data found."} }';
+            requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));
           } 
-          callUserJobAnswer(userJob,jobQuestion);
+          callAnsUserJobAnswer(req,res,userJob,jobQuestion);
      });  
   }
 
-callUserJobAnswer = function(userJob,jobQuestion){
+callAnsUserJobAnswer = function(req,res,userJob,jobQuestion){
     UserJobAnswer.find({ user_id : global.decoded._id },function (err, userJobAnswer) {
       if (err){
-        return errMessage = '{ "intro": { "message" : "No data found."} }';
+        errMessage = '{ "intro": { "message" : "No data found."} }';
+        requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));
       } 
-      callJobAnswer(userJob,jobQuestion,userJobAnswer);
+      callAnsJobAnswer(req,res,userJob,jobQuestion,userJobAnswer);
  });  
 }
 
-callJobAnswer = function(userJob,jobQuestion,userJobAnswer){
+callAnsJobAnswer = function(req,res,userJob,jobQuestion,userJobAnswer){
     var jobanswer=[];
     var i=0,j=0;
 
@@ -158,7 +160,7 @@ callJobAnswer = function(userJob,jobQuestion,userJobAnswer){
   var data = { 
         "userjob" :userJob
   };  
-  return data;
+  requestHandler.sendSuccess(res,'User job detail.',200,data);
 }
 
 module.exports = {
