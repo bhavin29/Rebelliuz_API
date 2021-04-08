@@ -126,46 +126,46 @@ jobValidation = function (req){
 // View User Intro
 view = function (req, res) {
   try{
-    callUserJob(req,res);
+    callvUserJob(req,res);
   } catch (err) {
       errMessage = { "View": { "message" : err.message } };
       requestHandler.sendError(req,res, 500, 'View user job detail',(errMessage));
     }
 };
 
-callUserJob = function(req,res){
+callvUserJob = function(req,res){
   UserJob.find( { user_id: global.decoded._id}, function (err, userJob) {
     if (err){
       errMessage = '{ "intro": { "message" : "No data found."} }';
       requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));
     } 
     else {
-      callJobQuestion(req,res,userJob);
+      callvJobQuestion(req,res,userJob);
     }
   });
 }
 
-callJobQuestion = function(req,res,userJob){
-        JobQuestion.find({ job_category_id : req.job_category_id },function (err, jobQuestion) {
+callvJobQuestion = function(req,res,userJob){
+        JobQuestion.find(function (err, jobQuestion) {
           if (err){
             errMessage = '{ "intro": { "message" : "No data found."} }';
             requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));
           } 
-          callUserJobAnswer(req,res,userJob,jobQuestion);
+          callvUserJobAnswer(req,res,userJob,jobQuestion);
      });  
   }
 
-callUserJobAnswer = function(req,res,userJob,jobQuestion){
+callvUserJobAnswer = function(req,res,userJob,jobQuestion){
     UserJobAnswer.find({ user_id : global.decoded._id },function (err, userJobAnswer) {
       if (err){
         errMessage = '{ "intro": { "message" : "No data found."} }';
         requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));
       } 
-      callJobAnswer(req,res,userJob,jobQuestion,userJobAnswer);
+      callvJobAnswer(req,res,userJob,jobQuestion,userJobAnswer);
  });  
 }
 
-callJobAnswer = function(req,res,userJob,jobQuestion,userJobAnswer){
+callvJobAnswer = function(req,res,userJob,jobQuestion,userJobAnswer){
     var jobanswer=[];
     var i=0,j=0;
 
