@@ -11,7 +11,7 @@ const  Schema = mongoose.Schema;
 const  BussinesAdminUserSchema = new  Schema({
     bussines_id: { type: String, required:  true },
     bussines_user_id: { type: String, required:  true },
-    role: { type: String, required:  true },
+    role: { type: Number, required:  true },
     isactive: { type: Boolean, default: 1 },
     created_on: { type: Date, default: Date.now },
     created_by: { type: Number, default: 0 }

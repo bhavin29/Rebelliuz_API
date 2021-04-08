@@ -72,6 +72,7 @@ try{
                             "refresh_token" : "",
                             "expire_time" : "2d",
                             "user" : user,
+                            "bussines_id":[]
                     };  
                 requestHandler.sendSuccess(res,'User successfully logged in.',200,(data));
             }

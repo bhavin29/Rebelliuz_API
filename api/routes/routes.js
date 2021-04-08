@@ -11,7 +11,7 @@ router.get('/', function(req, res) {
 
 //Import Bio Controller
 var bioController = require('../controllers/bioController');
-var userController = require('../controllers/authController');
+var authController = require('../controllers/authController');
 var userIntroController = require('../controllers/userIntroController');
 var userJobController = require('../controllers/userJobController');
 var userJobAnswerController = require('../controllers/userJobAnswerController');
@@ -20,6 +20,8 @@ var userReferenceController = require('../controllers/userReferenceController');
 var bussinesJobController = require('../controllers/bussinesJobController');
 var bussinesJobUserController = require('../controllers/bussinesJobUserController');
 var bussinesJobUserAnswerController = require('../controllers/bussinesJobUserAnswerController');
+var userController = require('../controllers/userController');
+var bussinesAdminUserController = require('../controllers/bussinesAdminUserController');
 
 //Masters
 var jobCategoryController = require('../controllers/master/JobCategoryController');
@@ -48,11 +50,11 @@ router.route('/bio/:bio_id')
 
  // post request for user registration
  router.route("/auth/register")
-       .post(userController.register);
+       .post(authController.register);
 
 // post request for user log in  
 router.route("/auth/sign_in")
-      .post(userController.signIn);
+      .post(authController.signIn);
 
 //Master
 router.route("/masters/jobcategory")
@@ -150,7 +152,7 @@ router.route("/user/intro")
 
 router.route("/user/job")
   .get(auth.isAuthunticated,userJobController.view)
-  .post(auth.isAuthunticated,userJobController.upload);
+  .post(auth.isAuthunticated,userJobController.upload)
 
 router.route("/user/jobanswer")
    .post(auth.isAuthunticated,userJobAnswerController.upload);
@@ -168,6 +170,9 @@ router.route("/user/reference")
    .post(auth.isAuthunticated,userReferenceController.add)
    .delete(auth.isAuthunticated,userReferenceController.remove);
 
+router.route("/user/:emailId")
+   .get(auth.isAuthunticated,userController.view)
+
 //Bussines
 router.route("/bussines/job/:bussinesid")
   .get(auth.isAuthunticated,bussinesJobController.view)
@@ -181,9 +186,13 @@ router.route("/bussines/jobanswer/:bussinesid")
   .get(auth.isAuthunticated,bussinesJobUserAnswerController.view)
   .post(auth.isAuthunticated,bussinesJobUserAnswerController.add);
 
- router.route("/bussines/jobanswer/comments/:bussinesid")
+router.route("/bussines/jobanswer/comments/:bussinesid")
   .get(auth.isAuthunticated,bussinesJobUserAnswerController.viewcomments)
   .post(auth.isAuthunticated,bussinesJobUserAnswerController.addcomments);
+
+router.route("/bussines/adminuser/:bussinesid")
+  .get(auth.isAuthunticated,bussinesAdminUserController.view)
+  .post(auth.isAuthunticated,bussinesAdminUserController.add);
 
 //Export API routes
 module.exports = router;
