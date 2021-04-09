@@ -8,6 +8,7 @@ const requestHandler = new RequestHandler(logger);
 const User = require("../models/userModel");
 const UserIntro = require("../models/userIntroModel");
 const accessTokenSecret = 'vasturebelliuzhsepur';
+const BusinessUser = require("../models/bussinesModel");
 
 // User Register function
  exports.register = (req, res) => {
@@ -66,15 +67,16 @@ try{
                 user = JSON.stringify(user);
                 user = JSON.parse(user);
                 user['userintro'] = JSON.parse(JSON.stringify(newuserintro));
- 
-                var data = { 
-                            "access_token" : sign ,
-                            "refresh_token" : "",
-                            "expire_time" : "2d",
-                            "user" : user,
-                            "bussines_id":[]
-                    };  
-                requestHandler.sendSuccess(res,'User successfully logged in.',200,(data));
+                    
+                // var data = { 
+                //             "access_token" : sign ,
+                //             "refresh_token" : "",
+                //             "expire_time" : "2d",
+                //             "user" : user,
+                //             "bussines_id":[]
+                //     };  
+                // requestHandler.sendSuccess(res,'User successfully logged in.',200,(data));
+                GetBusiness(req,res,sign,user);
             }
        }
     });
@@ -83,6 +85,38 @@ try{
     requestHandler.sendError(req,res, 500, 'User Signin',(errMessage));
   }
 };
+
+GetBusiness =function(req,res,sign,user){
+try
+{
+    BusinessUser.find( { owner_id: user.user_id}, 
+        function (err, businessUser) {
+            var data ;
+        if (err){
+            data = { 
+                "access_token" : sign ,
+                "refresh_token" : "",
+                "expire_time" : "2d",
+                "user" : user,
+                "bussines_id":[]
+            }; 
+        } 
+        else {
+            data = { 
+                "access_token" : sign ,
+                "refresh_token" : "",
+                "expire_time" : "2d",
+                "user" : user,
+                "bussines_id":businessUser
+            }; 
+        }
+        requestHandler.sendSuccess(res,'User successfully logged in.',200,(data));
+      });
+} catch (err) {
+    errMessage = { "SignIn": { "message" : err.message } };
+    requestHandler.sendError(req,res, 500, 'User Signin',(errMessage));
+  }
+}
 
 // User Register function
     exports.loginRequired = (req, res, next) => {
