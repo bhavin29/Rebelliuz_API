@@ -1,6 +1,7 @@
 const config = require('../../config/appconfig');
 const fs = require('fs');
 const uploadFile = require('../../utils/uploadIntro.js');
+const RunCommand = require('../../utils/runCommand.js');
 const UserIntro = require('../models/userIntroModel');
 const RequestHandler = require('../../utils/RequestHandler');
 const Logger = require('../../utils/logger');
@@ -31,6 +32,10 @@ const upload = async (req, res) => {
               errMessage = '{ "intro": { "message" : "User introdcution is not saved!!"} }';
               requestHandler.sendError(req,res, 422, 'Somthing worng with user introduction',JSON.parse(errMessage));
             } else {
+              var filenamex = config.general.content_path + '\\users\\intro\\' + global.vFilename; 
+
+            //  RunCommand(config.general.ffmpeg_path + 'ffmpeg', '-i ' + filenamex + ' -ss 00:00:04 -vframes 1 -y ' + filenamex.substring(0,filenamex.length -3) +'jpg', 
+            //  data => console.log(data), () => console.log('finished'))
               requestHandler.sendSuccess(res,'User introduction file save successfully.',200,userintro);
             }
         });
@@ -41,6 +46,7 @@ const upload = async (req, res) => {
 
           try {
             fs.unlinkSync(config.general.content_path + "/users/intro/" + oldvFilename)
+            fs.unlinkSync(config.general.content_path + "/users/intro/" + oldvFilename.substring(0,oldvFilename.length-3) + 'jpg')
             //file removed
             } catch(err) {
               console.error(err)
@@ -52,6 +58,14 @@ const upload = async (req, res) => {
               errMessage = '{ "intro": { "message" : "User introdcution is not saved!!"} }';
               requestHandler.sendError(req,res, 422, 'Somthing worng with user introduction',JSON.parse(errMessage));
             } else {
+
+             var filenamex = config.general.content_path + '\\users\\intro\\' + global.vFilename; 
+	          
+            // RunCommand(config.general.ffmpeg_path + 'ffmpeg', '-i ' + filenamex + ' -ss 00:00:04 -vframes 1 -y ' + filenamex.substring(0,filenamex.length -3) +'jpg', 
+            //      data => console.log(data), () => console.log('finished'))
+
+             /* RunCommand('c:\\ffmpeg\\bin\\ffmpeg', '-i d:\\1.mp4 -vcodec libx265 -crf 28 d:\\11_output.mp4', 
+                  data => console.log(data), () => console.log('finished'))*/
               requestHandler.sendSuccess(res,'User introduction file update successfully.',200,userIntro);
             }
           });

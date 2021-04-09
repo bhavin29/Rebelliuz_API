@@ -10,7 +10,7 @@ const bcrypt = require('bcryptjs');
 const Schema = mongoose.Schema;
 
 // Create Schema Instance for Bussines_Admin_UserSchema and add properties
-const Bussines_Admin_UserSchema = new Schema({
+const BussinesSchema = new Schema({
     page_id: { type: Number, default: 0 },
     owner_id: { type: Number, default: 0 },
     resource_type: { type: Number, default: 0 },
@@ -85,5 +85,5 @@ const Bussines_Admin_UserSchema = new Schema({
 });
 
 
-// Create and export Bussines_Admin_UserSchema model
-module.exports = mongoose.model("bussines_Admin_UserSchema", Bussines_Admin_UserSchema);
+// Create and export BussinesSchema model
+module.exports = mongoose.model("bussineses", BussinesSchema);
