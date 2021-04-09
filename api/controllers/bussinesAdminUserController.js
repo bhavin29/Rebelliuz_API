@@ -14,7 +14,7 @@ const view = function (req, res) {
         BussinesAdminUser.find({ bussines_id: req.params.bussinesid }, function (err, BussinesAdminUser) {
         if (err)
         {
-            errMessage = '{ "Bussines Admin User": { "message" : "Bussines admin user is not found"} }';
+            errMessage = '{ "Bussines Admin User": { "message" : "' + err.message +' "} }';
             requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
         }
         else
@@ -90,7 +90,7 @@ const add = async (req, res) => {
 
     jobValidation = function (req){
         var result = 0;
-        if ( req.body.bussines_user_id == undefined &&  req.params.role == undefined )
+        if ( req.body.bussines_user_id == undefined &&  req.body.role == undefined )
          {
             result = 1;
           }

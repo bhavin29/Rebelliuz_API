@@ -16,9 +16,14 @@ exports.view = function (req, res) {
             errMessage = '{ "User Email": { "message" : "User email is not found"} }';
             requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
         }
-        else
+        else if (User)
         {
             requestHandler.sendSuccess(res,'User email found successfully.',200,User);
+        }
+        else
+        {
+            errMessage = '{ "User Email": { "message" : "User email is not found"} }';
+            requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
         }
     });
     } catch (err) {
