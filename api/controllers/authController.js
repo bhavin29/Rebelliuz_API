@@ -30,7 +30,6 @@ try{
   
 };
 
-
 // User Sign function
     exports.signIn = (req, res) => {
 try{
@@ -62,20 +61,11 @@ try{
                     requestHandler.sendError(req,res, 422, 'Authentication failed. Wrong password.',JSON.parse(errMessage));
                 } else {
                var sign =  jwt.sign({ email: user.email, displayname : user.displayname, _id: user._id }, accessTokenSecret);
- //               var sign =  jwt.sign({ user }, accessTokenSecret);
 
                 user = JSON.stringify(user);
                 user = JSON.parse(user);
                 user['userintro'] = JSON.parse(JSON.stringify(newuserintro));
                     
-                // var data = { 
-                //             "access_token" : sign ,
-                //             "refresh_token" : "",
-                //             "expire_time" : "2d",
-                //             "user" : user,
-                //             "bussines_id":[]
-                //     };  
-                // requestHandler.sendSuccess(res,'User successfully logged in.',200,(data));
                 GetBusiness(req,res,sign,user);
             }
        }

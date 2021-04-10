@@ -74,7 +74,15 @@ add = function (req, res) {
 
 // View User Reference
 view = function (req, res) {
-    let aggregate_options = [];
+
+  if (req.body.user_id == undefined || req.body.user_id =='')
+  {
+    errMessage = '{ "User reference": { "message" : "Please enter user id"} }';
+    requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+  }
+  else
+  {
+  let aggregate_options = [];
 
     //PAGINATION
     let page = parseInt(req.query.page) || 1;
@@ -91,7 +99,7 @@ view = function (req, res) {
      };
     
     //FILTERING AND PARTIAL TEXT SEARCH -- FIRST STAGE
-    let match = {};
+    let match = { owner_id : req.body.user_id};
 
     //filter by name - use $regex in mongodb - add the 'i' flag if you want the search to be case insensitive.
       if (req.query.recommendedtext)
@@ -131,6 +139,7 @@ view = function (req, res) {
         errMessage = { "User Reference GET": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
     }
+   }
  };
 
  remove = function (req, res) {

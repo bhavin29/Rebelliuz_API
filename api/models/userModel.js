@@ -2,6 +2,7 @@
    
 // Import mongoose 
 const  mongoose = require("mongoose");
+const aggregatePaginate = require('mongoose-aggregate-paginate-v2');
 
 // Import bcryptjs - for password hashing
 const  bcrypt = require('bcryptjs');
@@ -77,6 +78,8 @@ const  UserSchema = new  Schema({
 UserSchema.methods.comparePassword = function(password){
 return  bcrypt.compareSync(password, this.hash_password);
 }
+
+UserSchema.plugin(aggregatePaginate);
 
 // Create and export User model
 module.exports = mongoose.model("users", UserSchema);

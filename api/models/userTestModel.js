@@ -11,10 +11,7 @@ const  UserTestSchema = new  Schema({
     user_id: { type: String, trim: true, required:  true },
     test_id: { type: String, trim: true, required:  true },
     test_question_id: { type: String, trim: true, required:  true },
-    answer1: { type: Boolean,  trim: true, required:  true },
-    answer2: { type: Boolean,  trim: true, required:  true },
-    answer3: { type: Boolean,  trim: true, required:  true },
-    answer4: { type: Boolean,  trim: true, required:  true },
+    answer: { type: Number,  trim: true, required:  true },
     created_on: { type: Date, default: Date.now },
     created_by: { type: Number, default: 0 }
 });

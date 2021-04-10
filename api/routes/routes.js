@@ -162,15 +162,16 @@ router.route("/user/test")
    .post(auth.isAuthunticated,userTestController.add);
 
 router.route("/user/test/upload")
-   .get(auth.isAuthunticated,userTestController.index)
-   .post(auth.isAuthunticated,userTestController.addupload);
+   .get(auth.isAuthunticated,userTestController.indexupload)
+   .post(auth.isAuthunticated,userTestController.addupload)
+   .delete(auth.isAuthunticated,userTestController.deleteupload);
 
 router.route("/user/reference")
    .get(auth.isAuthunticated,userReferenceController.view)
    .post(auth.isAuthunticated,userReferenceController.add)
    .delete(auth.isAuthunticated,userReferenceController.remove);
 
-router.route("/user/:emailId")
+router.route("/user")
    .get(auth.isAuthunticated,userController.view)
 
 //Bussines

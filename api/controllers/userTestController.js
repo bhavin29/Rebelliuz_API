@@ -14,6 +14,61 @@ var resources = {
     test_title: "$test_title"
 };
 
+exports.indexupload = async function (req, res) {
+  let aggregate_options = [];
+
+  //PAGINATION
+  let page = parseInt(req.query.page) || 1;
+  let limit = parseInt(req.query.rowsPerPage) || global.rows_per_page;
+
+  //set the options for pagination
+  const options = {
+      page, limit,
+      collation: {locale: 'en'},
+      customLabels: {
+          totalDocs: 'testupload',
+          docs: 'user_test_uploads'
+      }
+  };
+  
+  //FILTERING AND PARTIAL TEXT SEARCH -- FIRST STAGE
+  let match = {};
+
+  //filter by name - use $regex in mongodb - add the 'i' flag if you want the search to be case insensitive.
+  if (req.query.searchText)
+  {
+      match.test_title = {$regex: req.query.searchText, $options: 'i'};
+  } 
+
+  aggregate_options.push({$match: match});
+  
+  //SORTING -- THIRD STAGE
+  let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? -1 : 1;
+  aggregate_options.push({$sort: {"test_title": sortOrder}});
+
+  // Set up the aggregation
+  const myAggregate = UserTestUpload.aggregate(aggregate_options);
+
+  try
+  {
+    UserTestUpload.aggregatePaginate(myAggregate,options,function (err, Country) {
+          if (err)
+          {
+              errMessage = '{ "Test upload": { "message" : "Test upload is not getting data!!"} }';
+              requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+          }
+          else
+          {
+              requestHandler.sendSuccess(res,'Test data successfully.',200,Country);
+          }
+      });
+  }   
+      catch (err) {
+      errMessage = { "CouTest upload GET": { "message" : err.message } };
+      requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+  }
+};
+
 //upload and save/update user intro
 exports.addupload = async (req, res) => {
   try {
@@ -39,7 +94,7 @@ exports.addupload = async (req, res) => {
           usertestUpload.save(function (err) {
             if (err){
               errMessage = '{ "test": { "message" : "User test file is not saved!!"} }';
-              requestHandler.sendError(req,res, 422, 'Somthing worng with user test',JSON.parse(errMessage));
+              requestHandler.sendError(req,res, 422, 'Somthing worng with user test:' + err.message,JSON.parse(errMessage));
             } else {
               requestHandler.sendSuccess(res,'User test file save successfully.',200,usertestUpload);
             }
@@ -150,19 +205,13 @@ callUserTestAnswer = function(req,res,userTestResult,userTest){
       testanswer = a; 
       testanswer = JSON.stringify(testanswer);
       testanswer = JSON.parse(testanswer);
-      testanswer['answer1'] = false;
-      testanswer['answer2'] = false;
-      testanswer['answer3'] = false;
-      testanswer['answer4'] = false;
+      testanswer['answer'] = '';
  
       K=0;
       for (var userrow of userTest){
  
         if (questoin_id == userrow.test_question_id){
-            testanswer['answer1'] = userrow.answer1;
-            testanswer['answer2'] = userrow.answer2;
-            testanswer['answer3'] = userrow.answer3;
-            testanswer['answer4'] = userrow.answer4;
+            testanswer['answer'] = userrow.answer;
           }
         K=K=1;
     }
@@ -172,17 +221,12 @@ callUserTestAnswer = function(req,res,userTestResult,userTest){
   i=i+1;
 }
 
-var data = { 
-      "usertest" :userTestResult
-};  
+  var data = { 
+        "usertest" :userTestResult
+  };  
 
-requestHandler.sendSuccess(res,'User test detail.',200,data);
+  requestHandler.sendSuccess(res,'User test detail.',200,data);
 }
-
-
-
-
-
 
 //For creating new User Test
 exports.add = function (req, res) {
@@ -190,7 +234,7 @@ exports.add = function (req, res) {
         {
             UserTest.findOne({ user_id: global.decoded._id, test_id : req.body.test_id,test_question_id : req.body.test_question_id },(err,userTest)=>{
         if (err) {
-            errMessage = '{ "intro": { "message" : "User reference is not saved!!"} }';
+            errMessage = '{ "Test": { "message" : "User reference is not saved!!"} }';
             requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
         }
         if (!userTest) {
@@ -200,10 +244,7 @@ exports.add = function (req, res) {
          usertest.user_id = global.decoded._id;
          usertest.test_id = req.body.test_id;
          usertest.test_question_id = req.body.test_question_id;
-         usertest.answer1 = req.body.answer1;
-         usertest.answer2 = req.body.answer2;
-         usertest.answer3 = req.body.answer3;
-         usertest.answer4 = req.body.answer4;
+         usertest.answer = req.body.answer ;
          usertest.isactive = req.body.isactive;
     
         //Save and check error
@@ -222,18 +263,21 @@ exports.add = function (req, res) {
     else if (userTest) {
         
         if(req.body.title != undefined)
-            userTest.answer1 = req.body.answer1;
+            userTest.title = req.body.title;
 
         if(req.body.pros != undefined)
-            userTest.answer2 = req.body.answer2;
+            userTest.pros = req.body.pros;
 
         if(req.body.cons != undefined)
-            userTest.answer3 = req.body.answer3;
+            userTest.cons = req.body.cons;
 
         if(req.body.description != undefined)
-            userTest.answer4 = req.body.answer4;
+            userTest.description = req.body.description;
 
-        userTest.save(function (err) {
+        if(req.body.answer != undefined)
+            userTest.answer = req.body.answer;
+    
+          userTest.save(function (err) {
             if (err){
               errMessage = '{ "reference": { "message" : "User test is not saved!!"} }';
               requestHandler.sendError(req,res, 422, 'Somthing worng with user job',JSON.parse(errMessage));
@@ -249,3 +293,23 @@ exports.add = function (req, res) {
     }
 };
 
+exports.deleteupload = function (req, res) {
+  try
+    {
+      UserTestUpload.deleteOne({ user_id: global.decoded._id, _id : req.body._id },function (err, userReference) {
+        if (err)
+        {
+            errMessage = '{ "User test ": { "message" : "User test is not delete data!!"} }';
+            requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+        }
+        else
+        {
+            requestHandler.sendSuccess(res,'User test deleted successfully.',200,userReference);
+        }
+    });
+    }   
+    catch (err) {
+        errMessage = { "User Test Upload DELETE": { "message" : err.message } };
+        requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+    }
+  };
