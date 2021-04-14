@@ -1,6 +1,9 @@
+const config = require('../../config/appconfig');
 const UserReference = require('../models/userReferenceModel');
+const User = require('../models/userModel');
 const RequestHandler = require('../../utils/RequestHandler');
 const Logger = require('../../utils/logger');
+const { ObjectId } = require('bson');
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
 
@@ -74,11 +77,85 @@ add = function (req, res) {
 
 // View User Reference
 view = function (req, res) {
-
-  if (req.body.user_id == undefined || req.body.user_id =='')
+ 
+  if (req.query.ownerid == undefined || req.query.ownerid =='')
   {
-    errMessage = '{ "User reference": { "message" : "Please enter user id"} }';
-    requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+    errMessage = '{ "User reference": { "message" : "Please enter owner id"} }';
+    requestHandler.sendError(req,res, 422, 'Somthing went worng: ',JSON.parse(errMessage));
+  }
+  else
+  {
+ 
+    let match = { owner_id : req.query.ownerid};
+
+    //filter by name - use $regex in mongodb - add the 'i' flag if you want the search to be case insensitive.
+      if (req.query.recommendedtext)
+    {
+        match.recommended = {$regex: req.query.recommendedtext, $options: 'i'};
+    } 
+
+    if (req.query.rating)
+    {
+        match.rating = {$regex: req.query.rating, $options: 'i'};
+    } 
+
+
+    UserReference.aggregate([
+     {
+         $lookup:
+            {
+              from: "users",
+              let: { id: "$user_id" },
+              pipeline: [
+                {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, coverphoto:1  }  },
+                {$match: {$expr: {$eq: ["$_id", "$uid"]}}}
+              ],
+              as: "userdata"
+            }
+          },
+          {   $unwind:"$userdata" },
+          {
+              $lookup:{
+                from: "storage_files",
+                let: { photo_id: "$userdata.photo_id" , cover_photo: "$userdata.coverphoto" },
+                pipeline: [
+                  {$project: { storage_path :1, _id: 1,file_id:1 , displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
+                  {$match: {$expr:
+                        { $or : 
+                          [
+                            {$eq: ["$file_id", "$$photo_id"]},
+                         //   {$eq: ["$file_id", "$$cover_photo"]},
+                          ]
+                        }
+                  } 
+                  }
+                ],
+                as: "photo"
+                }
+          }],function(err, data) {
+                if (err)
+                 {
+                     errMessage = '{ "User Test": { "message" : "User test is not found"} }';
+                     requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+                 }
+                 else
+                 {
+                  // callUserTest(req,res,data)
+                     requestHandler.sendSuccess(res,'Bussiens user job result found successfully.',200,data);
+                 }
+              }
+      );
+        }
+}
+
+
+// View User Reference
+view123 = function (req, res) {
+
+  if (req.query.ownerid == undefined || req.query.ownerid =='')
+  {
+    errMessage = '{ "User reference": { "message" : "Please enter owner id"} }';
+    requestHandler.sendError(req,res, 422, 'Somthing went worng: ',JSON.parse(errMessage));
   }
   else
   {
@@ -99,7 +176,7 @@ view = function (req, res) {
      };
     
     //FILTERING AND PARTIAL TEXT SEARCH -- FIRST STAGE
-    let match = { owner_id : req.body.user_id};
+    let match = { owner_id : req.query.ownerid};
 
     //filter by name - use $regex in mongodb - add the 'i' flag if you want the search to be case insensitive.
       if (req.query.recommendedtext)
@@ -114,9 +191,23 @@ view = function (req, res) {
 
     aggregate_options.push({$match: match});
     
+   
     //SORTING -- THIRD STAGE
     let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? -1 : 1;
     aggregate_options.push({$sort: {"rating": sortOrder}});
+ 
+    aggregate_options.push({ "$addFields": { "user_id": { "$toString": "$user_id" }}});
+     aggregate_options.push(
+    {
+      $lookup:{
+       from: 'users',
+       localField:  'user_id',
+       foreignField: '_id' ,
+       as: 'Users'
+       }
+     });
+
+
 
     // Set up the aggregation
     const myAggregate = UserReference.aggregate(aggregate_options);
@@ -131,7 +222,8 @@ view = function (req, res) {
             }
             else
             {
-                requestHandler.sendSuccess(res,'Got user reference data successfully.',200,userReference);
+              requestHandler.sendSuccess(res,'User reference found successfully.',200,userReference);
+             // addusers(req,res,userReference);
             }
         });
     }   
@@ -141,6 +233,35 @@ view = function (req, res) {
     }
    }
  };
+
+addusers = function(req,res,userReference){
+  
+  User.aggregate([  
+    //           { "$match": { "user_id": global.decoded._id } },
+               { "$addFields": { "_id": { "$toString": "$_id" }}},
+               {
+                  $lookup:{
+                   from: userReference,//'test_questions',
+                   localField: '_id',
+                   foreignField: 'user_id',
+                   as: 'UserReference'
+                   }
+                 }
+             ],function(err, data) {
+                if (err)
+               {
+                   errMessage = '{ "User Test": { "message" : "User test is not found"} }';
+                   requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+               }
+               else
+               {
+                   requestHandler.sendSuccess(res,'User test found successfully.',200,data);
+               }
+           });      
+  }
+
+
+
 
  remove = function (req, res) {
   try

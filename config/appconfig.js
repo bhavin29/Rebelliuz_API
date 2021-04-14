@@ -34,5 +34,6 @@ module.exports = {
 		log_path : process.env.LOG_PATH || 'D:\\Bhavin\\MyProject\\Rebelliuz\\Publish\\',
 		ffmpeg_path : process.env.FFMPEG_PATH || 'C:\\FFmpeg\\bin\\',
 		rows_per_page : process.env.ROWS_PER_PAGE || 5,
-		}
+		parent_root : process.env.PARENT_ROOT || 'https://www.rebelliuz.com/',
+	}
 };

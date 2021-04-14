@@ -172,7 +172,7 @@ router.route("/user/reference")
    .delete(auth.isAuthunticated,userReferenceController.remove);
 
 router.route("/user")
-   .get(auth.isAuthunticated,userController.view)
+   .post(auth.isAuthunticated,userController.view)
 
 //Bussines
 router.route("/bussines/job/:bussinesid")
