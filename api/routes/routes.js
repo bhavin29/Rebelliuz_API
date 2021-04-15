@@ -173,8 +173,10 @@ router.route("/user/test")
 
 router.route("/user/test/upload")
    .get(auth.isAuthunticated,userTestController.indexupload)
-   .post(auth.isAuthunticated,userTestController.addupload)
-   .delete(auth.isAuthunticated,userTestController.deleteupload);
+   .post(auth.isAuthunticated,userTestController.addupload);
+
+router.route("/user/test/upload/:id")
+  .delete(auth.isAuthunticated,userTestController.deleteupload);
 
 router.route("/user/reference")
    .get(auth.isAuthunticated,userReferenceController.view)

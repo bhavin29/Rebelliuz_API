@@ -49,14 +49,27 @@ exports.view = function (req, res) {
                     docs: 'users'
                 }
             };
-            
+
+            var condition = {};
+            if ( req.body.email != '' && req.body.email !=undefined ){ 
+                condition = condition + {email: new RegExp(req.body.email,"i") };
+            }
+            if ( req.body.displayname != '' && req.body.displayname !=undefined ){ 
+                condition = condition + {displayname: new RegExp(req.body.displayname,"i") };
+            }
+            if ( req.body.location != '' && req.body.location !=undefined ){ 
+                condition = condition + {location: new RegExp(req.body.location,"i") };
+            }
+
             //FILTERING AND PARTIAL TEXT SEARCH -- FIRST STAGE
             let match = {
                     $and :[ 
                     {
-                        $or: [{email: new RegExp(req.body.email,"i")}, 
+                        $or: [
+                        {email: new RegExp(req.body.email,"i")}, 
                         {displayname : new RegExp(req.body.displayname,"i")}, 
-                        {location: RegExp(req.body.location,"i")} ]
+                        {location: RegExp(req.body.location,"i")} 
+                        ]
                     },
                     {
                         email: { $ne: global.decoded.email }

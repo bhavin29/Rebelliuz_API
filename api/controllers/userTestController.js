@@ -1,3 +1,4 @@
+var mongoose = require('mongoose');
 const _ = require('lodash');
 const UserTestUpload = require('../models/userTestUploadModel');
 const UserTest = require('../models/userTestModel');
@@ -319,7 +320,8 @@ exports.add = function (req, res) {
 exports.deleteupload = function (req, res) {
   try
     {
-      UserTestUpload.deleteOne({ user_id: global.decoded._id, _id : req.body._id },function (err, userReference) {
+
+      UserTestUpload.deleteOne({ _id : mongoose.Types.ObjectId(req.params.id) },function (err, userTestUpload) {
         if (err)
         {
             errMessage = '{ "User test ": { "message" : "User test is not delete data!!"} }';
@@ -327,7 +329,20 @@ exports.deleteupload = function (req, res) {
         }
         else
         {
-            requestHandler.sendSuccess(res,'User test deleted successfully.',200,userReference);
+         /* try {
+            fs.unlinkSync(config.general.content_path + "/test/" + userTestUpload.test_filename)
+            //file removed
+            } catch(err) {
+              console.error(err)
+          }*/
+          if (userTestUpload.deletedCount == 1){
+            requestHandler.sendSuccess(res,'User test deleted successfully.',200,userTestUpload);
+          }
+          else
+          {
+            errMessage = '{ "User test ": { "message" : "User test is not found!!"} }';
+            requestHandler.sendError(req,res, 422, 'No data found',JSON.parse(errMessage));
+          }
         }
     });
     }   
