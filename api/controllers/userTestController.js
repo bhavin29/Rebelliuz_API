@@ -206,12 +206,35 @@ callUserTestAnswer = function(req,res,userTestResult,userTest){
       testanswer = JSON.stringify(testanswer);
       testanswer = JSON.parse(testanswer);
       testanswer['answer'] = '';
+      testanswer['start_range'] = 0;
+      testanswer['end_range'] = 0;
  
       K=0;
       for (var userrow of userTest){
  
         if (questoin_id == userrow.test_question_id){
             testanswer['answer'] = userrow.answer;
+
+            if (userrow.answer == 1)
+            {
+              testanswer['start_range'] = 0;
+              testanswer['end_range'] = 25;
+            }
+            else if (userrow.answer == 2)
+            {
+              testanswer['start_range'] = 26;
+              testanswer['end_range'] = 50;
+            }
+            else if (userrow.answer == 3)
+            {
+              testanswer['start_range'] = 51;
+              testanswer['end_range'] = 75;
+            }
+            else if (userrow.answer == 4)
+            {
+              testanswer['start_range'] = 76;
+              testanswer['end_range'] = 10;
+            }
           }
         K=K=1;
     }

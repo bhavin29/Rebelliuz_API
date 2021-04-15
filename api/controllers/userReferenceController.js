@@ -21,7 +21,7 @@ add = function (req, res) {
            
           userreference.owner_id = global.decoded._id;
           userreference.user_id = req.body.user_id;
-
+          userreference.relationship_id = req.body.relationship_id;
           userreference.title = req.body.title;
           userreference.pros = req.body.pros;
           userreference.cons = req.body.cons;
@@ -58,10 +58,13 @@ add = function (req, res) {
         if(req.body.recommended != undefined)
                 userReference.recommended = req.body.recommended;
 
+        if(req.body.relationship_id != undefined)
+        userReference.relationship_id = req.body.relationship_id;
+ 
         userReference.save(function (err) {
             if (err){
               errMessage = '{ "reference": { "message" : "User reference is not saved!!"} }';
-              requestHandler.sendError(req,res, 422, 'Somthing worng with user job',JSON.parse(errMessage));
+              requestHandler.sendError(req,res, 422, 'Somthing worng with user job:' + err.message,JSON.parse(errMessage));
             } else {
               requestHandler.sendSuccess(res,'User reference updated successfully.',200,userReference);
             }
@@ -85,7 +88,6 @@ view = function (req, res) {
   }
   else
   {
- 
     let match = { owner_id : req.query.ownerid};
 
     //filter by name - use $regex in mongodb - add the 'i' flag if you want the search to be case insensitive.
@@ -98,7 +100,6 @@ view = function (req, res) {
     {
         match.rating = {$regex: req.query.rating, $options: 'i'};
     } 
-
 
     UserReference.aggregate([
      {
@@ -259,9 +260,6 @@ addusers = function(req,res,userReference){
                }
            });      
   }
-
-
-
 
  remove = function (req, res) {
   try

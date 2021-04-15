@@ -35,6 +35,8 @@ var TestQuestionController = require('../controllers/master/testQuestionControll
 var CountryController = require('../controllers/master/countryController');
 var CultureValuesController = require('../controllers/master/cultureValuesController');
 var LocationController = require('../controllers/master/locationController');
+var ReferenceRelationshipController = require('../controllers/master/referenceRelationshipController');
+
 const auth = require('../../utils/auth');
 
 // Bio routes
@@ -144,6 +146,14 @@ router.route("/masters/location")
 router.route("/masters/location/:locationId")
    .get(auth.isAuthunticated,LocationController.view)
    .put(auth.isAuthunticated,LocationController.update);
+
+router.route("/masters/referenceRelationship")
+   .get(auth.isAuthunticated,ReferenceRelationshipController.index)
+   .post(auth.isAuthunticated,ReferenceRelationshipController.add);
+
+   router.route("/masters/referenceRelationship/:relationshipId")
+   .get(auth.isAuthunticated,ReferenceRelationshipController.view)
+   .put(auth.isAuthunticated,ReferenceRelationshipController.update);
 
 //user   
 router.route("/user/intro")

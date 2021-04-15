@@ -11,6 +11,7 @@ const  Schema = mongoose.Schema;
 const  UserReferenceSchema = new  Schema({
     owner_id: { type: String, required:  true },
     user_id: { type: String, required:  true },
+    relationship_id: { type: String, required:  true },
     title: { type: String,  required:  true },
     pros: { type: String,  required:  true },
     cons: { type: String, required:  true },

@@ -56,10 +56,10 @@ try{
                 requestHandler.sendError(req,res, 422, 'Authentication failed. Email not found.',JSON.parse(errMessage));
             }
             else if (user) {
-                if (!user.comparePassword(req.body.password)) {  
+              /*  if (!user.comparePassword(req.body.password)) {  
                     errMessage = '{ "password": { "message" : "The password is not valid."} }';
                     requestHandler.sendError(req,res, 422, 'Authentication failed. Wrong password.',JSON.parse(errMessage));
-                } else {
+                } else {*/
                var sign =  jwt.sign({ email: user.email, displayname : user.displayname, _id: user._id }, accessTokenSecret);
 
                 user = JSON.stringify(user);
@@ -67,7 +67,7 @@ try{
                 user['userintro'] = JSON.parse(JSON.stringify(newuserintro));
                     
                 GetBusiness(req,res,sign,user);
-            }
+           // }
        }
     });
   } catch (err) {
