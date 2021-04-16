@@ -67,8 +67,8 @@ exports.view = function (req, res) {
                     {
                         $or: [
                         {email: new RegExp(req.body.email,"i")}, 
-                        {displayname : new RegExp(req.body.displayname,"i")}, 
-                        {location: RegExp(req.body.location,"i")} 
+                      //  {displayname : new RegExp(req.body.displayname,"i")}, 
+                      //  {location: RegExp(req.body.location,"i")} 
                         ]
                     },
                     {

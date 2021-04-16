@@ -13,10 +13,10 @@ const  UserReferenceSchema = new  Schema({
     user_id: { type: String, required:  true },
     relationship_id: { type: String, required:  true },
     title: { type: String,  required:  true },
-    pros: { type: String,  required:  true },
-    cons: { type: String, required:  true },
+/*    pros: { type: String,  required:  true },
+    cons: { type: String, required:  true },*/
     description: { type: String,  required:  true },
-    rating: { type: Number, required:  true },
+ //   rating: { type: Number, required:  true },
     recommended: { type: Boolean, default: 0 },
     useful_count: { type: Number, default: 0 },
     funny_count: { type: Number, default: 0 },

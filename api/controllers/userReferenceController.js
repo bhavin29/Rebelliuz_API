@@ -23,10 +23,10 @@ add = function (req, res) {
           userreference.user_id = req.body.user_id;
           userreference.relationship_id = req.body.relationship_id;
           userreference.title = req.body.title;
-          userreference.pros = req.body.pros;
-          userreference.cons = req.body.cons;
+          //userreference.pros = req.body.pros;
+          //userreference.cons = req.body.cons;
           userreference.description = req.body.description;
-          userreference.rating = req.body.rating;
+          //userreference.rating = req.body.rating;
           userreference.recommended = req.body.recommended;
 
           userreference.save(function (err) {
@@ -43,17 +43,17 @@ add = function (req, res) {
         if(req.body.title != undefined)
                 userReference.title = req.body.title;
 
-        if(req.body.pros != undefined)
+        /*if(req.body.pros != undefined)
                 userReference.pros = req.body.pros;
 
         if(req.body.cons != undefined)
-                userReference.cons = req.body.cons;
+                userReference.cons = req.body.cons;*/
 
         if(req.body.description != undefined)
                 userReference.description = req.body.description;
 
-        if(req.body.rating != undefined)
-                userReference.rating = req.body.rating;
+        /*if(req.body.rating != undefined)
+                userReference.rating = req.body.rating;*/
 
         if(req.body.recommended != undefined)
                 userReference.recommended = req.body.recommended;

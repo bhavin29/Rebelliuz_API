@@ -33,7 +33,7 @@ exports.indexupload = async function (req, res) {
   };
   
   //FILTERING AND PARTIAL TEXT SEARCH -- FIRST STAGE
-  let match = {};
+  let match = { user_id : global.decoded._id};
 
   //filter by name - use $regex in mongodb - add the 'i' flag if you want the search to be case insensitive.
   if (req.query.searchText)

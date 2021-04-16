@@ -12,8 +12,10 @@ module.exports = {
 	db: {
 		port: process.env.DB_PORT || 27016,
 		dbPath: process.env.DB_PATH || 'mongodb://localhost/firstrest',
-	//	dbPath: process.env.DB_PATH || 'mongodb+srv://test:test123@cluster0.e9yvt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority?authSource=admin&ssl=true' ,
-	},
+	//
+		dbPath: process.env.DB_PATH || 'mongodb+srv://test:test123@cluster0.e9yvt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority?authSource=admin&ssl=true' ,
+	//	dbPath: process.env.DB_PATH || 'mongodb://test:test123@cluster0.e9yvt.mongodb.net:27017?authMechanism=DEFAULT&authSource=db&ssl=true"';
+},
 	winiston: {
 		logpath: '/iLrnLogs/logs/',
 	},
