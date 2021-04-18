@@ -10,7 +10,7 @@ const  Schema = mongoose.Schema;
 const  BussinesJobUserAnswerSchema = new  Schema({
     bussines_id: { type: String, required:  true },
     job_category_id: { type: String, required:  true },
-    bussines_job_id: { type: String, required:  true },
+    bussines_job_id: { type: String },
     bussines_user_id: { type: String, required:  true },
     search_user_id: { type: String, required:  true },
     job_question_id: { type: String, required:  true },
@@ -19,7 +19,7 @@ const  BussinesJobUserAnswerSchema = new  Schema({
     created_by: { type: Number, default: 0 }
 });
 
-// search_status: 1: Requested, 2: RequestApproved, 3: RequestRejected, 3: Shortlisted, 4: Offer, 5: Final Interview, 6: TalentPool 
+//Rating: 1:Unacceptable, 2: Needs Improvement, 3: Meets Expectation, 4: Exceeds Expectation, 5: Outstanding 
 //overall_rating : sum of rating given on each question bu bussines_user_id
 //overall_progress: overall view by user on vidoe answers
 

@@ -10,7 +10,7 @@ const  Schema = mongoose.Schema;
 const  BussinesJobUserCommentSchema = new  Schema({
     bussines_id: { type: String, required:  true },
     job_category_id: { type: String, required:  true },
-    bussines_job_id: { type: String, required:  true },
+    bussines_job_id: { type: String },
     bussines_user_id: { type: String, required:  true },
     search_user_id: { type: String, required:  true },
     comments: { type: String, required:  true },

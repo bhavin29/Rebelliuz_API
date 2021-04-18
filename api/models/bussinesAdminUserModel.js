@@ -20,7 +20,7 @@ const  BussinesAdminUserSchema = new  Schema({
 BussinesAdminUserSchema.plugin(aggregatePaginate);
 
 
-//role : HR, Panaliest
+//role : 1: HR, 2: Panaliest
 
 // Create and export User model
 module.exports = mongoose.model("bussines_admin_users", BussinesAdminUserSchema);

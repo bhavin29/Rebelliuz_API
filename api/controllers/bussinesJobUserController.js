@@ -73,8 +73,8 @@ try {
       
 jobValidation = function (req){
   var result = 0;
-  if ( req.body.job_category_id == undefined ||  req.params.bussinesid == undefined ||  req.body.bussines_job_id == undefined
-         || req.body.search_user_id == undefined ||  req.body.search_status == undefined )
+  if ( req.body.job_category_id == undefined ||  req.params.bussinesid == undefined ||  
+         req.body.search_user_id == undefined ||  req.body.search_status == undefined )
    {
       result = 1;
     }
@@ -89,7 +89,7 @@ var status = 0;
 if(req.query.status != undefined){
         status = req.query.status; 
 
-        if (!(status >= 1 & status<= 6))
+        if (!(status >= 0 & status<= 6))
         {
         errMessage = '{ "Search status": { "message" : "Status is out of range."} }';
         return requestHandler.sendError(req,res, 422, 'Please enter correct status.',JSON.parse(errMessage));
@@ -114,7 +114,7 @@ else {
 //find the all best march with the user_job fr this bussinesid and return the user list        
 // culture_values_id: { type: String, required:  true },    
 BussinesJob.aggregate([
-        { "$match": { "bussines_id": req.params.bussinesid, job_category_id : req.body.job_category_id } },
+        { "$match": { "bussines_id": req.params.bussinesid, job_category_id : req.query.job_category_id } },
         {
            $lookup:
               {
@@ -127,10 +127,10 @@ BussinesJob.aggregate([
                          { $and:
                             [
                               { $eq: [ "$job_category_id",  "$$user_job_category_id" ] },
-                              { $eq: [ "$job_classification_id",  "$$user_job_classification_id" ] },
+                   /*           { $eq: [ "$job_classification_id",  "$$user_job_classification_id" ] },
                               { $eq: [ "$job_experience_id",  "$$user_job_experience_id" ] },
                               { $in: [ "$Job_type_ids",  "$user_Job_type_ids".split(",") ] },
-                        /*      { $in: [ "$job_skill_ids",  "$$user_job_skill_ids" ] },*/
+                             { $in: [ "$job_skill_ids",  "$$user_job_skill_ids" ] },*/
                               //     { $gte: [ "$instock", "$$order_qty" ] }
                             ]
                          }

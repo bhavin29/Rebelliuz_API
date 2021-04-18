@@ -6,38 +6,72 @@ const Logger = require('../../utils/logger');
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
 
-
-// View Bussines Admin User
-const view = function (req, res) {
-    try
+view = function(req,res){
+    
+    BussinesAdminUser.aggregate([
     {
-        BussinesAdminUser.find({ bussines_id: req.params.bussinesid }, function (err, BussinesAdminUser) {
-        if (err)
-        {
-            errMessage = '{ "Bussines Admin User": { "message" : "' + err.message +' "} }';
-            requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+      $match: {bussines_id: req.params.bussinesid}  
+    },
+    {
+       $lookup:
+      {
+        from: "users",
+        let: { id: "$bussines_user_id" },
+        pipeline: [
+          {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, coverphoto:1,owner_id:1 }  },
+                 {$match: {$expr:
+                      {$and:[ 
+                        { $eq: ["$_id", "$uid"]},
+                      ]}
+                  }
+          }
+        ],
+        as: "bussinesuser"
+      }
+    },
+    {   $unwind:"$bussinesuser" },
+    {  $lookup:{
+          from: "storage_files",
+          let: { photo_id: "$photo_id" , cover_photo: "$coverphoto" },
+          pipeline: [
+            {$project: { storage_path :1, _id: 1,file_id:1 , displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
+            {$match: {$expr:
+                  { $or : 
+                    [
+                      {$eq: ["$file_id", "$$photo_id"]},
+                   //   {$eq: ["$file_id", "$$cover_photo"]},
+                    ]
+                  }
+            } 
+            }
+          ],
+          as: "bussinesuserphoto"
         }
-        else
-        {
-            requestHandler.sendSuccess(res,'Bussines admin user found successfully.',200,BussinesAdminUser);
+        },
+        ],function(err, data) {
+          if (err)
+           {
+               errMessage = '{ "Admin user ": { "message" : "User is not found"} }';
+               requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+           }
+           else
+           {
+               requestHandler.sendSuccess(res,'Admin user found successfully.',200,data);
+           }
         }
-    });
-    } catch (err) {
-    errMessage = { "Bussines Admin User GET": { "message" : err.message } };
-    requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
-    }
-};
+    );
+  }
 
 //add/update Bussines Admin User
 const add = async (req, res) => {
     try {
-      if (jobValidation(req))
+      if (jobValidationAdminuser(req))
       {
           errMessage = '{ "Bussines Admin User": { "message" : "Please enter mandatory field."} }';
           return requestHandler.sendError(req,res, 422, 'Please enter mandatory field.',JSON.parse(errMessage));
       }
     
-      BussinesAdminUser.findOne({ bussines_id: req.params.bussinesid, bussines_user_id : req.body.bussines_user_id,role: req.body.role},
+      BussinesAdminUser.findOne({ bussines_id: req.params.bussinesid, bussines_user_id : req.query.bussines_user_id,role: req.query.role},
         (err,bussinesAdminUser)=>{
         if (err){
             errMessage = '{ "Bussines Admin User": { "message" : "Bussines admin user is not saved!!"} }';
@@ -88,7 +122,7 @@ const add = async (req, res) => {
     }
     };
 
-    jobValidation = function (req){
+    jobValidationAdminuser = function (req){
         var result = 0;
         if ( req.body.bussines_user_id == undefined &&  req.body.role == undefined )
          {

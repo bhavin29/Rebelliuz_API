@@ -29,7 +29,8 @@ const upload = async (req, res) => {
         errMessage = '{ "intro": { "message" : "Please upload a file!"} }';
         return requestHandler.sendError(req,res, 422, 'Please upload a file!',JSON.parse(errMessage));
     }*/
-    if (jobValidation(req))
+
+    if (jobValidationBussinesJob(req))
     {
         errMessage = '{ "intro": { "message" : "Please enter mandatory field."} }';
         return requestHandler.sendError(req,res, 422, 'Please enter mandatory field.',JSON.parse(errMessage));
@@ -144,12 +145,13 @@ const upload = async (req, res) => {
   }
 };
 
-jobValidation = function (req){
+jobValidationBussinesJob = function (req){
 
     var result = 0;
     if ( req.body.job_category_id == undefined ||  req.body.job_classification_id == undefined ||  
-        req.body.job_experience_id == undefined || req.body.Job_type_ids == undefined ||  req.body.job_skills_ids == undefined ||  
-        req.body.short_description == undefined ||  req.body.expected_salary_start == undefined || req.body.expected_salary_end == undefined )
+        req.body.job_experience_id == undefined || req.body.Job_type_ids == undefined ||  
+        req.body.job_skills_ids == undefined ||  req.body.short_description == undefined ||  
+        req.body.expected_salary_start == undefined || req.body.expected_salary_end == undefined )
          {
         result = 1;
       }

@@ -19,7 +19,7 @@ const  BussinesJobUserSchema = new  Schema({
     created_by: { type: Number, default: 0 }
 });
 
-// search_status: 1: Requested, 2: RequestApproved, 3: RequestRejected, 3: Shortlisted, 4: Offer, 5: Final Interview, 6: TalentPool 
+//search_status: 10: Requested, 20: Request Approved, 30: Request Rejected, 40: Shortlisted, 50: Offer, 60: Final Interview, 70: TalentPool 
 //overall_rating : sum of rating given on each question by bussines_user_id
 //overall_progress: overall view by user on vidoe answers bussines_user_id
 

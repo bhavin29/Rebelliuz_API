@@ -1,3 +1,4 @@
+var mongoose = require('mongoose');
 const config = require('../../config/appconfig');
 const fs = require('fs');
 const BussinesJob = require('../models/bussinesJobModel');
@@ -6,6 +7,7 @@ const BussinesJobUserComments = require('../models/bussinesJobUserCommentsModel'
 const BussinesJobUser = require('../models/bussinesJobUserModel');
 const UserJobAnswer = require('../models/userJobAnswerModel');
 const JobQuestion = require('../models/master/jobQuestionModel');
+const User = require('../models/userModel');
 const RequestHandler = require('../../utils/RequestHandler');
 const Logger = require('../../utils/logger');
 const logger = new Logger();
@@ -31,7 +33,7 @@ add = function(req,res){
        
         bussinesjobUseranswer.bussines_id = req.params.bussinesid;
         bussinesjobUseranswer.job_category_id = req.body.job_category_id;
-        bussinesjobUseranswer.bussines_job_id = req.body.bussines_job_id;
+      //  bussinesjobUseranswer.bussines_job_id = req.body.bussines_job_id;
         bussinesjobUseranswer.bussines_user_id = global.decoded._id;
         bussinesjobUseranswer.search_user_id = req.body.search_user_id;
         bussinesjobUseranswer.job_question_id = req.body.job_question_id;
@@ -165,7 +167,7 @@ callupdate_overall_rating = function(req,res,bussinesJobUserAnswer,data,question
       errMessage = '{ "raintg": { "message" :"' + err.message + '"} }';
       requestHandler.sendError(req,res, 422, 'Somthing worng with raitng',JSON.parse(errMessage));
     } else {
-    requestHandler.sendSuccess(res,'Rating added successfully.',200,bussinesJobUserAnswer);
+    requestHandler.sendSuccess(res,'Rating save successfully.',200,bussinesJobUserAnswer);
     }
   });
 }
@@ -178,7 +180,6 @@ try
     bussinesJobUserComments.bussines_user_id= global.decoded._id;
 
     bussinesJobUserComments.job_category_id=req.body.job_category_id;
-    bussinesJobUserComments.bussines_job_id=req.body.bussines_job_id;
     bussinesJobUserComments.search_user_id=req.body.search_user_id;
     bussinesJobUserComments.comments=req.body.comments;
 
@@ -198,22 +199,112 @@ try
 }
 
 viewcomments = function(req,res){
-  BussinesJobUserComments.find( { bussines_id: req.params.bussinesid, job_category_id : req.body.job_category_id, search_user_id : req.body.search_user_id }, 
-    function (err, bussinesJobUserComments) {
-    if (err){
-      errMessage = '{ "comments": { "message" : "No data found."} }';
-      requestHandler.sendError(req,res, 422, 'No data for comments',JSON.parse(errMessage));
-    } 
-    else {
-      requestHandler.sendSuccess(res,'Comments.',200,bussinesJobUserComments);
+
+  BussinesJobUserComments.aggregate([
+  {
+    $match: {bussines_id: req.params.bussinesid, job_category_id : req.query.job_category_id, search_user_id : req.query.search_user_id}  
+  },
+  {
+     $lookup:
+    {
+      from: "users",
+      let: { id: "$bussines_user_id" },
+      pipeline: [
+        {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, coverphoto:1,owner_id:1 }  },
+               {$match: {$expr:
+                    {$and:[ 
+                      { $eq: ["$_id", "$uid"]},
+                    ]}
+                }
+        }
+      ],
+      as: "bussinesuser"
     }
-  });
+  },
+  {   $unwind:"$bussinesuser" },
+  {  $lookup:{
+        from: "storage_files",
+        let: { photo_id: "$photo_id" , cover_photo: "$coverphoto" },
+        pipeline: [
+          {$project: { storage_path :1, _id: 1,file_id:1 , displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
+          {$match: {$expr:
+                { $or : 
+                  [
+                    {$eq: ["$file_id", "$$photo_id"]},
+                 //   {$eq: ["$file_id", "$$cover_photo"]},
+                  ]
+                }
+          } 
+          }
+        ],
+        as: "bussinesuserphoto"
+      }
+      },
+      ],function(err, data) {
+        if (err)
+         {
+             errMessage = '{ "User Test": { "message" : "User comments is not found"} }';
+             requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+         }
+         else
+         {
+          // callUserTest(req,res,data)
+             requestHandler.sendSuccess(res,'User comments result found successfully.',200,data);
+         }
+      }
+  );
 }
 
 // View Bussiens Job
 view = function (req, res) {
     try{
-        callBussinesJob(req,res);
+  
+      newUser = new User();
+
+      User.aggregate([
+        {
+          $match: {_id : mongoose.Types.ObjectId(req.query.search_user_id) }  
+        },
+        {
+          $lookup:
+           {
+             from: "storage_files",
+             let: { photo_id: "$photo_id" , cover_photo: "$coverphoto" },
+             pipeline: [
+              {$project: { storage_path :1, _id: 1,file_id:1 , displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
+              {$match: {$expr:
+                    { $or : 
+                      [
+                        {$eq: ["$file_id", "$$photo_id"]},
+                     //   {$eq: ["$file_id", "$$cover_photo"]},
+                      ]
+                    }
+              } 
+              }
+            ],
+         as: "photo"
+           }
+        }],function(err, data) {
+          if (err)
+           {
+               errMessage = '{ "User": { "message" : "User  is not found"} }';
+               requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+           }
+           else
+           {
+              if(data)
+              {
+                newUser = data;
+              }
+              else
+              {
+                newUser = {};
+              }
+           }
+        }
+    );
+
+  callBussinesJob(req,res);
     } catch (err) {
         errMessage = { "View": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'View user job detail',(errMessage));
@@ -221,7 +312,7 @@ view = function (req, res) {
   };
   
   callBussinesJob = function(req,res){
-    BussinesJob.find( { bussines_id: req.params.bussinesid, job_category_id : req.body.job_category_id }, function (err, bussinesJob) {
+    BussinesJob.find( {  job_category_id : req.query.job_category_id, bussines_id: req.params.bussinesid }, function (err, bussinesJob) {
       if (err){
         errMessage = '{ "intro": { "message" : "No data found."} }';
         requestHandler.sendError(req,res, 422, 'No data for bussines job',JSON.parse(errMessage));
@@ -233,7 +324,7 @@ view = function (req, res) {
   }
   
   callBussinesJobQuestion = function(req,res,bussinesJob){
-        JobQuestion.find({job_category_id : req.body.job_category_id},function (err, jobQuestion) {
+        JobQuestion.find({job_category_id : req.query.job_category_id},function (err, jobQuestion) {
             if (err){
               errMessage = '{ "intro": { "message" : "No data found."} }';
               requestHandler.sendError(req,res, 422, 'No data for job questions',JSON.parse(errMessage));
@@ -246,8 +337,8 @@ view = function (req, res) {
     }
   
     callBussinesJobUserAnswer = function(req,res,bussinesJob,jobQuestion){
-        BussinesJobUserAnswer.find({ user_id : req.body.search_user_id, job_category_id :req.body.job_category_id, 
-            bussines_user_id : global.decoded._id },
+        BussinesJobUserAnswer.find({ search_user_id : req.query.search_user_id, 
+          job_category_id :req.query.job_category_id, bussines_user_id : global.decoded._id },
             function (err, bussinesJobUserAnswer) {
         if (err){
           errMessage = '{ "intro": { "message" : "No data found."} }';
@@ -258,7 +349,7 @@ view = function (req, res) {
   }
   
   callUserJobAnswer = function(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer){
-    UserJobAnswer.find({ user_id : req.body.search_user_id, job_category_id :req.body.job_category_id },
+    UserJobAnswer.find({ user_id : req.query.search_user_id, job_category_id :req.query.job_category_id },
         function (err, userJobAnswer) {
     if (err){
       errMessage = '{ "intro": { "message" : "No data found."} }';
@@ -269,7 +360,7 @@ view = function (req, res) {
 }
 
 Callcomments = function(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer){
-  BussinesJobUserComments.find( { bussines_id: req.params.bussinesid, job_category_id : req.body.job_category_id, search_user_id : req.body.search_user_id }, 
+  BussinesJobUserComments.find( { bussines_id: req.params.bussinesid, job_category_id : req.query.job_category_id, search_user_id : req.query.search_user_id }, 
     function (err, bussinesJobUserComments) {
     if (err){
       errMessage = '{ "intro": { "message" : "No data found."} }';
@@ -329,7 +420,8 @@ callJobAnswer = function(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer,u
     }
     
     var data = { 
-          "userjob" :bussinesJob
+          "userjob" :bussinesJob,
+          "userdata" : newUser
     };  
   
     requestHandler.sendSuccess(res,'User job detail.',200,data);
