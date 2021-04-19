@@ -3,6 +3,8 @@
 //overall_rating : sum of rating given on each question bu bussines_user_id
 //overall_progress: overall view by user on vido
 */
+var mongoose = require('mongoose');
+const config = require('../../config/appconfig');
 const BussinesJobUser = require('../models/bussinesJobUserModel');
 const BussinesJob = require('../models/bussinesJobModel');
 const RequestHandler = require('../../utils/RequestHandler');
@@ -140,7 +142,45 @@ BussinesJob.aggregate([
                 ],
                 as: "data"
               }
-                 }],function(err, data) {
+                 },
+                 {   $unwind:"$data" },
+                 {
+                  $lookup:
+                       {
+                         from: "users",
+                         let: { id: "$data.user_id" },
+                         pipeline: [
+                           {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, coverphoto:1,owner_id:1 }  },
+                                  {$match: {$expr:
+                                       {$and:[ 
+                                         { $eq: ["$_id", "$uid"]},
+                                       ]}
+                                   }
+                           }
+                         ],
+                         as: "userdata"
+                       }
+                     },
+                     {   $unwind:"$userdata" },
+                     {  $lookup:{
+                           from: "storage_files",
+                           let: { photo_id: "$userdata.photo_id" , cover_photo: "$coverphoto" },
+                           pipeline: [
+                             {$project: { storage_path :1, _id: 1,file_id:1 , displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
+                             {$match: {$expr:
+                                   { $or : 
+                                     [
+                                       {$eq: ["$file_id", "$$photo_id"]},
+                                    //   {$eq: ["$file_id", "$$cover_photo"]},
+                                     ]
+                                   }
+                             } 
+                             }
+                           ],
+                           as: "userphoto"
+                         }
+                         }                   
+                ],function(err, data) {
                   if (err)
                    {
                        errMessage = '{ "User Test": { "message" : "User test is not found"} }';

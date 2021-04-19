@@ -243,7 +243,14 @@ addusers = function(req,res,userReference){
  remove = function (req, res) {
   try
     {
-      UserReference.deleteOne({ owner_id: global.decoded._id, user_id : req.body.user_id },function (err, userReference) {
+      if (req.query.reference_id == undefined || req.query.reference_id =='')
+      {
+        errMessage = '{ "User reference": { "message" : "Please enter reference id"} }';
+        requestHandler.sendError(req,res, 422, 'Somthing went worng: ',JSON.parse(errMessage));
+      }
+      else
+     {     
+      UserReference.deleteOne({ _id : mongoose.Types.ObjectId(req.query.reference_id) },function (err, userReference) {
         if (err)
         {
             errMessage = '{ "User reference": { "message" : "User reference is not delete data!!"} }';
@@ -251,10 +258,20 @@ addusers = function(req,res,userReference){
         }
         else
         {
+          if (userReference.deletedCount >0)
+          {
             requestHandler.sendSuccess(res,'User reference deleted successfully.',200,userReference);
+          }
+          else
+          {
+            errMessage = '{ "User reference": { "message" : "User reference is not found"} }';
+            requestHandler.sendError(req,res, 422, 'User refernce not deleted ',JSON.parse(errMessage));
+
+          }
         }
     });
-    }   
+    } 
+  }  
     catch (err) {
         errMessage = { "User Reference DELETE": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));

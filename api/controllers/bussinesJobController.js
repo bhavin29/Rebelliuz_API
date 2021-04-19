@@ -1,16 +1,3 @@
-/*
-as per BussinesJobModel
-GET may have musltiple jobs. 
-
-
-GET:
-    api/bussines/{bussines_id}
-    api/bussines/{bussines_id}?isactive=0
-POST
-    api/bussines [ manage insert/update]
-
-*/
-
 const config = require('../../config/appconfig');
 const fs = require('fs');
 const uploadFile = require('../../utils/uploadBussinesJob.js');
@@ -49,17 +36,41 @@ const upload = async (req, res) => {
           if (global.short_description_file != undefined)
               bussinesjob.short_description_file = global.short_description_file;
 
-          bussinesjob.country_id=req.body.country_id;
+          if (req.body.country_id == undefined)
+              bussinesjob.country_id='';
+          else
+              bussinesjob.country_id=req.body.country_id;
+
+          if (req.body.job_experience_id == undefined)
+              bussinesjob.job_experience_id='';
+          else
+              bussinesjob.job_experience_id=req.body.job_experience_id;
+
+          if (req.body.Job_type_ids == undefined)
+              bussinesjob.Job_type_ids='';
+          else
+              bussinesjob.Job_type_ids=req.body.Job_type_ids;
+
+          if (req.body.job_skill_ids == undefined)
+              bussinesjob.job_skill_ids='';
+          else
+              bussinesjob.job_skill_ids=req.body.job_skill_ids;
+
+          if (req.body.education == undefined)
+              bussinesjob.education='';
+          else
+              bussinesjob.education=req.body.education;
+
+          if (req.body.certification == undefined)
+              bussinesjob.certification='';
+          else
+              bussinesjob.certification=req.body.certification;
+ 
           bussinesjob.location_id=req.body.location_id;
           bussinesjob.job_category_id=req.body.job_category_id;
           bussinesjob.job_classification_id=req.body.job_classification_id;
-          bussinesjob.job_experience_id=req.body.job_experience_id;
-          bussinesjob.Job_type_ids=req.body.Job_type_ids;
-          bussinesjob.job_skill_ids=req.body.job_skill_ids;
           bussinesjob.short_description=req.body.short_description;
           bussinesjob.culture_values_ids=req.body.culture_values_ids;
-          bussinesjob.education=req.body.education;
-          bussinesjob.certification=req.body.certification;
           bussinesjob.expected_salary_start=req.body.expected_salary_start;
           bussinesjob.expected_salary_end=req.body.expected_salary_end;
 
@@ -96,9 +107,9 @@ const upload = async (req, res) => {
              bussinesJob.job_experience_id=req.body.job_experience_id;
 
            if(req.body.Job_type_ids != undefined) 
-            bussinesJob.Job_type_ids=req.body.Job_type_ids;
+            bussinesJob.Job_type_ids=req.body.job_type_ids;
 
-           if( req.body.job_skills_ids != undefined) 
+           if( req.body.job_skill_ids != undefined) 
             bussinesJob.job_skill_ids=req.body.job_skill_ids;
 
             if( req.body.culture_values_ids != undefined) 
@@ -131,7 +142,7 @@ const upload = async (req, res) => {
             bussinesJob.save(function (err) {
             if (err){
               errMessage = '{ "intro": { "message" : "Bussines job is not saved!!"} }';
-              requestHandler.sendError(req,res, 422, 'Somthing worng with bussines job',JSON.parse(errMessage));
+              requestHandler.sendError(req,res, 422, 'Somthing worng with bussines job: ' + err.message,JSON.parse(errMessage));
             } else {
               requestHandler.sendSuccess(res,'Bussines job updated successfully.',200,bussinesJob);
             }
@@ -149,8 +160,9 @@ jobValidationBussinesJob = function (req){
 
     var result = 0;
     if ( req.body.job_category_id == undefined ||  req.body.job_classification_id == undefined ||  
-        req.body.job_experience_id == undefined || req.body.Job_type_ids == undefined ||  
-        req.body.job_skills_ids == undefined ||  req.body.short_description == undefined ||  
+       // req.body.job_experience_id == undefined || req.body.Job_type_ids == undefined ||  
+      //  req.body.job_skills_ids == undefined ||  
+        req.body.short_description == undefined ||  
         req.body.expected_salary_start == undefined || req.body.expected_salary_end == undefined )
          {
         result = 1;

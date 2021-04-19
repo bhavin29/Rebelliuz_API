@@ -30,7 +30,7 @@ const upload = async (req, res) => {
           userintro.save(function (err) {
             if (err){
               errMessage = '{ "intro": { "message" : "User introdcution is not saved!!"} }';
-              requestHandler.sendError(req,res, 422, 'Somthing worng with user introduction',JSON.parse(errMessage));
+              requestHandler.sendError(req,res, 422, 'Somthing worng with user introduction: '+ err.errMessage,JSON.parse(errMessage));
             } else {
               var filenamex = config.general.content_path + '\\users\\intro\\' + global.vFilename; 
 
@@ -56,7 +56,7 @@ const upload = async (req, res) => {
           userIntro.save(function (err) {
             if (err){
               errMessage = '{ "intro": { "message" : "User introdcution is not saved!!"} }';
-              requestHandler.sendError(req,res, 422, 'Somthing worng with user introduction',JSON.parse(errMessage));
+              requestHandler.sendError(req,res, 422, 'Somthing worng with user introduction:' + err.message,JSON.parse(errMessage));
             } else {
 
              var filenamex = config.general.content_path + '\\users\\intro\\' + global.vFilename; 
