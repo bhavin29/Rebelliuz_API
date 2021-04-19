@@ -170,7 +170,7 @@ jobValidationBussinesJob = function (req){
  };
 
 // View 
-const view = function (req, res) {
+const view123 = function (req, res) {
     try
     {
       var active = 1;  
@@ -193,6 +193,74 @@ const view = function (req, res) {
     requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
     }
 };
+
+const view = function (req, res) {
+  try
+  {
+    var active = true;  
+    if(req.query.isactive != undefined)
+          active = req.query.isactive 
+
+          BussinesJob.aggregate([
+            {
+              $match: {bussines_id : req.params.bussinesid, isactive : active} 
+            },  
+            {
+              $lookup:
+               {
+                 from: "job_categories",
+                 let: { jcid: "$job_category_id" },
+                 pipeline: [
+                  {$project: { jobid: {"$toObjectId": "$$jcid"} , jobcategory_name : 1  }  },
+                  {$match: {$expr:
+                        { $or : 
+                          [
+                            {$eq: ["$_id", "$jobid"]},
+                          ]
+                        }
+                  } 
+                  }
+                ],
+             as: "job_categories"
+               }
+            },
+            {   $unwind:"$job_categories" },
+            {
+              $lookup:
+               {
+                 from: "job_types",
+                 let: { jtid: "$job_type_ids" },
+                 pipeline: [
+                  {$project: { jobtypeid: {"$toObjectId": "$$jtid"} , jobtype_name : 1  }  },
+                  {$match: {$expr:
+                        { $or : 
+                          [
+                            {$eq: ["$_id", "$jobtypeid"]},
+                          ]
+                        }
+                  } 
+                  }
+                ],
+             as: "job_type"
+               }
+            }
+          ],function(err, data) {
+              if (err)
+               {
+                   errMessage = '{ "User": { "message" : "Bussines job is not found"} }';
+                   requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+               }
+               else
+               {
+                requestHandler.sendSuccess(res,'Bussines job found successfully.',200,data);
+              }
+            }
+  )} catch (err) {
+  errMessage = { "Bussines job GET": { "message" : err.message } };
+  requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+  }
+};
+
 
 module.exports = {
   upload,

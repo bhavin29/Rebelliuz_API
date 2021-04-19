@@ -115,7 +115,7 @@ else {
 
 //find the all best march with the user_job fr this bussinesid and return the user list        
 // culture_values_id: { type: String, required:  true },    
-BussinesJob.aggregate([
+  BussinesJob.aggregate([
         { "$match": { "bussines_id": req.params.bussinesid, job_category_id : req.query.job_category_id } },
         {
            $lookup:
@@ -150,7 +150,7 @@ BussinesJob.aggregate([
                          from: "users",
                          let: { id: "$data.user_id" },
                          pipeline: [
-                           {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, coverphoto:1,owner_id:1 }  },
+                           {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, coverphoto:1,owner_id:1, first_name:1,last_name:1, gender:1,user_id:1 }  },
                                   {$match: {$expr:
                                        {$and:[ 
                                          { $eq: ["$_id", "$uid"]},
@@ -179,7 +179,25 @@ BussinesJob.aggregate([
                            ],
                            as: "userphoto"
                          }
-                         }                   
+                         },
+                         {   $unwind:"$userdata" },
+                         {
+                          $lookup:
+                               {
+                                 from: "user_experiences",
+                                 let: { id: "$userdata.user_id" },
+                                 pipeline: [
+                                   {$project: {_id: 1, owner_id:1, title:1, location:1, company:1,fromyear:1, frommonth:1, toyear:1, tomonth:1  }  },
+                                          {$match: {$expr:
+                                               {$or:[ 
+                                                 { $eq: ["$owner_id", "$$id"]},
+                                               ]}
+                                           }
+                                   }
+                                 ],
+                                 as: "experince"
+                               }
+                             },
                 ],function(err, data) {
                   if (err)
                    {
