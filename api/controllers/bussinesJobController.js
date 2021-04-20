@@ -1,3 +1,4 @@
+var mongoose = require('mongoose');
 const config = require('../../config/appconfig');
 const fs = require('fs');
 const uploadFile = require('../../utils/uploadBussinesJob.js');
@@ -169,30 +170,33 @@ jobValidationBussinesJob = function (req){
       }
  };
 
-// View 
-const view123 = function (req, res) {
-    try
-    {
-      var active = 1;  
-      if(req.query.isactive != undefined)
-            active = req.query.isactive 
-
-    BussinesJob.find({bussines_id : req.params.bussinesid, isactive : active}, function (err, bussinesjob) {
-        if (err)
-        {
-            errMessage = '{ "Bussines Job": { "message" : "Bussines job is not found"} }';
-            requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
-        }
-        else
-        {
-            requestHandler.sendSuccess(res,'Bussines job found successfully.',200,bussinesjob);
-        }
-    });
-    } catch (err) {
-    errMessage = { "Bussines job GET": { "message" : err.message } };
-    requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
-    }
-};
+// Update jobClassification
+const update = function (req, res) {
+  try
+  {
+    BussinesJob.findById({  bussines_id : req.params.bussinesid , _id : mongoose.Types.ObjectId(req.query.id), 
+      isactive: req.query.isactive }, function (err, bussinesJob) {
+        
+        bussinesJob.isactive = req.query.isactive;
+      //Save and check error
+      bussinesJob.save(function (err) {
+      if (err)
+      {
+          errMessage = '{ "Bussines job ": { "message" : "Bussines job is not updated"} }';
+          requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+      }
+      else
+      {
+          requestHandler.sendSuccess(res,'Bussines job updated successfully.',200,bussinesJob);
+      }
+      });
+  });
+  }
+  catch (err) {
+  errMessage = { "Job Classification Update": { "message" : err.message } };
+  requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+  }
+}
 
 const view = function (req, res) {
   try
@@ -264,5 +268,6 @@ const view = function (req, res) {
 
 module.exports = {
   upload,
-  view
+  view,
+  update
 };
