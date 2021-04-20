@@ -150,7 +150,7 @@ else {
                          from: "users",
                          let: { id: "$data.user_id" },
                          pipeline: [
-                           {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, coverphoto:1,owner_id:1, first_name:1,last_name:1, gender:1,user_id:1 }  },
+                           {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, coverphoto:1,owner_id:1, first_name:1,last_name:1, gender:1,user_id:1 , location:1}  },
                                   {$match: {$expr:
                                        {$and:[ 
                                          { $eq: ["$_id", "$uid"]},

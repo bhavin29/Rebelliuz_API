@@ -189,7 +189,8 @@ router.route("/user")
 //Bussines
 router.route("/bussines/job/:bussinesid")
   .get(auth.isAuthunticated,bussinesJobController.view)
-  .post(auth.isAuthunticated,bussinesJobController.upload);
+  .post(auth.isAuthunticated,bussinesJobController.upload)
+  .put(auth.isAuthunticated,bussinesJobController.update);
 
 router.route("/bussines/jobuser/:bussinesid")
   .get(auth.isAuthunticated,bussinesJobUserController.view)
