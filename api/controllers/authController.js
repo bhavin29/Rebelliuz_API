@@ -13,11 +13,25 @@ const accessTokenSecret = 'vasturebelliuzhsepur';
 const BusinessUser = require("../models/bussinesModel");
 const StorageFile = require("../models/storageFileModel");
 
+
 exports.signIn = (req, res) => {
     try{
-        User.aggregate([
+
+            let isUserId = Number.isInteger(parseInt(req.query.username));
+            let matchValue=0;
+
+            if (isUserId == true)
             {
-              $match: { username: new RegExp(req.query.username , "i") }  
+                matchValue = { user_id : parseInt(req.query.username) };
+            }
+            else
+            {
+                matchValue = {username: new RegExp(req.query.username , "i")};
+            }
+
+            User.aggregate([
+            {
+              $match: matchValue 
             },
             {  $lookup:{
                   from: "storage_files",
@@ -37,14 +51,19 @@ exports.signIn = (req, res) => {
                   as: "userphoto"
                 }
                 },
-                {   $unwind:"$userphoto" },
+                {
+                    $unwind: {
+                        path: "$user",
+                        preserveNullAndEmptyArrays: true
+                    }
+                 },
                 {  $lookup:{
                     from: "user_intros",
                     let: { email: "$email"  },
                     pipeline: [
                       {$project: {  _id: 1 , vFilename:1 ,email:1 } },
                       {$match: {$expr:
-                            { $and : 
+                            { $or : 
                               [
                                 { $eq: ["$email", "$$email"]},
                               ]
@@ -55,7 +74,12 @@ exports.signIn = (req, res) => {
                     as: "userintro"
                   }
                   },
-                 {   $unwind:"$userphoto" },
+                 {   
+                    $unwind: {
+                        path: "$user",
+                        preserveNullAndEmptyArrays: true
+                    }
+                    },
                   {  $lookup:{
                       from: "bussineses",
                       let: { user_id: "$user_id"  },
@@ -69,7 +93,6 @@ exports.signIn = (req, res) => {
                               }
                         } 
                         }
-                       // {$match: {$expr: { $eq: ["$owner_id", "$$user_id"]} }}
                       ],
                       as: "bussines"
                     }

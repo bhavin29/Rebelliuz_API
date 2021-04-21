@@ -77,7 +77,16 @@ exports.view = function (req, res) {
                     ]
             };
 
-            //filter by name - use $regex in mongodb - add the 'i' flag if you want the search to be case insensitive.
+            let query ={
+                    from: "storage_files",
+                    localField: "photo_id",
+                    foreignField: "file_id",
+                    as: "userphoto"
+             };
+
+             aggregate_options.push({$lookup: query});
+
+             //filter by name - use $regex in mongodb - add the 'i' flag if you want the search to be case insensitive.
             if (req.query.searchText)
             {
                 match.email = {$regex: req.query.searchText, $options: 'i'};
@@ -88,8 +97,7 @@ exports.view = function (req, res) {
             //SORTING -- THIRD STAGE
             let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? -1 : 1;
             aggregate_options.push({$sort: {"email": sortOrder}});
-        
-        
+
             // Set up the aggregation
             const myAggregate = User.aggregate(aggregate_options);
 
