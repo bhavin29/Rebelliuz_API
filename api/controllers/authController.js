@@ -17,7 +17,14 @@ const StorageFile = require("../models/storageFileModel");
 exports.signIn = (req, res) => {
     try{
 
-            let isUserId = Number.isInteger(parseInt(req.query.username));
+    if (req.query.username == undefined || req.query.username == '')
+    {
+        errMessage = '{ "Sign in": { "message" : "Parameter missing."} }';
+        requestHandler.sendError(req,res, 422, 'Somthing went worng: ' ,JSON.parse(errMessage));
+    }
+    else {
+
+        let isUserId = Number.isInteger(parseInt(req.query.username));
             let matchValue=0;
 
             if (isUserId == true)
@@ -100,10 +107,15 @@ exports.signIn = (req, res) => {
                     ],function(err, data) {
                   if (err)
                    {
-                       errMessage = '{ "User Test": { "message" : "User is not found"} }';
+                       errMessage = '{ "User sign in": { "message" : "User is not found"} }';
                        requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
                    }
-                   else
+                   else if (data.length == 0)
+                   {
+                    errMessage = '{ "User sign in": { "message" : "User is not found"} }';
+                    requestHandler.sendError(req,res, 422, 'Somthing went worng: ',JSON.parse(errMessage));
+                   }
+                    else
                    {
                     var sign = '';
                        if (data.length > 0 )
@@ -121,7 +133,7 @@ exports.signIn = (req, res) => {
                     }
                 }
             );
-        
+            }    
     } catch (err) {
         errMessage = { "SignIn": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'User Signin',(errMessage));

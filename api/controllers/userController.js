@@ -50,32 +50,21 @@ exports.view = function (req, res) {
                 }
             };
 
-            var condition = {};
+            var condition = [];
             if ( req.body.email != '' && req.body.email !=undefined ){ 
-                condition = condition + {email: new RegExp(req.body.email,"i") };
+                a =  {email: {'$regex': '^' + req.body.email, '$options': 'i'}};
+                condition.push(a);
             }
             if ( req.body.displayname != '' && req.body.displayname !=undefined ){ 
-                condition = condition + {displayname: new RegExp(req.body.displayname,"i") };
+                b =  {displayname: new RegExp(req.body.displayname,"i") };
+                condition.push(b);
             }
             if ( req.body.location != '' && req.body.location !=undefined ){ 
-                condition = condition + {location: new RegExp(req.body.location,"i") };
+                c = {location: new RegExp(req.body.location,"i") };
+                condition.push(c);
             }
-
-            //FILTERING AND PARTIAL TEXT SEARCH -- FIRST STAGE
-            let match = {
-                    $and :[ 
-                    {
-                        $or: [
-                        {email: new RegExp(req.body.email,"i")}, 
-                      //  {displayname : new RegExp(req.body.displayname,"i")}, 
-                      //  {location: RegExp(req.body.location,"i")} 
-                        ]
-                    },
-                    {
-                        email: { $ne: global.decoded.email }
-                    } 
-                    ]
-            };
+          
+            let match = {$or : condition };
 
             let query ={
                     from: "storage_files",
@@ -83,22 +72,15 @@ exports.view = function (req, res) {
                     foreignField: "file_id",
                     as: "userphoto"
              };
-
-             aggregate_options.push({$lookup: query});
-
-             //filter by name - use $regex in mongodb - add the 'i' flag if you want the search to be case insensitive.
-            if (req.query.searchText)
-            {
-                match.email = {$regex: req.query.searchText, $options: 'i'};
-            } 
-        
-            aggregate_options.push({$match: match});
             
+            let path = {  "root_path" :  { $literal: config.general.parent_root }  };
             //SORTING -- THIRD STAGE
             let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? -1 : 1;
-            aggregate_options.push({$sort: {"email": sortOrder}});
 
-            // Set up the aggregation
+            aggregate_options.push({$match: match});
+            aggregate_options.push({$addFields: path});
+            aggregate_options.push({$lookup: query});
+            aggregate_options.push({$sort: {"email": sortOrder}});
             const myAggregate = User.aggregate(aggregate_options);
 
             User.aggregatePaginate(myAggregate,options,function (err, user) {
@@ -107,7 +89,7 @@ exports.view = function (req, res) {
                     errMessage = '{ "User": { "message" : "User email is not found"} }';
                     requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
                 }
-                else if (user)
+                else if (user.Users >0)
                 {
                     requestHandler.sendSuccess(res,'User found successfully.',200,user);
                 }
