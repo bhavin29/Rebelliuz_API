@@ -91,7 +91,7 @@ exports.signIn = (req, res) => {
                       from: "bussineses",
                       let: { user_id: "$user_id"  },
                       pipeline: [
-                        {$project: {  _id: 1 ,owner_id:1 ,title:1,description:1, location:1,page_id:1 } },
+                        {$project: {  _id: 1 ,owner_id:1 ,title:1,description:1, location:1,page_id:1,photo_id:1,cover:1 } },
                         {$match: {$expr:
                               { $and : 
                                 [
@@ -104,6 +104,29 @@ exports.signIn = (req, res) => {
                       as: "bussines"
                     }
                     },
+                    {  $unwind: {
+                        path: "$bussines",
+                        preserveNullAndEmptyArrays: true
+                    }
+                     },
+                        {  $lookup:{
+                        from: "storage_files",
+                        let: { photo_id: "$photo_id" , cover_photo: "$bussines.cover" },
+                        pipeline: [
+                          {$project: { storage_path :1, _id: 1,file_id:1 , email:1, displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
+                          {$match: {$expr:
+                                { $or : 
+                                  [
+                                    {$eq: ["$file_id", "$$photo_id"]},
+                                 //   {$eq: ["$file_id", "$$cover_photo"]},
+                                  ]
+                                }
+                          } 
+                          }
+                        ],
+                        as: "bussinesphoto"
+                      }
+                      },
                     ],function(err, data) {
                   if (err)
                    {
