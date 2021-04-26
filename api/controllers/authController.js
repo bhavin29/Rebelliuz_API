@@ -2,12 +2,14 @@ jwt = require('jsonwebtoken'),
 bcrypt = require('bcryptjs');
 const config = require('../../config/appconfig');
 const RequestHandler = require('../../utils/RequestHandler');
+const SendEmail = require('../../utils/sendEmail');
 const Logger = require('../../utils/logger');
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
 var mongoose = require('mongoose');
 
 const User = require("../models/userModel");
+const Bussines = require("../models/bussinesModel");
 const UserIntro = require("../models/userIntroModel");
 const accessTokenSecret = 'vasturebelliuzhsepur';
 const BusinessUser = require("../models/bussinesModel");
@@ -81,52 +83,6 @@ exports.signIn = (req, res) => {
                     as: "userintro"
                   }
                   },
-                 {   
-                    $unwind: {
-                        path: "$user",
-                        preserveNullAndEmptyArrays: true
-                    }
-                    },
-                  {  $lookup:{
-                      from: "bussineses",
-                      let: { user_id: "$user_id"  },
-                      pipeline: [
-                        {$project: {  _id: 1 ,owner_id:1 ,title:1,description:1, location:1,page_id:1,photo_id:1,cover:1 } },
-                        {$match: {$expr:
-                              { $and : 
-                                [
-                                  { $eq: ["$owner_id", "$$user_id"]},
-                                ]
-                              }
-                        } 
-                        }
-                      ],
-                      as: "bussines"
-                    }
-                    },
-                    {  $unwind: {
-                        path: "$bussines",
-                        preserveNullAndEmptyArrays: true
-                    }
-                     },
-                        {  $lookup:{
-                        from: "storage_files",
-                        let: { photo_id: "$photo_id" , cover_photo: "$bussines.cover" },
-                        pipeline: [
-                          {$project: { storage_path :1, _id: 1,file_id:1 , email:1, displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
-                          {$match: {$expr:
-                                { $or : 
-                                  [
-                                    {$eq: ["$file_id", "$$photo_id"]},
-                                 //   {$eq: ["$file_id", "$$cover_photo"]},
-                                  ]
-                                }
-                          } 
-                          }
-                        ],
-                        as: "bussinesphoto"
-                      }
-                      },
                     ],function(err, data) {
                   if (err)
                    {
@@ -141,22 +97,53 @@ exports.signIn = (req, res) => {
                     else
                    {
                     var sign = '';
-                       if (data.length > 0 )
+                       if (data.length > 0 ) {
                         sign =  jwt.sign({ email: data[0].email, displayname : data[0].displayname, _id: data[0]._id }, accessTokenSecret);
-  
-                        data = { 
+                        
+                        Bussines.aggregate([
+                          {
+                            $match:{ owner_id : data[0].user_id } 
+                          },
+                            {  $lookup:{
+                            from: "storage_files",
+                            let: { photo_id: "$photo_id" , cover_photo: "$bussines.cover" },
+                            pipeline: [
+                              {$project: { storage_path :1, _id: 1,file_id:1 , email:1, displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
+                              {$match: {$expr:
+                                    { $or : 
+                                      [
+                                        {$eq: ["$file_id", "$$photo_id"]},
+                                     //   {$eq: ["$file_id", "$$cover_photo"]},
+                                      ]
+                                    }
+                              } 
+                              }
+                            ],
+                            as: "bussinesphoto"
+                          }
+                          },                         
+                      ],function(err, bussines) {
+                        if (err)
+                         {
+                             errMessage = '{ "User sign in": { "message" : "User is not found"} }';
+                             requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+                         }
+                         else
+                        {
+                          data = { 
                             "access_token" : sign ,
                             "refresh_token" : "",
                             "expire_time" : "2d",
                             "user" : data,
-                        }; 
-
-                        requestHandler.sendSuccess(res,'User result found successfully.',200,data);
-
+                            "bussines" : bussines,
+                          }; 
+                          requestHandler.sendSuccess(res,'User result found successfully.',200,data);
+                        }
+                      });
                     }
-                }
-            );
-            }    
+            }
+          });
+        }
     } catch (err) {
         errMessage = { "SignIn": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'User Signin',(errMessage));

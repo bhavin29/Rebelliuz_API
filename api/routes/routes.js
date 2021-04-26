@@ -21,7 +21,9 @@ var bussinesJobController = require('../controllers/bussinesJobController');
 var bussinesJobUserController = require('../controllers/bussinesJobUserController');
 var bussinesJobUserAnswerController = require('../controllers/bussinesJobUserAnswerController');
 var userController = require('../controllers/userController');
+var userProfileController = require('../controllers/userProfileController');
 var bussinesAdminUserController = require('../controllers/bussinesAdminUserController');
+var userJobRequestController = require('../controllers/userJobRequestController');
 
 //Masters
 var jobCategoryController = require('../controllers/master/JobCategoryController');
@@ -185,6 +187,13 @@ router.route("/user/reference")
 
 router.route("/user")
    .post(auth.isAuthunticated,userController.view)
+
+router.route("/user/profile")
+   .post(auth.isAuthunticated,userProfileController.view)
+
+router.route("/user/job/request")
+   .get(auth.isAuthunticated,userJobRequestController.view)
+   .post(auth.isAuthunticated,userJobRequestController.add);
 
 //Bussines
 router.route("/bussines/job/:bussinesid")

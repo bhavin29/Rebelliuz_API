@@ -1,8 +1,3 @@
-/*
-// search_status: 1: Requested, 2: RequestApproved, 3: RequestRejected, 3: Shortlisted, 4: Offer, 5: Final Interview, 6: TalentPool 
-//overall_rating : sum of rating given on each question bu bussines_user_id
-//overall_progress: overall view by user on vido
-*/
 var mongoose = require('mongoose');
 const config = require('../../config/appconfig');
 const BussinesJobUser = require('../models/bussinesJobUserModel');
@@ -127,119 +122,12 @@ else {
         }
 };
 
-callSearchbyStatusData_old = function(req,res,status){
-  try{
-      // var userIdArr = (bJobUser.user_id)
-      
-    //find the all best march with the user_job fr this bussinesid and return the user list        
-    // culture_values_id: { type: String, required:  true },    
-    BussinesJob.aggregate([
-      { "$match": { "bussines_id": req.params.bussinesid, job_category_id : req.query.job_category_id } },
-      {
-         $lookup:
-            {
-              from: "bussines_job_users",
-              let: {  job_category_id: "$job_category_id"},
-              pipeline: [
-                 { $match:
-                    { $expr:
-                       { $and:
-                          [
-                            { $eq: [ "$job_category_id",  "$$job_category_id" ] },
-                            { $eq: [ "$search_status", 10 ] },
-                          ]
-                       }
-                    }
-                 },
-              ],
-              as: "user_job"
-            }
-               },
-               {   $unwind:"$user_job" },
-               {
-                $lookup:
-                     {
-                       from: "users",
-                       let: { id: "$user_job.search_user_id" },
-                       pipeline: [
-                         {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, coverphoto:1,owner_id:1, first_name:1,last_name:1, gender:1,user_id:1 , location:1}  },
-                                {$match: {$expr:
-                                     {$and:[ 
-                                       { $eq: ["$_id", "$uid"]},
-                                     ]}
-                                 }
-                         }
-                       ],
-                       as: "userdata"
-                     }
-                   },
-                   {   $unwind:"$userdata" },
-                   {  $lookup:{
-                         from: "storage_files",
-                         let: { photo_id: "$userdata.photo_id" , cover_photo: "$coverphoto" },
-                         pipeline: [
-                           {$project: { storage_path :1, _id: 1,file_id:1 , displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
-                           {$match: {$expr:
-                                 { $or : 
-                                   [
-                                     {$eq: ["$file_id", "$$photo_id"]},
-                                  //   {$eq: ["$file_id", "$$cover_photo"]},
-                                   ]
-                                 }
-                           } 
-                           }
-                         ],
-                         as: "userphoto"
-                       }
-                       },
-                       {   $unwind:"$userdata" },
-                       {
-                        $lookup:
-                             {
-                               from: "user_experiences",
-                               let: { id: "$userdata.user_id" },
-                               pipeline: [
-                                 {$project: {_id: 1, owner_id:1, title:1, location:1, company:1,fromyear:1, frommonth:1, toyear:1, tomonth:1  }  },
-                                        {$match: {$expr:
-                                             {$or:[ 
-                                               { $eq: ["$owner_id", "$$id"]},
-                                             ]}
-                                         }
-                                 }
-                               ],
-                               as: "experince"
-                             }
-                           },
-              ],function(err, data) {
-                if (err)
-                 {
-                     errMessage = '{ "User Test": { "message" : "Bussiens user job is not found"} }';
-                     requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
-                 }
-                 else if (data)
-                 {
-                     requestHandler.sendSuccess(res,'Bussiens user job result found successfully.',200,data);
-                 }
-                 else {
-                  errMessage = '{ "User Test": { "message" : "Bussiens user job is not found"} }';
-                  requestHandler.sendError(req,res, 422, 'No data ',JSON.parse(errMessage));
-              }
-           }
-      );
-  } catch (err) {
-    errMessage = { "Bussines job GET": { "message" : err.message } };
-    requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
-    }
-}
-
-/*--------------------------------------------------------------*/
-
 callSearchbyStatusData = function(req,res,status){
- 
+let search_status = parseInt(status); 
 let match =
      { "bussines_id": req.params.bussinesid, job_category_id : req.query.job_category_id } ;
 
-let lookupvalue_1 = 
+const lookupvalue_1 = 
 {
   from: "bussines_job_users",
   let: {  job_category_id: "$job_category_id", s : parseInt(status)},
@@ -249,11 +137,13 @@ let lookupvalue_1 =
            { $and:
               [
                 { $eq: [ "$job_category_id",  "$$job_category_id" ] },
-              //  { $eq: [ "$search_status",  status ] },
+                { $eq: [ "$search_status",  search_status ] },
               ]
            }
         }
      },
+     {$project:{user_id:"$search_user_id","_id": 1, "search_status": 1, "overall_rating":1, "overall_progress":1, 
+     "created_by":1, "created_on": 1, "bussines_id": 1, "job_category_id":1, "__v": 1}},
   ],
   as: "user_job"
 };
@@ -263,7 +153,7 @@ let lookupvalue_1_unwind = {   $unwind:"$user_job" };
 let lookupvalue_2 =
 {
   from: "users",
-  let: { id: "$user_job.search_user_id" },
+  let: { id: "$user_job.user_id" },
   pipeline: [
     {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, coverphoto:1,owner_id:1, first_name:1,last_name:1, gender:1,user_id:1 , location:1}  },
            {$match: {$expr:
@@ -350,13 +240,13 @@ let lookupvalue_4 =
                 errMessage = '{ "Bussines user job": { "message" : "Bussiens user job result not found!!"} }';
                 requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
             }
-            else if (JobCategory)
+            else if (JobCategory.totalResults > 0)
             {
-                requestHandler.sendSuccess(res,'Bussiens user job result found successfully',200,JobCategory);
+              requestHandler.sendSuccess(res,'Bussiens user job result found successfully',200,JobCategory);
             }
             else
             {
-                requestHandler.sendSuccess(res,'Bussiens user job result no data found',200,JobCategory);
+                requestHandler.sendSuccess(res,'Bussiens user job no data found',200,JobCategory);
             }
         });
     }   
@@ -497,7 +387,8 @@ callSearchData = function(req,res,bJobUser){
           requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
       }
 };
-  
+
+
 module.exports = {
 add,
 view

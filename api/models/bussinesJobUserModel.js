@@ -2,6 +2,7 @@
    
 // Import mongoose 
 const  mongoose = require("mongoose");
+const aggregatePaginate = require('mongoose-aggregate-paginate-v2');
 
 // Declare schema and assign Schema class
 const  Schema = mongoose.Schema;
@@ -18,6 +19,8 @@ const  BussinesJobUserSchema = new  Schema({
     created_on: { type: Date, default: Date.now },
     created_by: { type: Number, default: 0 }
 });
+
+BussinesJobUserSchema.plugin(aggregatePaginate);
 
 //search_status: 10: Requested, 20: Request Approved, 30: Request Rejected, 40: Shortlisted, 50: Offer, 60: Final Interview, 70: TalentPool 
 //overall_rating : sum of rating given on each question by bussines_user_id
