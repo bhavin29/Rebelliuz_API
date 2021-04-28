@@ -376,7 +376,7 @@ callJobAnswer = function(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer,u
       var jobanswer=[];
       var i=0,j=0;
   
-      for (var item of bussinesJob){
+     for (var item of bussinesJob){
   
         const job_id = bussinesJob[i].job_category_id;
         j=0;
@@ -401,7 +401,7 @@ callJobAnswer = function(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer,u
   
             for (var useranswer of userJobAnswer){
               if (useranswer.job_category_id == job_id && useranswer.job_question_id == item._id.toString()){
-                console.log(answer.job_question_id);
+                console.log(useranswer.job_question_id);
                 console.log(useranswer.video_filename);
                 console.log(useranswer.video_status);
                 jobanswer[j]['video_filename'] = useranswer.video_filename;
@@ -411,17 +411,19 @@ callJobAnswer = function(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer,u
             j = j+1;
           }
       }
-  
-      bussinesJob[i] = JSON.stringify(bussinesJob[i]);
-      bussinesJob[i] = JSON.parse(bussinesJob[i]);
-      bussinesJob[i]['jobanswer'] = JSON.parse(JSON.stringify(jobanswer));
-      bussinesJob[i]['comments'] = JSON.parse(JSON.stringify(bussinesJobUserComments));
+      var bJob = {}; 
+      bJob = JSON.stringify(bussinesJob[i]);
+      bJob = JSON.parse(bJob);
+      bJob['jobanswer'] = JSON.parse(JSON.stringify(jobanswer));
+      bJob['comments'] = JSON.parse(JSON.stringify(bussinesJobUserComments));
       i=i+1;
     }
     
+    udata = JSON.stringify(newUser[0]);
+    udata = JSON.parse(udata);
     var data = { 
-          "userjob" :bussinesJob,
-          "userdata" : newUser
+          "userjob" :bJob,
+          "userdata" : udata
     };  
   
     requestHandler.sendSuccess(res,'User job detail.',200,data);

@@ -51,6 +51,8 @@ exports.index = async function (req, res) {
             }
             else
             {
+
+
                 requestHandler.sendSuccess(res,'Got Job category data successfully.',200,JobCategory);
             }
         });

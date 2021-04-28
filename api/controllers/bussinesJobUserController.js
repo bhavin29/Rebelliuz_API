@@ -103,7 +103,8 @@ else {
 
   var bJobUser = [];
 
-  BussinesJobUser.find( { bussines_id:req.params.bussinesid, job_category_id : req.query.job_category_id}
+  BussinesJobUser.find( { bussines_id:req.params.bussinesid, 
+      job_category_id : req.query.job_category_id,  search_status:  { $gt: 31 } }
     , {search_user_id : 1 , _id:0}, 
     function (err, businessJobUser) {
       if (err) {}
@@ -138,6 +139,7 @@ const lookupvalue_1 =
               [
                 { $eq: [ "$job_category_id",  "$$job_category_id" ] },
                 { $eq: [ "$search_status",  search_status ] },
+                { $eq: [ "$bussines_id",  req.params.bussinesid ] },
               ]
            }
         }
@@ -155,13 +157,8 @@ let lookupvalue_2 =
   from: "users",
   let: { id: "$user_job.user_id" },
   pipeline: [
-    {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, coverphoto:1,owner_id:1, first_name:1,last_name:1, gender:1,user_id:1 , location:1}  },
-           {$match: {$expr:
-                {$and:[ 
-                  { $eq: ["$_id", "$uid"]},
-                ]}
-            }
-    },
+           {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, coverphoto:1,owner_id:1, first_name:1,last_name:1, gender:1,user_id:1 , location:1}  },
+           {$match: {$expr:  {$and:[ { $eq: ["$_id", "$uid"]}, ]}} },
   ],
   as: "userdata"
 };
@@ -265,16 +262,10 @@ callSearchData = function(req,res,bJobUser){
                 let: { bj_user_id : "user_id", user_job_category_id: "$job_category_id", user_job_classification_id : "$job_classification_id", 
                         user_job_experience_id : "$job_experience_id",user_Job_type_ids : "$Job_type_ids",user_job_skill_ids : "$job_skill_ids"},
                 pipeline: [
-                   { $match:
-                      { $expr:
-                         { $and:
-                            [
+                   { $match: { $expr:{ $and:  [
                               { $eq: [ "$job_category_id",  "$$user_job_category_id" ] },
                               { $not: { $in: [ "$user_id",  bJobUser ] }},
-                            ]
-                         }
-                      }
-                   },
+                            ] } } },
                 ],
                 as: "user_job"
               };
@@ -287,16 +278,37 @@ callSearchData = function(req,res,bJobUser){
       let: { id: "$user_job.user_id" },
       pipeline: [
       {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, coverphoto:1,owner_id:1, first_name:1,last_name:1, gender:1,user_id:1 , location:1}  },
-        {$match: {$expr:
-            {$and:[ 
-              { $eq: ["$_id", "$uid"]},
-            ]}
-          }
-      }
+        {$match: {$expr: {$and:[  { $eq: ["$_id", "$uid"]}, ]} } },
       ],
       as: "userdata"
     };
+      
+  let lookupvalue_2_1unwind = 
+    {
+      $unwind: {
+          path: "$userdata",
+          preserveNullAndEmptyArrays: false
+      }
+  };
   
+  let lookupvalue_2_1 =
+          {
+            from: "bussines_job_users",
+            let: { u_id: "$userdata.uid" },
+            pipeline: [
+              {$project: {  _id: 1,file_id:1, search_status:1 , uid:1 }  },
+              {$match: {$expr:
+                { $and : 
+                  [
+                  {$eq: ["$search_user_id", "$$u_id"]},
+                  ]
+                }
+              } 
+              }
+            ],
+            as: "search_status"
+          };
+      
   let lookupvalue_2_unwind = {   $unwind:"$userdata" };
   
   let lookupvalue_3 =
@@ -356,6 +368,8 @@ callSearchData = function(req,res,bJobUser){
       aggregate_options.push({$lookup : lookupvalue_1});
       aggregate_options.push(lookupvalue_1_unwind);
       aggregate_options.push({$lookup : lookupvalue_2});
+      aggregate_options.push(lookupvalue_2_1unwind);
+      aggregate_options.push({$lookup : lookupvalue_2_1});
       aggregate_options.push(lookupvalue_2_unwind);
       aggregate_options.push({$lookup : lookupvalue_3});
       aggregate_options.push(lookupvalue_3_unwind);

@@ -32,7 +32,7 @@ view = function(req,res){
     {   $unwind:"$bussinesuser" },
     {  $lookup:{
           from: "storage_files",
-          let: { photo_id: "$photo_id" , cover_photo: "$coverphoto" },
+          let: { photo_id: "$bussinesuser.photo_id" , cover_photo: "$coverphoto" },
           pipeline: [
             {$project: { storage_path :1, _id: 1,file_id:1 , displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
             {$match: {$expr:
@@ -71,7 +71,8 @@ const add = async (req, res) => {
           return requestHandler.sendError(req,res, 422, 'Please enter mandatory field.',JSON.parse(errMessage));
       }
     
-      BussinesAdminUser.findOne({ bussines_id: req.params.bussinesid, bussines_user_id : req.query.bussines_user_id,role: req.query.role},
+      BussinesAdminUser.findOne({ bussines_id: req.params.bussinesid, 
+            bussines_user_id : req.body.bussines_user_id},
         (err,bussinesAdminUser)=>{
         if (err){
             errMessage = '{ "Bussines Admin User": { "message" : "Bussines admin user is not saved!!"} }';
@@ -79,26 +80,25 @@ const add = async (req, res) => {
         }
         if (!bussinesAdminUser) {
             //insert
-            var bussinesAdminUser = new BussinesAdminUser();
+            var bussinesadminUser = new BussinesAdminUser();
             
-            bussinesAdminUser.bussines_id=req.params.bussinesid;
-            bussinesAdminUser.bussines_user_id=req.body.bussines_user_id;
-            bussinesAdminUser.role=req.body.role;
-            
-    
-            bussinesAdminUser.save(function (err) {
-            if (err){
-                    errMessage = '{ "Bussines Admin User": { "message" : "Bussines admin user is not saved!!"} }';
-                    requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
-            } else 
-            {
-                    requestHandler.sendSuccess(res,'Bussines admin user save successfully.',200,bussinesAdminUser);
-            }
-            });
+            bussinesadminUser.bussines_id=req.params.bussinesid;
+            bussinesadminUser.bussines_user_id=req.body.bussines_user_id;
+            bussinesadminUser.role=req.body.role;
+
+            bussinesadminUser.save(function (err) {
+              if (err){
+                      errMessage = '{ "Bussines Admin User": { "message" : "Bussines admin user is not saved!!"} }';
+                      requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
+              } else 
+              {
+                      requestHandler.sendSuccess(res,'Bussines admin user save successfully.',200,bussinesAdminUser);
+              }
+              });
             }
             else if (bussinesAdminUser) {
             
-                if(req.query.isactive == undefined)
+                if(req.query.isactive == undefined || !(req.query.isactive == 0 || req.query.isactive ==1))
                 {
                     errMessage = '{ "Bussines Admin User": { "message" : "Bussines admin user is already exists!!"} }';
                     requestHandler.sendError(req,res, 422, 'bussines admin user already exists.',JSON.parse(errMessage));
@@ -113,7 +113,7 @@ const add = async (req, res) => {
                                 requestHandler.sendSuccess(res,'Bussines admin user updated successfully.',200,bussinesAdminUser);
                         }
                     });
-                }
+                  }
        }
        });
     } catch (err) {

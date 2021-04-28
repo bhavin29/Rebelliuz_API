@@ -42,6 +42,9 @@ global.__basedir = __dirname;
 global.rows_per_page = config.general.rows_per_page;
 let app = express();
 
+
+
+
 //Enabled CROS
 app.use(cors());
 
