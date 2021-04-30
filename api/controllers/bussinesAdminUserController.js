@@ -18,7 +18,7 @@ view = function(req,res){
         from: "users",
         let: { id: "$bussines_user_id" },
         pipeline: [
-          {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, coverphoto:1,owner_id:1 }  },
+          {$project: {_id: 1,isactive:1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, coverphoto:1,owner_id:1 }  },
                  {$match: {$expr:
                       {$and:[ 
                         { $eq: ["$_id", "$uid"]},
@@ -29,7 +29,12 @@ view = function(req,res){
         as: "bussinesuser"
       }
     },
-    {   $unwind:"$bussinesuser" },
+    {
+      $unwind: {
+          path: "$bussinesuser",
+          preserveNullAndEmptyArrays: false
+      }
+    },
     {  $lookup:{
           from: "storage_files",
           let: { photo_id: "$bussinesuser.photo_id" , cover_photo: "$coverphoto" },
@@ -85,6 +90,7 @@ const add = async (req, res) => {
             bussinesadminUser.bussines_id=req.params.bussinesid;
             bussinesadminUser.bussines_user_id=req.body.bussines_user_id;
             bussinesadminUser.role=req.body.role;
+            bussinesadminUser.isactive = 1;
 
             bussinesadminUser.save(function (err) {
               if (err){
@@ -98,13 +104,13 @@ const add = async (req, res) => {
             }
             else if (bussinesAdminUser) {
             
-                if(req.query.isactive == undefined || !(req.query.isactive == 0 || req.query.isactive ==1))
+                if(req.body.isactive == undefined || !(req.body.isactive == 0 || req.body.isactive ==1))
                 {
                     errMessage = '{ "Bussines Admin User": { "message" : "Bussines admin user is already exists!!"} }';
                     requestHandler.sendError(req,res, 422, 'bussines admin user already exists.',JSON.parse(errMessage));
                 }
                 else{
-                    bussinesAdminUser.isactive = req.query.isactive;
+                    bussinesAdminUser.isactive = req.body.isactive;
                     bussinesAdminUser.save(function (err) {
                         if (err){
                                 errMessage = '{ "Bussines Admin User": { "message" : "Bussines admin user is not saved!!"} }';

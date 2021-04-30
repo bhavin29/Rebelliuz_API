@@ -1,7 +1,11 @@
+var fs = require('fs');
+const Mailer = require('../../utils/Mailer');
 var mongoose = require('mongoose');
 const config = require('../../config/appconfig');
 const BussinesJobUser = require('../models/bussinesJobUserModel');
 const BussinesJob = require('../models/bussinesJobModel');
+const Users = require('../models/userModel');
+const Bussines = require('../models/bussinesModel');
 const RequestHandler = require('../../utils/RequestHandler');
 const Logger = require('../../utils/logger');
 const logger = new Logger();
@@ -48,7 +52,10 @@ try {
                 requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
         } else 
         {
-                requestHandler.sendSuccess(res,'Bussines use job save successfully.',200,bussinesjobuser);
+          if (req.body.search_status == 10)
+              mailing(req.body.search_user_id,req.params.bussinesid);
+
+          requestHandler.sendSuccess(res,'Bussines use job save successfully.',200,bussinesjobuser);
         }
         });
         }
@@ -61,7 +68,10 @@ try {
                 errMessage = '{ "Search": { "message" : "Bussines user job is not saved!!"} }';
                 requestHandler.sendError(req,res, 422, 'Somthing worng with bussines user job',JSON.parse(errMessage));
         } else {
-                requestHandler.sendSuccess(res,'Bussines user job updated successfully.',200,bussinesJobUser);
+            if (req.body.search_status == 10)
+                mailing(req.body.search_user_id,req.params.bussinesid);
+
+              requestHandler.sendSuccess(res,'Bussines user job updated successfully.',200,bussinesJobUser);
         }
         });
    }
@@ -402,6 +412,16 @@ callSearchData = function(req,res,bJobUser){
       }
 };
 
+function mailing(userid,bussinesid){
+
+  var template = fs.readFileSync(config.general.content_path + '\\HTML_Template\\User_Review_Request.html',{encoding:'utf-8'});
+  template = template.replace(/(\r\n|\n|\r)/gm, "");
+
+//  template = template.replace('@username@',users_data[0].last_name + ' ' + users_data[0].first_name);
+//  template = template.replace('@Bussinesname@',bussines_data[0].title);
+
+  Mailer.sendEmail ({from:'b@b.com',to: config.mailer.to_mail , bcc: config.mailer.bcc_mail, subject: 'Welcome again!!!', html: template});
+}
 
 module.exports = {
 add,

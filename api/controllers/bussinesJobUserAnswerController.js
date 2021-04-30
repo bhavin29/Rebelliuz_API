@@ -157,8 +157,8 @@ callupdate_overall_rating = function(req,res,bussinesJobUserAnswer,data,question
     progress =Math.floor (( 100 * readbyuser[0]["count"]) / questions[0]["count"]);
   }
 
-  var myquery = {bussines_id : req.params.bussinesid ,job_category_id : req.query.job_category_id ,
-    search_user_id : req.query.search_user_id };
+  var myquery = {bussines_id : req.params.bussinesid ,job_category_id : req.body.job_category_id ,
+    search_user_id : req.body.search_user_id };
 
   var newvalues = { $set: {overall_rating: avg_rating, overall_progress: progress } };
 
@@ -202,8 +202,10 @@ viewcomments = function(req,res){
 
   BussinesJobUserComments.aggregate([
   {
-    $match: {bussines_id: req.params.bussinesid, job_category_id : req.query.job_category_id, search_user_id : req.query.search_user_id}  
+    $match: {bussines_id: req.params.bussinesid, job_category_id : req.query.job_category_id, 
+      search_user_id : req.query.search_user_id}  
   },
+  { $sort: { created_on: -1 } },
   {
      $lookup:
     {
@@ -221,10 +223,15 @@ viewcomments = function(req,res){
       as: "bussinesuser"
     }
   },
-  {   $unwind:"$bussinesuser" },
-  {  $lookup:{
+  {
+    $unwind: {
+        path: "$bussinesuser",
+        preserveNullAndEmptyArrays: false
+    }
+  },
+ {  $lookup:{
         from: "storage_files",
-        let: { photo_id: "$photo_id" , cover_photo: "$coverphoto" },
+        let: { photo_id: "$bussinesuser.photo_id" , cover_photo: "$coverphoto" },
         pipeline: [
           {$project: { storage_path :1, _id: 1,file_id:1 , displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
           {$match: {$expr:
@@ -304,8 +311,9 @@ view = function (req, res) {
         }
     );
 
-  callBussinesJob(req,res);
-    } catch (err) {
+    callBussinesJob(req,res,newUser);
+ 
+  } catch (err) {
         errMessage = { "View": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'View user job detail',(errMessage));
       }
@@ -318,12 +326,12 @@ view = function (req, res) {
         requestHandler.sendError(req,res, 422, 'No data for bussines job',JSON.parse(errMessage));
       } 
       else {
-        callBussinesJobQuestion(req,res,bussinesJob);
+        callBussinesJobQuestion(req,res,newUser,bussinesJob);
       }
     });
   }
   
-  callBussinesJobQuestion = function(req,res,bussinesJob){
+  callBussinesJobQuestion = function(req,res,newUser,bussinesJob){
         JobQuestion.find({job_category_id : req.query.job_category_id},function (err, jobQuestion) {
             if (err){
               errMessage = '{ "intro": { "message" : "No data found."} }';
@@ -331,12 +339,12 @@ view = function (req, res) {
             }
             else
             { 
-            callBussinesJobUserAnswer(req,res,bussinesJob,jobQuestion);
+            callBussinesJobUserAnswer(req,res,newUser,bussinesJob,jobQuestion);
             }
        });  
     }
   
-    callBussinesJobUserAnswer = function(req,res,bussinesJob,jobQuestion){
+    callBussinesJobUserAnswer = function(req,res,newUser,bussinesJob,jobQuestion){
         BussinesJobUserAnswer.find({ search_user_id : req.query.search_user_id, 
           job_category_id :req.query.job_category_id, bussines_user_id : global.decoded._id },
             function (err, bussinesJobUserAnswer) {
@@ -344,37 +352,55 @@ view = function (req, res) {
           errMessage = '{ "intro": { "message" : "No data found."} }';
           requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));
         } 
-        callUserJobAnswer(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer);
+        callUserJobAnswer(req,res,newUser,bussinesJob,jobQuestion,bussinesJobUserAnswer);
    });  
   }
   
-  callUserJobAnswer = function(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer){
+  callUserJobAnswer = function(req,res,newUser,bussinesJob,jobQuestion,bussinesJobUserAnswer){
     UserJobAnswer.find({ user_id : req.query.search_user_id, job_category_id :req.query.job_category_id },
         function (err, userJobAnswer) {
     if (err){
       errMessage = '{ "intro": { "message" : "No data found."} }';
       requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));
     } 
-    Callcomments(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer);
+    Callcomments(req,res,newUser,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer);
 });  
 }
 
-Callcomments = function(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer){
-  BussinesJobUserComments.find( { bussines_id: req.params.bussinesid, job_category_id : req.query.job_category_id, search_user_id : req.query.search_user_id }, 
+Callcomments = function(req,res,newUser,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer){
+  BussinesJobUserComments.find( { bussines_id: req.params.bussinesid, 
+    job_category_id : req.query.job_category_id, search_user_id : req.query.search_user_id }, 
     function (err, bussinesJobUserComments) {
     if (err){
       errMessage = '{ "intro": { "message" : "No data found."} }';
       requestHandler.sendError(req,res, 422, 'No data for comments',JSON.parse(errMessage));
     } 
     else {
-      callJobAnswer(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer,bussinesJobUserComments);
+      CallBussinesJobUser(req,res,newUser,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer,bussinesJobUserComments);
     }
-  });
+  }).sort({created_on : -1});
 }
 
-callJobAnswer = function(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer,bussinesJobUserComments){
-      var jobanswer=[];
-      var i=0,j=0;
+CallBussinesJobUser = function(req,res,newUser,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer,bussinesJobUserComments){
+  BussinesJobUser.find( { bussines_id: req.params.bussinesid, 
+    job_category_id : req.query.job_category_id, search_user_id : req.query.search_user_id }, 
+    function (err, bussinesJobUser) {
+    if (err){
+      errMessage = '{ "bussinesJobUser": { "message" : "No data found."} }';
+      requestHandler.sendError(req,res, 422, 'No data for comments',JSON.parse(errMessage));
+    } 
+    else {
+      callJobAnswer(req,res,newUser,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer,bussinesJobUserComments,bussinesJobUser);
+    }
+  }).sort({created_on : -1});
+}
+
+
+
+callJobAnswer = function(req,res,newUserData,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer,bussinesJobUserComments,bussinesJobUser){
+  var bJob = {}; 
+  var jobanswer=[];
+  var i=0,j=0;
   
      for (var item of bussinesJob){
   
@@ -411,16 +437,21 @@ callJobAnswer = function(req,res,bussinesJob,jobQuestion,bussinesJobUserAnswer,u
             j = j+1;
           }
       }
-      var bJob = {}; 
       bJob = JSON.stringify(bussinesJob[i]);
       bJob = JSON.parse(bJob);
+      
+      bJob['overall'] = JSON.parse(JSON.stringify(bussinesJobUser));
       bJob['jobanswer'] = JSON.parse(JSON.stringify(jobanswer));
       bJob['comments'] = JSON.parse(JSON.stringify(bussinesJobUserComments));
       i=i+1;
     }
     
-    udata = JSON.stringify(newUser[0]);
+    udata = {};
+    if (newUserData){
+    udata = JSON.stringify(newUserData[0]);
     udata = JSON.parse(udata);
+    }
+
     var data = { 
           "userjob" :bJob,
           "userdata" : udata

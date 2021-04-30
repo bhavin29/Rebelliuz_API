@@ -135,20 +135,13 @@ exports.addupload = async (req, res) => {
 
 exports.index = async function (req, res) {
    
- /*       UserTest.aggregate([
+          if ( req.query.userid == undefined || req.query.userid == '')
+          {
+            requestHandler.sendError(req,res, 422, 'userid is missing','');
+          }
+        else
         {
-            $lookup:{
-            from: 'tests',
-            localField: 'test_id',
-            foreignField: '_id',
-            as: 'userTest'
-            }
-        }],function(err, data) {*/
-
-
-
           Test.aggregate([  
- //           { "$match": { "user_id": global.decoded._id } },
             { "$addFields": { "_id": { "$toString": "$_id" }}},
             {
                $lookup:{
@@ -158,16 +151,6 @@ exports.index = async function (req, res) {
                 as: 'TestQuestionResult'
                 }
               }
-/*              ,
-                { "$unwind": "$TestQuestionResult" },
-                {
-                    "$lookup": {
-                        "from": "test",
-                        "localField": "test_id",
-                        "foreignField": "_id",
-                        "as": "userTestResult"
-                    }
-            }*/
           ],function(err, data) {
              if (err)
             {
@@ -177,13 +160,13 @@ exports.index = async function (req, res) {
             else
             {
               callUserTest(req,res,data)
-              //  requestHandler.sendSuccess(res,'User test found successfully.',200,data);
             }
         });      
+      }
 };
 
 callUserTest = function(req,res,userTestResult){
-  UserTest.find({ user_id : global.decoded._id },function (err, userTest) {
+  UserTest.find({ user_id : req.query.userid },function (err, userTest) {
     if (err){
       errMessage = '{ "intro": { "message" : "No data found."} }';
       requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));

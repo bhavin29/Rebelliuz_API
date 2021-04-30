@@ -1,5 +1,3 @@
-
-
 require('dotenv').config();
 
 // config.js
@@ -11,9 +9,9 @@ module.exports = {
 	},
 	db: {
 		port: process.env.DB_PORT || 27016,
-		dbPath: process.env.DB_PATH || 'mongodb://localhost/firstrest',
+	//	dbPath: process.env.DB_PATH || 'mongodb://localhost/firstrest',
 	//
-	//	dbPath: process.env.DB_PATH || 'mongodb+srv://test:test123@cluster0.e9yvt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority?authSource=admin&ssl=true' ,
+		dbPath: process.env.DB_PATH || 'mongodb+srv://test:test123@cluster0.e9yvt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority?authSource=admin&ssl=true' ,
 	//	dbPath: process.env.DB_PATH || 'mongodb://test:test123@cluster0.e9yvt.mongodb.net:27017?authMechanism=DEFAULT&authSource=db&ssl=true"';
 },
 	winiston: {
@@ -26,9 +24,20 @@ module.exports = {
 		refresh_token_secret: process.env.REFRESH_TOKEN_SECRET || 'VmVyeVBvd2VyZnVsbFNlY3JldA==',
 		refresh_token_expiresin: process.env.REFRESH_TOKEN_EXPIRES_IN || '2d', // 2 days
 	},
-	email: {
-		user: process.env.EMAILUSER || 'bhavinkcs@gmail.com',
-		pass: process.env.EMAILPASS || 'RocketPOS007'
+	smtpOptions: {
+	    host: 'smtp.gmail.com',
+	    port: 587,
+    	auth: {
+			user: process.env.EMAILUSER || 'bhavinkcs@gmail.com',
+			pass: process.env.EMAILPASS || 'RocketPOS007'
+   		},
+		   tls: {
+			   rejectUnauthorized: false
+		   }
+	},
+	mailer:{
+		to_mail : 'p.bhavin29@gmail.com',
+		bcc_mail : 'bhavinkcs@gmail.com'
 	},
 	sendgrid: {
 		api_key: process.env.SEND_GRID_API_KEY,

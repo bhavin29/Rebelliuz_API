@@ -47,10 +47,10 @@ const upload = async (req, res) => {
           else
               bussinesjob.job_experience_id=req.body.job_experience_id;
 
-          if (req.body.Job_type_ids == undefined)
-              bussinesjob.Job_type_ids='';
+          if (req.body.job_type_ids == undefined)
+              bussinesjob.job_type_ids='';
           else
-              bussinesjob.Job_type_ids=req.body.Job_type_ids;
+              bussinesjob.job_type_ids=req.body.job_type_ids;
 
           if (req.body.job_skill_ids == undefined)
               bussinesjob.job_skill_ids='';
@@ -107,8 +107,8 @@ const upload = async (req, res) => {
            if( req.body.job_experience_id != undefined) 
              bussinesJob.job_experience_id=req.body.job_experience_id;
 
-           if(req.body.Job_type_ids != undefined) 
-            bussinesJob.Job_type_ids=req.body.job_type_ids;
+           if(req.body.job_type_ids != undefined) 
+            bussinesJob.job_type_ids=req.body.job_type_ids;
 
            if( req.body.job_skill_ids != undefined) 
             bussinesJob.job_skill_ids=req.body.job_skill_ids;
@@ -161,7 +161,7 @@ jobValidationBussinesJob = function (req){
 
     var result = 0;
     if ( req.body.job_category_id == undefined ||  req.body.job_classification_id == undefined ||  
-       // req.body.job_experience_id == undefined || req.body.Job_type_ids == undefined ||  
+       // req.body.job_experience_id == undefined || req.body.job_type_ids == undefined ||  
       //  req.body.job_skills_ids == undefined ||  
         req.body.short_description == undefined ||  
         req.body.expected_salary_start == undefined || req.body.expected_salary_end == undefined )
@@ -228,24 +228,42 @@ const view = function (req, res) {
              as: "job_categories"
                }
             },
-            {   $unwind:"$job_categories" },
             {
+              $unwind: {
+                  path: "$job_categories",
+                  preserveNullAndEmptyArrays: false
+              }
+            },
+             {
               $lookup:
                {
                  from: "job_types",
-                 let: { jtid: "$job_type_ids" },
+                 let: { jtid:{$ifNull: [{ "$split": [ "$job_type_ids", "," ] },[] ]},  },
+
                  pipeline: [
-                  {$project: { jobtypeid: {"$toObjectId": "$$jtid"} , jobtype_name : 1  }  },
-                  {$match: {$expr:
-                        { $or : 
-                          [
-                            {$eq: ["$_id", "$jobtypeid"]},
-                          ]
-                        }
-                  } 
-                  }
+                  {$project: {  jobtype_name : 1 }  },
+                  {$match: {$expr: {$in: [  { "$toString": "$_id" }, "$$jtid"]}}  }
                 ],
              as: "job_type"
+               }
+            },
+            {
+              $unwind: {
+                  path: "$job_categories",
+                  preserveNullAndEmptyArrays: false
+              }
+            },
+             {
+              $lookup:
+               {
+                 from: "job_skills",
+                 let: { jtid:{$ifNull: [{ "$split": [ "$job_skill_ids", "," ] },[] ]},  },
+
+                 pipeline: [
+                  {$project: {  jobskill_name : 1 }  },
+                  {$match: {$expr: {$in: [  { "$toString": "$_id" }, "$$jtid"]}}  }
+                ],
+             as: "job_skills"
                }
             }
           ],function(err, data) {

@@ -1,3 +1,4 @@
+var fs = require('fs');
 jwt = require('jsonwebtoken'),
 bcrypt = require('bcryptjs');
 const config = require('../../config/appconfig');
@@ -18,7 +19,6 @@ const StorageFile = require("../models/storageFileModel");
 
 exports.signIn = (req, res) => {
     try{
-
     if (req.query.username == undefined || req.query.username == '')
     {
         errMessage = '{ "Sign in": { "message" : "Parameter missing."} }';
@@ -99,7 +99,6 @@ exports.signIn = (req, res) => {
                     var sign = '';
                        if (data.length > 0 ) {
                         sign =  jwt.sign({ email: data[0].email, displayname : data[0].displayname, _id: data[0]._id }, accessTokenSecret);
-                        
                         Bussines.aggregate([
                           {
                             $match:{ owner_id : data[0].user_id } 
@@ -137,6 +136,7 @@ exports.signIn = (req, res) => {
                             "user" : data,
                             "bussines" : bussines,
                           }; 
+                          mailing(data);
                           requestHandler.sendSuccess(res,'User result found successfully.',200,data);
                         }
                       });
@@ -150,35 +150,6 @@ exports.signIn = (req, res) => {
       }
 };
         
-// User Sign function
-    exports.signIn123 = (req, res) => {
-try{
-
-    var a = RegExp("\b" + req.query.username + "\b" , "i") ;
-    User.findOne({
-         username: new RegExp(req.query.username , "i") 
-       }, (err, user) => {
-        if (err) throw err;
-            if (!user) {
-                errMessage = '{ "password": { "message" : "The username is not valid."} }';
-                requestHandler.sendError(req,res, 422, 'Authentication failed. username not found.',JSON.parse(errMessage));
-            }
-            else if (user) {
-              /*  if (!user.comparePassword(req.body.password)) {  
-                    errMessage = '{ "password": { "message" : "The password is not valid."} }';
-                    requestHandler.sendError(req,res, 422, 'Authentication failed. Wrong password.',JSON.parse(errMessage));
-                } else {*/
-           // }
-           GetUserPhoto(req,res,user);
-       }
-    });
-  } catch (err) {
-    errMessage = { "SignIn": { "message" : err.message } };
-    requestHandler.sendError(req,res, 500, 'User Signin',(errMessage));
-  }
-};
-
-
 GetUserPhoto  = function(req,res,user){
    
     StorageFile.findOne({file_id: (parseInt(user.photo_id)) },
@@ -302,6 +273,13 @@ exports.register = (req, res) => {
         errMessage = { "Register": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'User Registration',(errMessage));
       }
-      
 };
-    
+
+function mailing(user){
+  var template = fs.readFileSync(config.general.content_path + '\\HTML_Template\\Welcome.html',{encoding:'utf-8'});
+  
+  template = template.replace(/(\r\n|\n|\r)/gm, "");
+  template = template.replace('@username@',user.user[0].last_name + ' ' + user.user[0].first_name);
+ 
+  Mailer.sendEmail ({from:'b@b.com',to: config.mailer.to_mail , bcc: config.mailer.bcc_mail, subject: 'Welcome again!!!', html: template});
+}
