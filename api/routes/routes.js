@@ -24,6 +24,7 @@ var userController = require('../controllers/userController');
 var userProfileController = require('../controllers/userProfileController');
 var bussinesAdminUserController = require('../controllers/bussinesAdminUserController');
 var userJobRequestController = require('../controllers/userJobRequestController');
+var bussinesJobRequestController = require('../controllers/bussinesJobRequestController');
 
 //Masters
 var jobCategoryController = require('../controllers/master/JobCategoryController');
@@ -201,6 +202,9 @@ router.route("/bussines/job/:bussinesid")
   .post(auth.isAuthunticated,bussinesJobController.upload)
   .put(auth.isAuthunticated,bussinesJobController.update);
 
+router.route("/bussines/job/request/:bussinesid")
+   .get(auth.isAuthunticated,bussinesJobRequestController.view);
+ 
 router.route("/bussines/jobuser/:bussinesid")
   .get(auth.isAuthunticated,bussinesJobUserController.view)
   .post(auth.isAuthunticated,bussinesJobUserController.add);
@@ -216,6 +220,8 @@ router.route("/bussines/jobanswer/comments/:bussinesid")
 router.route("/bussines/adminuser/:bussinesid")
   .get(auth.isAuthunticated,bussinesAdminUserController.view)
   .post(auth.isAuthunticated,bussinesAdminUserController.add);
+
+
 
 //Export API routes
 module.exports = router;

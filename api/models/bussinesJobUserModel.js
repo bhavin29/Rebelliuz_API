@@ -22,7 +22,7 @@ const  BussinesJobUserSchema = new  Schema({
 
 BussinesJobUserSchema.plugin(aggregatePaginate);
 
-//search_status: 10: Requested, 20: Request Approved, 30: Request Rejected, 40: Shortlisted, 50: Offer, 60: Final Interview, 70: TalentPool 
+//search_status: 10: Requested, 20: Request Approved, 30: Request Rejected, 40: Shortlisted, 50: Final Interview,, 60: Offer,  70: TalentPool 
 //overall_rating : sum of rating given on each question by bussines_user_id
 //overall_progress: overall view by user on vidoe answers bussines_user_id
 

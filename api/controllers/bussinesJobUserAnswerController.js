@@ -301,18 +301,17 @@ view = function (req, res) {
            {
               if(data)
               {
+                callBussinesJob(req,res,data);
                 newUser = data;
               }
               else
               {
-                newUser = {};
-              }
+                errMessage = '{ "User": { "message" : "User  is not found"} }';
+                requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+               }
            }
         }
     );
-
-    callBussinesJob(req,res,newUser);
- 
   } catch (err) {
         errMessage = { "View": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'View user job detail',(errMessage));
@@ -395,10 +394,11 @@ CallBussinesJobUser = function(req,res,newUser,bussinesJob,jobQuestion,bussinesJ
   }).sort({created_on : -1});
 }
 
-
-
 callJobAnswer = function(req,res,newUserData,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer,bussinesJobUserComments,bussinesJobUser){
-  var bJob = {}; 
+try
+{
+
+ var bJob = {}; 
   var jobanswer=[];
   var i=0,j=0;
   
@@ -458,8 +458,12 @@ callJobAnswer = function(req,res,newUserData,bussinesJob,jobQuestion,bussinesJob
     };  
   
     requestHandler.sendSuccess(res,'User job detail.',200,data);
+  } catch (err) {
+    errMessage = { "User Answer": { "message" : err.message } };
+    requestHandler.sendError(req,res, 500, 'User answer detail.',(errMessage));
   }
-  
+}
+
   module.exports = {
     view,
     addcomments,

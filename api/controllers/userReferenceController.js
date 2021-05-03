@@ -82,10 +82,20 @@ add = function (req, res) {
 // View User Reference
 view = function (req, res) {
  
-  if (req.query.userid == undefined || req.query.userid =='')
+  var validation =0;
+  if ( req.query.userid == undefined || req.query.userid =='')
   {
-    errMessage = '{ "User reference": { "message" : "Please enter user id"} }';
+    if (req.query.ownerid == undefined || req.query.ownerid =='')
+    {
+      validation =1;
+    }
+  }
+
+
+  if (validation===1){
+    errMessage = '{ "User reference": { "message" : "Please enter user id/owner id"} }';
     requestHandler.sendError(req,res, 422, 'Somthing went worng: ',JSON.parse(errMessage));
+
   }
   else
   {
@@ -102,9 +112,18 @@ view = function (req, res) {
         match.rating = {$regex: req.query.rating, $options: 'i'};
     } 
 
+    if (req.query.userid)
+    {
+      reference_match =  {user_id : req.query.userid};  
+    }
+    else if (req.query.ownerid)
+    {
+      reference_match =  {owner_id : req.query.ownerid};  
+    }
+
     UserReference.aggregate([
           {
-            $match: {user_id : req.query.userid}  
+            $match: reference_match
           },
           {
             $lookup:
@@ -112,7 +131,7 @@ view = function (req, res) {
                from: "reference_relationships",
                let: { id: "$relationship_id" },
                pipeline: [
-                 {$project: {_id: 1, rid: {"$toObjectId": "$$id"}, relationship_name:1 }  },
+                 {$project: {user_id:1,_id: 1, rid: {"$toObjectId": "$$id"}, relationship_name:1 }  },
                         {$match: {$expr:
                              {$and:[ 
                                { $eq: ["$_id", "$rid"]},
@@ -123,14 +142,22 @@ view = function (req, res) {
                as: "ReferenceRelationship"
              }
            },
-           {   $unwind:"$ReferenceRelationship" },
+            /*        {   $unwind:"$ReferenceRelationship" },*/
+            {
+              $unwind: {
+                  path: "$ReferenceRelationship",
+                  preserveNullAndEmptyArrays: false
+              }
+            },
            {
            $lookup:
             {
               from: "users",
-              let: { id: "$user_id" },
+              let: { id: "$user_id" , username : "$username", user_id : "$user_id"},
               pipeline: [
-                {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, coverphoto:1,owner_id:1 }  },
+                {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1,
+                              username:  {$ifNull: [ "$username" , "$user_id" ]},
+                             coverphoto:1,owner_id:1 }  },
                        {$match: {$expr:
                             {$and:[ 
                               { $eq: ["$_id", "$uid"]},
@@ -146,7 +173,7 @@ view = function (req, res) {
               $lookup:{
                 from: "storage_files",
                 let: { photo_id: "$userdata.photo_id" , cover_photo: "$userdata.coverphoto" },
-                pipeline: [
+                pipeline: [ 
                   {$project: { storage_path :1, _id: 1,file_id:1 , displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
                   {$match: {$expr:
                         { $or : 
@@ -198,7 +225,8 @@ view = function (req, res) {
                        ],
                        as: "ownerphoto"
                        }
-                 }],function(err, data) {
+                 }
+                ],function(err, data) {
                 if (err)
                  {
                      errMessage = '{ "User Test": { "message" : "User test is not found"} }';
@@ -207,6 +235,8 @@ view = function (req, res) {
                  else
                  {
                   // callUserTest(req,res,data)
+
+                  
                      requestHandler.sendSuccess(res,'User reference result found successfully.',200,data);
                  }
               }

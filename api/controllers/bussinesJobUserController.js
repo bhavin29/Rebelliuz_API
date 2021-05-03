@@ -20,7 +20,7 @@ try {
       return requestHandler.sendError(req,res, 422, 'Please enter mandatory field.',JSON.parse(errMessage));
   }
       
-  if (!(req.body.search_status == 10 || req.body.search_status == 20 ||
+  if (!(req.body.search_status == 0 || req.body.search_status == 10 || req.body.search_status == 20 ||
         req.body.search_status == 30 || req.body.search_status == 40 ||
         req.body.search_status == 50 || req.body.search_status == 60 ||
         req.body.search_status == 70  ))
@@ -106,14 +106,47 @@ try
         errMessage = '{ "Search status": { "message" : "Status is out of range."} }';
         return requestHandler.sendError(req,res, 422, 'Please enter correct status.',JSON.parse(errMessage));
     }
-else if (status>0){    
-      callSearchbyStatusData(req,res,status)      
+
+    BussinesJobUser.aggregate( [
+      {
+        $match: { bussines_id:req.params.bussinesid, 
+          job_category_id : req.query.job_category_id }
+      },
+      {
+        $group: {
+           _id: "$search_status",
+           count: { $sum: 1 }
+        }
+      },
+    ],function(err, jobCount) {
+      if (err)
+     {
+         errMessage = '{ "User Test": { "message" : "User test is not found"} }';
+         requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+     }
+     else
+     {
+      callSearch(req,res,status,jobCount);
+    }
+    });
+
+
+  } catch (err) {
+        errMessage = { "Bussines job GET": { "message" : err.message } };
+        requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+        }
+};
+
+//common saerch
+function callSearch(req,res,status,jobCount) {
+  if (status>0){    
+    callSearchbyStatusData(req,res,status,jobCount)      
   }
-else {
+  else {
+    var bJobUser = [];
+    //       $or: [ { search_status: { $gt: 31 } }, { search_status: 0 } ] },
 
-  var bJobUser = [];
-
-  BussinesJobUser.find( { bussines_id:req.params.bussinesid, 
+    BussinesJobUser.find( { bussines_id:req.params.bussinesid, 
       job_category_id : req.query.job_category_id,  search_status:  { $gt: 31 } }
     , {search_user_id : 1 , _id:0}, 
     function (err, businessJobUser) {
@@ -123,17 +156,16 @@ else {
         json_data = JSON.parse(JSON.stringify(businessJobUser));
         bJobUser = json_data.map(x=>x.search_user_id)
 
-        callSearchData(req,res,bJobUser);
+        callSearchData(req,res,bJobUser,jobCount);
       }
     });
   }
-} catch (err) {
-        errMessage = { "Bussines job GET": { "message" : err.message } };
-        requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
-        }
-};
+}
 
-callSearchbyStatusData = function(req,res,status){
+
+
+//SErch user for status 
+callSearchbyStatusData = function(req,res,status,jobCount){
 let search_status = parseInt(status); 
 let match =
      { "bussines_id": req.params.bussinesid, job_category_id : req.query.job_category_id } ;
@@ -240,6 +272,7 @@ let lookupvalue_4 =
   try
     {
       const myAggregate = BussinesJob.aggregate(aggregate_options);
+      var bJob = {}; 
 
       BussinesJob.aggregatePaginate(myAggregate,options,function (err, JobCategory) {
             if (err)
@@ -249,11 +282,20 @@ let lookupvalue_4 =
             }
             else if (JobCategory.totalResults > 0)
             {
-              requestHandler.sendSuccess(res,'Bussiens user job result found successfully',200,JobCategory);
+              bJob = JSON.stringify(JobCategory);
+              bJob = JSON.parse(bJob);
+              
+              bJob['jobCounts'] = JSON.parse(JSON.stringify(jobCount));
+          
+              requestHandler.sendSuccess(res,'Bussiens user job result found successfully',200,bJob);
             }
             else
             {
-                requestHandler.sendSuccess(res,'Bussiens user job no data found',200,JobCategory);
+              bJob = JSON.stringify(JobCategory);
+              bJob = JSON.parse(bJob);
+              
+              bJob['jobCounts'] = JSON.parse(JSON.stringify(jobCount));
+              requestHandler.sendSuccess(res,'Bussiens user job no data found',200,bJob);
             }
         });
     }   
@@ -263,7 +305,8 @@ let lookupvalue_4 =
     }
 };
 
-callSearchData = function(req,res,bJobUser){
+//saerch if status = 0
+callSearchData = function(req,res,bJobUser,jobCount){
   let match = { "bussines_id": req.params.bussinesid, job_category_id : req.query.job_category_id }
   
   let lookupvalue_1 = 
@@ -280,6 +323,23 @@ callSearchData = function(req,res,bJobUser){
                 as: "user_job"
               };
   
+  let lookupvalue_1_1 = 
+              {
+                from: "user_jobs",
+                let: { b_user_id : "$user_id", culture_values_ids:{$ifNull: [{ "$split": [ "$culture_values_ids", "," ] },[] ]},},
+                pipeline: [
+               
+                  {$match: {$expr: {$and:[  { $eq: ["$user_id", "$$b_user_id"]}, ]} } },
+                    {
+                      "$group": {
+                         _id: null,
+                         count: { $sum: 1 }
+                      }},
+                      {"$project" : { "Values" : { "$multiply" : ["$count", 25]}}},
+                    ],
+                as: "culture_values"
+              };
+
   let lookupvalue_1_unwind = {   $unwind:"$user_job" };
                  
   let lookupvalue_2 =
@@ -377,6 +437,8 @@ callSearchData = function(req,res,bJobUser){
       aggregate_options.push({$match : match});
       aggregate_options.push({$lookup : lookupvalue_1});
       aggregate_options.push(lookupvalue_1_unwind);
+      aggregate_options.push({$lookup : lookupvalue_1_1});
+      aggregate_options.push(lookupvalue_1_unwind);
       aggregate_options.push({$lookup : lookupvalue_2});
       aggregate_options.push(lookupvalue_2_1unwind);
       aggregate_options.push({$lookup : lookupvalue_2_1});
@@ -397,12 +459,19 @@ callSearchData = function(req,res,bJobUser){
               }
               else if(JobCategory)
               {
-                  requestHandler.sendSuccess(res,'Bussiens user job result found successfully',200,JobCategory);
+                bJob = JSON.stringify(JobCategory);
+                bJob = JSON.parse(bJob);
+                
+                bJob['jobCounts'] = JSON.parse(JSON.stringify(jobCount));
+                requestHandler.sendSuccess(res,'Bussiens user job result found successfully',200,bJob);
               }
               else {
-                errMessage = '{ "User Test": { "message" : "Bussiens user job is not found"} }';
-                requestHandler.sendError(req,res, 422, 'No data ',JSON.parse(errMessage));
-            }
+                bJob = JSON.stringify(JobCategory);
+                bJob = JSON.parse(bJob);
+                
+                bJob['jobCounts'] = JSON.parse(JSON.stringify(jobCount));
+                 requestHandler.sendSuccess(res,'Bussiens user job result not found',200,bJob);
+                }
 
           });
       }   

@@ -103,7 +103,23 @@ exports.signIn = (req, res) => {
                           {
                             $match:{ owner_id : data[0].user_id } 
                           },
-                            {  $lookup:{
+                          {  $lookup:{
+                            from: "bussines_jobs",
+                            let: { id: "$_id"  },
+                            pipeline: [
+                         //   {$project : { bid : { "$toString" : "$id" } }},  
+                            {$match: {$expr: {$eq: [ {"toObjectId" : "$bussines_id"} , "$id" ]}}}
+                            ],
+                            as: "bussinesjobs"
+                            }
+                          },
+                     /*     {
+                            $unwind: {
+                                path: "$bussines_jobs",
+                                preserveNullAndEmptyArrays: true
+                            }
+                         },*/
+                          {  $lookup:{
                             from: "storage_files",
                             let: { photo_id: "$photo_id" , cover_photo: "$bussines.cover" },
                             pipeline: [
@@ -119,9 +135,8 @@ exports.signIn = (req, res) => {
                               }
                             ],
                             as: "bussinesphoto"
-                          }
-                          },                         
-                      ],function(err, bussines) {
+                          },
+                          }],function(err, bussines) {
                         if (err)
                          {
                              errMessage = '{ "User sign in": { "message" : "User is not found"} }';
@@ -149,82 +164,6 @@ exports.signIn = (req, res) => {
         requestHandler.sendError(req,res, 500, 'User Signin',(errMessage));
       }
 };
-        
-GetUserPhoto  = function(req,res,user){
-   
-    StorageFile.findOne({file_id: (parseInt(user.photo_id)) },
-      (err, storagefile) => {
-       if (err) throw err;
-       GetUserIntro(req,res,user,storagefile);
-      });
-}    
-
-GetUserIntro = function(req,res,user,storagefile){
-    var sign =  jwt.sign({ email: user.email, displayname : user.displayname, _id: user._id }, accessTokenSecret);
-
-    UserIntro.findOne({ email: user.email},(err, userintro)=>{
-        if (err){
-            data = { 
-                "access_token" : sign ,
-                "refresh_token" : "",
-                "expire_time" : "2d",
-                "user" : user,
-                "bussines_id":[]
-            }; 
-            requestHandler.sendSuccess(res,'User successfully logged in.',200,(data));
-        }
-        else
-        {
-            if(userintro)
-            {
-                newuserintro = userintro;
-            }
-            else
-            {
-                newuserintro = {};
-            }
-
-            user = JSON.stringify(user);
-            user = JSON.parse(user);
-            user['userphoto'] = JSON.parse(JSON.stringify(storagefile));
-            user['userintro'] = JSON.parse(JSON.stringify(newuserintro));
-            
-            GetBusiness(req,res,sign,user);
-        }
-    });
-}
-
-GetBusiness =function(req,res,sign,user){
-try
-{
-    BusinessUser.find( { owner_id: user.user_id}, 
-        function (err, businessUser) {
-            var data ;
-        if (err){
-            data = { 
-                "access_token" : sign ,
-                "refresh_token" : "",
-                "expire_time" : "2d",
-                "user" : user,
-                "bussines":[]
-            }; 
-        } 
-        else {
-            data = { 
-                "access_token" : sign ,
-                "refresh_token" : "",
-                "expire_time" : "2d",
-                "user" : user,
-                "bussines":businessUser
-            }; 
-        }
-        requestHandler.sendSuccess(res,'User successfully logged in.',200,(data));
-      });
-} catch (err) {
-    errMessage = { "SignIn": { "message" : err.message } };
-    requestHandler.sendError(req,res, 500, 'User Signin',(errMessage));
-  }
-}
 
 // User Register function
 exports.loginRequired = (req, res, next) => {

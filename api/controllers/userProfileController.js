@@ -29,14 +29,15 @@ const view = function (req, res) {
             {  
                 $lookup:{
                   from: "storage_files",
-                  let: { photo_id: "$photo_id" , cover_photo: "$coverphoto" },
+                  let: { photo_id: "$photo_id" , cover_photo: "$coverphoto", cover_video : "$cover_video" },
                   pipeline: [
                     {$project: {  storage_path :1, _id: 1,file_id:1 , email:1, displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
                     {$match: {$expr:
                           { $or : 
                             [
                               {$eq: ["$file_id", "$$photo_id"]},
-                           //   {$eq: ["$file_id", "$$cover_photo"]},
+                              {$eq: ["$file_id", "$$cover_photo"]},
+                              {$eq: ["$cover_video", "$$cover_video"]},
                             ]
                           }
                     } 
