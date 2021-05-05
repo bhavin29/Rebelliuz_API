@@ -323,7 +323,9 @@ callSearchData = function(req,res,bJobUser,jobCount){
                 as: "user_job"
               };
   
-  let lookupvalue_1_1 = 
+  let lookupvalue_2_unwind = {   $unwind:"$user_job" };
+
+  let lookupvalue_2 = 
               {
                 from: "user_jobs",
                 let: { b_user_id : "$user_id", culture_values_ids:{$ifNull: [{ "$split": [ "$culture_values_ids", "," ] },[] ]},},
@@ -340,9 +342,11 @@ callSearchData = function(req,res,bJobUser,jobCount){
                 as: "culture_values"
               };
 
-  let lookupvalue_1_unwind = {   $unwind:"$user_job" };
+  
+  let lookupvalue_3_unwind = {   $unwind:"$user_job" };
+            
                  
-  let lookupvalue_2 =
+  let lookupvalue_3 =
     {
       from: "users",
       let: { id: "$user_job.user_id" },
@@ -353,45 +357,26 @@ callSearchData = function(req,res,bJobUser,jobCount){
       as: "userdata"
     };
       
-  let lookupvalue_2_1unwind = 
+/*  let lookupvalue_2_1unwind = 
     {
       $unwind: {
           path: "$userdata",
           preserveNullAndEmptyArrays: false
       }
-  };
-  
-  let lookupvalue_2_1 =
-          {
-            from: "bussines_job_users",
-            let: { u_id: "$userdata.uid" },
-            pipeline: [
-              {$project: {  _id: 1,file_id:1, search_status:1 , uid:1 }  },
-              {$match: {$expr:
-                { $and : 
-                  [
-                  {$eq: ["$search_user_id", "$$u_id"]},
-                  ]
-                }
-              } 
-              }
-            ],
-            as: "search_status"
-          };
-      
-  let lookupvalue_2_unwind = {   $unwind:"$userdata" };
-  
-  let lookupvalue_3 =
+  };*/
+
+  let lookupvalue_4_unwind = {   $unwind:"$userdata" };
+
+  let lookupvalue_4 =
     {
       from: "storage_files",
       let: { photo_id: "$userdata.photo_id" , cover_photo: "$coverphoto" },
       pipeline: [
-        {$project: { storage_path :1, _id: 1,file_id:1 , displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
+        {$project: { storage_path :1,"userdata.uid" :1, _id: 1,file_id:1 , displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
         {$match: {$expr:
           { $or : 
             [
             {$eq: ["$file_id", "$$photo_id"]},
-          //   {$eq: ["$file_id", "$$cover_photo"]},
             ]
           }
         } 
@@ -399,10 +384,30 @@ callSearchData = function(req,res,bJobUser,jobCount){
       ],
       as: "userphoto"
     };
+      
+  let lookupvalue_5_unwind = {   $unwind:"$userphoto" };
   
-  let lookupvalue_3_unwind = {   $unwind:"$userphoto" };
+  let lookupvalue_5 =
+  {
+        from: "bussines_job_users",
+        let: { id: "$userdata.uid" },
+        pipeline: [
+          {$project: {_id: 1, search_user_id:1 ,search_status:1,bussines_id:1,job_category_id:1 }  },
+                {$match: {$expr:
+                      {$and:[ 
+                        { $eq:  ["$search_user_id", {"$toString" : "$$id" } ]},
+                        { $eq : [ "$bussines_id", req.params.bussinesid ]},
+                        { $eq : [ "$job_category_id" , req.query.job_category_id]}
+                      ]}
+                  }
+          }
+        ],
+        as: "search_status"
+     };
   
-  let lookupvalue_4 =
+  let lookupvalue_6_unwind = {   $unwind:"$userphoto" };
+  
+  let lookupvalue_6 =
   {
         from: "user_experiences",
         let: { id: "$userdata.user_id" },
@@ -436,16 +441,21 @@ callSearchData = function(req,res,bJobUser,jobCount){
       
       aggregate_options.push({$match : match});
       aggregate_options.push({$lookup : lookupvalue_1});
-      aggregate_options.push(lookupvalue_1_unwind);
-      aggregate_options.push({$lookup : lookupvalue_1_1});
-      aggregate_options.push(lookupvalue_1_unwind);
-      aggregate_options.push({$lookup : lookupvalue_2});
-      aggregate_options.push(lookupvalue_2_1unwind);
-      aggregate_options.push({$lookup : lookupvalue_2_1});
+
       aggregate_options.push(lookupvalue_2_unwind);
-      aggregate_options.push({$lookup : lookupvalue_3});
+      aggregate_options.push({$lookup : lookupvalue_2});
+
       aggregate_options.push(lookupvalue_3_unwind);
+      aggregate_options.push({$lookup : lookupvalue_3});
+
+      aggregate_options.push(lookupvalue_4_unwind);
       aggregate_options.push({$lookup : lookupvalue_4});
+      
+      aggregate_options.push(lookupvalue_5_unwind);
+      aggregate_options.push({$lookup : lookupvalue_5});
+      
+      aggregate_options.push(lookupvalue_6_unwind);
+      aggregate_options.push({$lookup : lookupvalue_6});
       
     try
       {
@@ -489,7 +499,7 @@ function mailing(userid,bussinesid){
 //  template = template.replace('@username@',users_data[0].last_name + ' ' + users_data[0].first_name);
 //  template = template.replace('@Bussinesname@',bussines_data[0].title);
 
-  Mailer.sendEmail ({from:'b@b.com',to: config.mailer.to_mail , bcc: config.mailer.bcc_mail, subject: 'Welcome again!!!', html: template});
+  Mailer.sendEmail ({from:'b@b.com',to: config.mailer.to_mail , bcc: config.mailer.bcc_mail, subject: 'You have new job request', html: template});
 }
 
 module.exports = {

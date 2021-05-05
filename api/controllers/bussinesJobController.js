@@ -207,7 +207,7 @@ const view = function (req, res) {
 
           BussinesJob.aggregate([
             {
-              $match: {bussines_id : req.params.bussinesid, isactive : active} 
+              $match: {bussines_id : req.params.bussinesid} 
             },  
             {
               $lookup:
