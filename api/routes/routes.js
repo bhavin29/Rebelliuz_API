@@ -190,7 +190,7 @@ router.route("/user")
    .post(auth.isAuthunticated,userController.view)
 
 router.route("/user/profile")
-   .post(auth.isAuthunticated,userProfileController.view)
+   .post(userProfileController.view)
 
 router.route("/user/job/request")
    .get(auth.isAuthunticated,userJobRequestController.view)

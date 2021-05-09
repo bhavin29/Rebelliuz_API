@@ -52,36 +52,54 @@ const view = function (req, res) {
                         preserveNullAndEmptyArrays: true
                     }
                  },
-              {
-                $lookup:
-                 {
-                   from: "user_experiences",
-                   let: { user_id: "$user_id" },
-                   pipeline: [
-                    {$match: {$expr: { $or :  [ {$eq: ["$owner_id", "$$user_id"]},] } } },
-                    {  
+                {
                         $lookup:{
-                          from: "storage_files",
-                          let: { photo_id: "$photo_id" , cover_photo: "$coverphoto" },
+                          from: "user_intros",
+                          let: { email: "$email"  },
                           pipeline: [
-                            {$project: { storage_path :1, _id: 1,file_id:1 , email:1, displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
-                            {$match: {$expr:
-                                  { $or : 
-                                    [
-                                      {$eq: ["$file_id", "$$photo_id"]}, //   {$eq: ["$file_id", "$$cover_photo"]},
-                                    ]
-                                  }
-                            } 
-                            }
+                           {$project: { email:1, vFilename:1, "root_path" :  { $literal: config.general.parent_root }  }  },
+                            {$match: {$expr: { $eq: ["$email", "$$email"]},
+                          }}
                           ],
-                          as: "experince_photo"
-                        }
-                        }
-                  ],
-               as: "experience"
+                          as: "user_intro"
                  }
               },
               {
+                $unwind: {
+                    path: "$users",
+                    preserveNullAndEmptyArrays: true
+                }
+             },
+          {
+            $lookup:
+             {
+               from: "user_experiences",
+               let: { user_id: "$user_id" },
+               pipeline: [
+                {$match: {$expr: { $or :  [ {$eq: ["$owner_id", "$$user_id"]},] } } },
+                {  
+                    $lookup:{
+                      from: "storage_files",
+                      let: { photo_id: "$photo_id" , cover_photo: "$coverphoto" },
+                      pipeline: [
+                        {$project: { storage_path :1, _id: 1,file_id:1 , email:1, displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
+                        {$match: {$expr:
+                              { $or : 
+                                [
+                                  {$eq: ["$file_id", "$$photo_id"]}, //   {$eq: ["$file_id", "$$cover_photo"]},
+                                ]
+                              }
+                        } 
+                        }
+                      ],
+                      as: "experince_photo"
+                    }
+                    }
+              ],
+           as: "experience"
+             }
+          },
+          {
                 $unwind: {
                     path: "$users",
                     preserveNullAndEmptyArrays: true

@@ -91,18 +91,15 @@ view = function (req, res) {
     }
   }
 
-
   if (validation===1){
     errMessage = '{ "User reference": { "message" : "Please enter user id/owner id"} }';
     requestHandler.sendError(req,res, 422, 'Somthing went worng: ',JSON.parse(errMessage));
-
   }
   else
   {
     let match = { user_id : req.query.userid};
 
-    //filter by name - use $regex in mongodb - add the 'i' flag if you want the search to be case insensitive.
-      if (req.query.recommendedtext)
+    if (req.query.recommendedtext)
     {
         match.recommended = {$regex: req.query.recommendedtext, $options: 'i'};
     } 
@@ -155,7 +152,7 @@ view = function (req, res) {
               from: "users",
               let: { id: "$user_id" , username : "$username", user_id : "$user_id"},
               pipeline: [
-                {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1,
+                {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, first_name:1,last_name:1,
                               username:  {$ifNull: [ "$username" , "$user_id" ]},
                              coverphoto:1,owner_id:1 }  },
                        {$match: {$expr:
