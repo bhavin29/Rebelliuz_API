@@ -204,6 +204,25 @@ let lookupvalue_2 =
   ],
   as: "userdata"
 };
+let lookupvalue_2_1unwind = {   $unwind:"$user_job" };
+
+let lookupvalue_2_1 = 
+            {
+              from: "user_jobs",
+              let: { b_user_id : "$user_id", culture_values_ids:{$ifNull: [{ "$split": [ "$culture_values_ids", "," ] },[] ]},},
+              pipeline: [
+             
+                {$match: {$expr: {$and:[  { $eq: ["$user_id", "$$b_user_id"]}, ]} } },
+                  {
+                    "$group": {
+                       _id: null,
+                       count: { $sum: 1 }
+                    }},
+                    {"$project" : { "Values" : { "$multiply" : ["$count", 25]}}},
+                  ],
+              as: "culture_values"
+            };
+
 
 let lookupvalue_2_unwind = {   $unwind:"$userdata" };
 
@@ -264,6 +283,8 @@ let lookupvalue_4 =
     aggregate_options.push({$lookup : lookupvalue_1});
     aggregate_options.push(lookupvalue_1_unwind);
     aggregate_options.push({$lookup : lookupvalue_2});
+    aggregate_options.push(lookupvalue_2_1unwind);
+    aggregate_options.push({$lookup : lookupvalue_2_1});
     aggregate_options.push(lookupvalue_2_unwind);
     aggregate_options.push({$lookup : lookupvalue_3});
     aggregate_options.push(lookupvalue_3_unwind);
