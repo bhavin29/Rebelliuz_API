@@ -11,22 +11,23 @@ const  Schema = mongoose.Schema;
 const  PaymentTransactionSchema = new  Schema({
     module: { type: String, trim:true, required:  true },
     user_id: { type: String, trim:true},
-    business_id: { type: String, trim:true, required:  true },
+    business_id: { type: String, trim:true },
     payment_package_id: { type: String, required:  true },
-    payment_gateway_id: { type: Number, required:  true },
-    payment_order_id: { type: Number, required:  true },
+    payment_gateway_id: { type: String, required:  true },
+    payment_order_id: { type: String, required:  true },
     payment_date: { type: Date },
     status: { type: Number, required:  true },
     notes: { type: String },
     gateway_transaction_id: { type: String },
-    amount: { type: Long, required:  true },
+    amount: { type: Number, required:  true },
     currency: { type: String, required:  true },
     params: { type: Object },
     file_id: { type: Object },
     created_on: { type: Date, default: Date.now },
-    created_by: { type: Number, default: 0 },
+    created_by: { type: String, default: 0 },
     modified_on: { type: Date },
-    modified_by: { type: Number }
+    modified_by: { type: Number },
+    isactive: { type: Boolean, required:  true }
 });
 
 PaymentTransactionSchema.plugin(aggregatePaginate);

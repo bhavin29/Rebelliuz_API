@@ -11,13 +11,13 @@ const  Schema = mongoose.Schema;
 const  PaymentOrderSchema = new  Schema({
     module: { type: String, trim:true, required:  true },
     user_id: { type: String, trim:true},
-    business_id: { type: String, trim:true, required:  true },
+    business_id: { type: String, trim:true },
     payment_package_id: { type: String, required:  true },
-    payment_gateway_id: { type: Number, required:  true },
+    payment_gateway_id: { type: String, required:  true },
     status: { type: Number, required:  true },
     notes: { type: String },
     created_on: { type: Date, default: Date.now },
-    created_by: { type: Number, default: 0 },
+    created_by: { type: String, default: 0 },
 });
 
 PaymentOrderSchema.plugin(aggregatePaginate);

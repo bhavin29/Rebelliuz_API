@@ -40,6 +40,9 @@ var CultureValuesController = require('../controllers/master/cultureValuesContro
 var LocationController = require('../controllers/master/locationController');
 var ReferenceRelationshipController = require('../controllers/master/referenceRelationshipController');
 
+//Payment
+var PaymentOrderController = require('../controllers/payment/paymentOrderController');
+
 const auth = require('../../utils/auth');
 
 // Bio routes
@@ -221,7 +224,12 @@ router.route("/bussines/adminuser/:bussinesid")
   .get(auth.isAuthunticated,bussinesAdminUserController.view)
   .post(auth.isAuthunticated,bussinesAdminUserController.add);
 
+//Payment
+router.route("/payment/order/:paymentOrderId")
+  .get(auth.isAuthunticated,PaymentOrderController.view);
 
+router.route("/payment/order")
+  .post(auth.isAuthunticated,PaymentOrderController.add);
 
 //Export API routes
 module.exports = router;
