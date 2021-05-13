@@ -162,9 +162,7 @@ function callSearch(req,res,status,jobCount) {
   }
 }
 
-
-
-//SErch user for status 
+//Serch user for status 
 callSearchbyStatusData = function(req,res,status,jobCount){
 let search_status = parseInt(status); 
 let match =
@@ -378,14 +376,6 @@ callSearchData = function(req,res,bJobUser,jobCount){
       as: "userdata"
     };
       
-/*  let lookupvalue_2_1unwind = 
-    {
-      $unwind: {
-          path: "$userdata",
-          preserveNullAndEmptyArrays: false
-      }
-  };*/
-
   let lookupvalue_4_unwind = {   $unwind:"$userdata" };
 
   let lookupvalue_4 =
@@ -406,8 +396,15 @@ callSearchData = function(req,res,bJobUser,jobCount){
       as: "userphoto"
     };
       
-  let lookupvalue_5_unwind = {   $unwind:"$userphoto" };
+  //let lookupvalue_5_unwind = {   $unwind:"$userphoto" };
   
+  let lookupvalue_5_unwind = {
+    $unwind: {
+        path: "$userphoto",
+        preserveNullAndEmptyArrays: true
+    }
+  };
+
   let lookupvalue_5 =
   {
         from: "bussines_job_users",
@@ -426,7 +423,12 @@ callSearchData = function(req,res,bJobUser,jobCount){
         as: "search_status"
      };
   
-  let lookupvalue_6_unwind = {   $unwind:"$userphoto" };
+  let lookupvalue_6_unwind = {
+    $unwind: {
+        path: "$userphoto",
+        preserveNullAndEmptyArrays: true
+    }
+  };
   
   let lookupvalue_6 =
   {
