@@ -192,7 +192,7 @@ view = function (req, res) {
                      from: "users",
                      let: { id: "$owner_id" },
                      pipeline: [
-                       {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, coverphoto:1,owner_id:1 }  },
+                       {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, username : 1, user_id :1, displayname:1, photo_id:1, coverphoto:1,owner_id:1 }  },
                               {$match: {$expr:
                                    {$and:[ 
                                      { $eq: ["$_id", "$uid"]},
