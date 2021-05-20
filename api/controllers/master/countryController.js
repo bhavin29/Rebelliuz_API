@@ -14,6 +14,7 @@ exports.index = async function (req, res) {
 
     //set the options for pagination
     const options = {
+        pagination : false,
         page, limit,
         collation: {locale: 'en'},
         customLabels: {

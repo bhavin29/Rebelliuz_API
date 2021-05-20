@@ -10,10 +10,11 @@ exports.index = async function (req, res) {
 
     //PAGINATION
     let page = parseInt(req.query.page) || 1;
-    let limit = parseInt(req.query.rowsPerPage) || global.rows_per_page;
+    let limit =  parseInt(req.query.rowsPerPage) || global.rows_per_page;
 
     //set the options for pagination
     const options = {
+        pagination : false,
         page, limit,
         collation: {locale: 'en'},
         customLabels: {

@@ -122,7 +122,6 @@ jobValidation = function (req){
       }
  };
 
-
 // View User Intro
 view = function (req, res) {
   try{

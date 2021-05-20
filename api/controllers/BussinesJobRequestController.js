@@ -10,8 +10,9 @@ const requestHandler = new RequestHandler(logger);
 // View 
 view = function (req, res) {
     
-    let match = { "bussines_id": req.params.bussinesid,  "search_status" : {$in : [20,30]}  }
-     
+  //  let match = { "bussines_id": req.params.bussinesid,  "search_status" : {$in : [20,30]}  }
+    let match = { "bussines_id": req.params.bussinesid }
+  
     let lookupvalue_1 = 
                 {
                   from: "job_categories",
@@ -99,8 +100,8 @@ view = function (req, res) {
     
     aggregate_options.push({$match : match});
     aggregate_options.push({$lookup : lookupvalue_1});
-    aggregate_options.push(lookupvalue_1_unwind);
-    aggregate_options.push({$lookup : lookupvalue_2});
+   // aggregate_options.push(lookupvalue_1_unwind);
+    //aggregate_options.push({$lookup : lookupvalue_2});
     
    try
     {
