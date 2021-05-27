@@ -263,7 +263,34 @@ exports.add = function (req, res) {
             }
             else
             {
-                requestHandler.sendSuccess(res,'User test save successfully.',200,usertest);
+
+              testanswer = JSON.stringify(usertest);
+              testanswer = JSON.parse(testanswer);
+              testanswer['start_range'] = 0;
+              testanswer['end_range'] = 0;
+
+              if (usertest.answer == 1)
+              {
+                testanswer['start_range'] = 0;
+                testanswer['end_range'] = 25;
+              }
+              else if (usertest.answer == 2)
+              {
+                testanswer['start_range'] = 26;
+                testanswer['end_range'] = 50;
+              }
+              else if (usertest.answer == 3)
+              {
+                testanswer['start_range'] = 51;
+                testanswer['end_range'] = 75;
+              }
+              else if (usertest.answer == 4)
+              {
+                testanswer['start_range'] = 76;
+                testanswer['end_range'] = 10;
+              }
+              
+              requestHandler.sendSuccess(res,'User test save successfully.',200,testanswer);
             }
         });
     }
@@ -289,7 +316,34 @@ exports.add = function (req, res) {
               errMessage = '{ "reference": { "message" : "User test is not saved!!"} }';
               requestHandler.sendError(req,res, 422, 'Somthing worng with user job',JSON.parse(errMessage));
             } else {
-              requestHandler.sendSuccess(res,'User test updated successfully.',200,userTest);
+
+              testanswer = JSON.stringify(userTest);
+              testanswer = JSON.parse(testanswer);
+              testanswer['start_range'] = 0;
+              testanswer['end_range'] = 0;
+
+              if (userTest.answer == 1)
+              {
+                testanswer['start_range'] = 0;
+                testanswer['end_range'] = 25;
+              }
+              else if (userTest.answer == 2)
+              {
+                testanswer['start_range'] = 26;
+                testanswer['end_range'] = 50;
+              }
+              else if (userTest.answer == 3)
+              {
+                testanswer['start_range'] = 51;
+                testanswer['end_range'] = 75;
+              }
+              else if (userTest.answer == 4)
+              {
+                testanswer['start_range'] = 76;
+                testanswer['end_range'] = 10;
+              }
+
+              requestHandler.sendSuccess(res,'User test updated successfully.',200,testanswer);
             }
           });
      }

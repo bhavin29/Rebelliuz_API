@@ -49,9 +49,9 @@ AddPaymentSubscription = function(req,res,paymentOrder){
      paymentSubscription.business_id = req.body.business_id;
      paymentSubscription.payment_package_id = req.body.payment_package_id;
      paymentSubscription.payment_gateway_id = req.body.payment_gateway_id;
-     paymentSubscription.gateway_profile_id = req.body.gateway_profile_id;
-     paymentSubscription.payment_date = req.body.payment_date;
-     paymentSubscription.expiration_date = req.body.expiration_date;
+   //  paymentSubscription.gateway_profile_id = req.body.gateway_profile_id;
+  //   paymentSubscription.payment_date = req.body.payment_date;
+  //   paymentSubscription.expiration_date = ''req.body.expiration_date'';
      paymentSubscription.status = req.body.status;
      paymentSubscription.notes = req.body.notes;
      paymentSubscription.created_by = global.decoded._id;
@@ -85,16 +85,16 @@ AddPaymentTransaction = function(req,res,paymentOrder,paymentSubscription){
      paymentTransaction.payment_package_id = req.body.payment_package_id;
      paymentTransaction.payment_gateway_id = req.body.payment_gateway_id;
      paymentTransaction.payment_order_id = paymentOrder._id;
-     paymentTransaction.payment_date = req.body.payment_date;
+   //  paymentTransaction.payment_date = req.body.payment_date;
      paymentTransaction.status = req.body.status;
      paymentTransaction.notes = req.body.notes;
-     paymentTransaction.gateway_transaction_id = req.body.gateway_transaction_id;
-     paymentTransaction.amount = req.body.amount;
-     paymentTransaction.currency = req.body.currency;
+   //  paymentTransaction.gateway_transaction_id = req.body.gateway_transaction_id;
+     paymentTransaction.amount = 50; // Amount need to save from master as per pacakge_id
+     paymentTransaction.currency = "A$";
      paymentTransaction.params = req.body.params;
      paymentTransaction.file_id = req.body.file_id;     
      paymentTransaction.created_by = global.decoded._id;
-     paymentTransaction.isactive = req.body.isactive;
+     paymentTransaction.isactive = 1;
 
     //Save and check error
     paymentTransaction.save(function (err) {

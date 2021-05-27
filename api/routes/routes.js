@@ -39,6 +39,8 @@ var CountryController = require('../controllers/master/countryController');
 var CultureValuesController = require('../controllers/master/cultureValuesController');
 var LocationController = require('../controllers/master/locationController');
 var ReferenceRelationshipController = require('../controllers/master/referenceRelationshipController');
+var PaymentGatewayController = require('../controllers/master/paymentGatewayController');
+var PaymentPackageController = require('../controllers/master/paymentPackageController');
 
 //Payment
 var PaymentOrderController = require('../controllers/payment/paymentOrderController');
@@ -157,9 +159,21 @@ router.route("/masters/referenceRelationship")
    .get(auth.isAuthunticated,ReferenceRelationshipController.index)
    .post(auth.isAuthunticated,ReferenceRelationshipController.add);
 
-   router.route("/masters/referenceRelationship/:relationshipId")
+router.route("/masters/referenceRelationship/:relationshipId")
    .get(auth.isAuthunticated,ReferenceRelationshipController.view)
    .put(auth.isAuthunticated,ReferenceRelationshipController.update);
+
+router.route("/masters/paymentGateway")
+   .get(auth.isAuthunticated,PaymentGatewayController.index)
+
+router.route("/masters/paymentGateway/:paymentGatewayId")
+   .get(auth.isAuthunticated,PaymentGatewayController.view)
+
+router.route("/masters/PaymentPackage")
+   .get(auth.isAuthunticated,PaymentPackageController.index)
+
+router.route("/masters/PaymentPackage/:paymentPackageId")
+   .get(auth.isAuthunticated,PaymentPackageController.view)
 
 //user   
 router.route("/user/intro")

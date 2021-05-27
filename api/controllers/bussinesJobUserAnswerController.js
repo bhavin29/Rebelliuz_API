@@ -209,19 +209,21 @@ viewcomments = function(req,res){
   {
      $lookup:
     {
-      from: "users",
-      let: { id: "$bussines_user_id" },
+      from: "job_categories",
+      let: { jcid: "$job_category_id" },
       pipeline: [
-        {$project: {_id: 1, uid: {"$toObjectId": "$$id"}, displayname:1, photo_id:1, coverphoto:1,owner_id:1 }  },
-               {$match: {$expr:
-                    {$and:[ 
-                      { $eq: ["$_id", "$uid"]},
-                    ]}
-                }
-        }
-      ],
-      as: "bussinesuser"
-    }
+       {$project: { jobid: {"$toObjectId": "$$jcid"} , jobcategory_name : 1  }  },
+       {$match: {$expr:
+             { $or : 
+               [
+                 {$eq: ["$_id", "$jobid"]},
+               ]
+             }
+         } 
+         }
+       ],
+      as: "job_categories"
+      }
   },
   {
     $unwind: {
@@ -366,6 +368,7 @@ view = function (req, res) {
 });  
 }
 
+
 Callcomments = function(req,res,newUser,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer){
   BussinesJobUserComments.find( { bussines_id: req.params.bussinesid, 
     job_category_id : req.query.job_category_id, search_user_id : req.query.search_user_id }, 
@@ -379,6 +382,61 @@ Callcomments = function(req,res,newUser,bussinesJob,jobQuestion,bussinesJobUserA
     }
   }).sort({created_on : -1});
 }
+
+
+
+Callcomments123 = function(req,res,newUser,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer){
+  try{
+     
+    BussinesJobUserComments.aggregate([
+      {
+        $match: { bussines_id: req.params.bussinesid, job_category_id : req.query.job_category_id, 
+                  search_user_id : req.query.search_user_id 
+                }  
+      },
+      {
+        $lookup:
+         {
+          from: "users",
+          let: { b_id: "$bussines_user_id" },
+          pipeline: [
+            {$project: {_id: 1, displayname:1 }  },
+                  {$match: {$expr:
+                        {$and:[ 
+                          { $eq: [ "$_id",{"$toObjectId" : "$b_id" } ,  ]},
+                        ]}
+                    }
+            }
+          ],
+          as: "comment_user"
+         }
+      }],function(err, data) {
+        if (err)
+         {
+             errMessage = '{ "User": { "message" : "User  is not found"} }';
+             requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+         }
+         else
+         {
+            if(data)
+            {
+              CallBussinesJobUser(req,res,newUser,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer,data);
+            }
+            else
+            {
+              errMessage = '{ "User": { "message" : "User  is not found"} }';
+              requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+             }
+         }
+      }
+  );
+} catch (err) {
+      errMessage = { "View": { "message" : err.message } };
+      requestHandler.sendError(req,res, 500, 'View user job detail',(errMessage));
+    }
+}
+
+
 
 CallBussinesJobUser = function(req,res,newUser,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer,bussinesJobUserComments){
   BussinesJobUser.find( { bussines_id: req.params.bussinesid, 

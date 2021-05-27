@@ -100,8 +100,8 @@ view = function (req, res) {
     
     aggregate_options.push({$match : match});
     aggregate_options.push({$lookup : lookupvalue_1});
-   // aggregate_options.push(lookupvalue_1_unwind);
-    //aggregate_options.push({$lookup : lookupvalue_2});
+    aggregate_options.push(lookupvalue_1_unwind);
+    aggregate_options.push({$lookup : lookupvalue_2});
     
    try
     {

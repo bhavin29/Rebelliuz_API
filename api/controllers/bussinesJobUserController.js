@@ -137,7 +137,7 @@ try
         }
 };
 
-//common saerch
+//common search
 function callSearch(req,res,status,jobCount) {
   if (status>0){    
     callSearchbyStatusData(req,res,status,jobCount)      
@@ -243,6 +243,35 @@ let lookupvalue_3 =
     as: "userphoto"
   };
 
+
+  let lookupvalue_2_1_unwind = {
+    $unwind: {
+        path: "$userphoto",
+        preserveNullAndEmptyArrays: true
+    }
+  };
+
+  let lookupvalue_3_1 =
+  {
+        from: "bussines_job_users",
+        let: { id: "$userdata.uid" },
+        pipeline: [
+          {$project: {_id: 1, search_user_id:1 ,search_status:1,bussines_id:1,job_category_id:1 }  },
+                {$match: {$expr:
+                      {$and:[ 
+                        { $eq:  ["$search_user_id", {"$toString" : "$$id" } ]},
+                        { $eq : [ "$bussines_id", req.params.bussinesid ]},
+                        { $eq : [ "$job_category_id" , req.query.job_category_id]}
+                      ]}
+                  }
+          }
+        ],
+        as: "search_status"
+     };
+ 
+
+
+
 let lookupvalue_3_unwind = {   $unwind:"$userphoto" };
 
 let lookupvalue_4 =
@@ -285,6 +314,10 @@ let lookupvalue_4 =
     aggregate_options.push({$lookup : lookupvalue_2_1});
     aggregate_options.push(lookupvalue_2_unwind);
     aggregate_options.push({$lookup : lookupvalue_3});
+
+    aggregate_options.push(lookupvalue_2_1_unwind);
+    aggregate_options.push({$lookup : lookupvalue_3_1});
+
     aggregate_options.push(lookupvalue_3_unwind);
     aggregate_options.push({$lookup : lookupvalue_4});
     

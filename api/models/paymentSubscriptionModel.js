@@ -15,7 +15,7 @@ const  PaymentSubscriptionSchema = new  Schema({
     payment_package_id: { type: String, required:  true },
     payment_gateway_id: { type: String, required:  true },
     gateway_profile_id: { type: String },
-    payment_date: { type: Date },
+    payment_date: { type: Date, default: Date.now  },
     expiration_date: { type: Date },
     status: { type: Number, required:  true },
     notes: { type: String },
