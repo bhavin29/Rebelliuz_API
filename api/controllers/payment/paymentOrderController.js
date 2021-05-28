@@ -1,3 +1,4 @@
+//var paypal = require('paypal-rest-sdk');
 const _ = require('lodash');
 const PaymentOrder = require('../../models/paymentOrderModel');
 const PaymentSubscription = require('../../models/paymentSubscriptionModel');
@@ -146,3 +147,47 @@ exports.view = function (req, res) {
     requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
     }
 };
+
+exports.webhooks = function(req, res) {
+    try
+    {
+     /*   var clientId = 'YOUR APPLICATION CLIENT ID';
+        var secret = 'YOUR APPLICATION SECRET';
+
+        paypal.configure({
+            'mode': 'sandbox', //sandbox or live
+            'client_id': clientId,
+            'client_secret': secret
+        });
+
+
+    gateway.webhookNotification.parse(
+      req.body.bt_signature,
+      req.body.bt_payload,
+      (err, webhookNotification) => {
+
+        if (err)
+        {
+            errMessage = '{ "Paypal": { "message" : "Paypal err"} }';
+            requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+        }
+        console.log("[Webhook Received " + webhookNotification.timestamp + "] | Kind: " + webhookNotification.kind);
+  
+        // Example values for webhook notification properties
+        this.logger.log(" Paypal Kind:" + webhookNotification.kind, 'push data');
+        this.logger.log(" Paypa timestampa:" + webhookNotification.timestamp, 'push data');
+  
+        console.log(webhookNotification.kind); // "subscriptionWentPastDue"
+        console.log(webhookNotification.timestamp); // Sun Jan 1 00:00:00 UTC 2012
+        requestHandler.sendSuccess(res,'Paypal.',200,webhookNotification);
+        
+
+    });*/
+    console.log(res);
+    requestHandler.sendSuccess(res,'Payment .',200,null);
+ 
+    } catch (err) {
+    errMessage = { "Payment Order GET": { "message" : err.message } };
+    requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+    }
+  };
