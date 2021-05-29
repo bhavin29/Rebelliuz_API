@@ -8,6 +8,14 @@ const bodyParser = require('body-parser');
 const serveIndex = require('serve-index');
 const cors = require('cors');
 const mongoose = require('mongoose');
+var http = require('http');
+var https = require('https');
+var fs = require('fs');
+//
+var privateKey  = fs.readFileSync(__dirname +'/private.key', 'utf8');
+var certificate = fs.readFileSync(__dirname +'/certificate.crt', 'utf8');
+
+var credentials = {key: privateKey, cert: certificate};
 
 //connect to mongoose
 const dbPath = config.db.dbPath;
@@ -96,7 +104,18 @@ next();
     }
 });
 
-// Launch app to the specified port
-app.listen(port, function() {
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
+
+if(process.env.ENVIRONMENT === "local"){
+    httpServer.listen(port);
     console.log("Running Rebelliuz API on Port "+ port);
-});
+} else {
+    httpsServer.listen(port);
+    console.log("Running Rebelliuz API on Port "+ port);
+}
+
+// Launch app to the specified port
+//app.listen(port, function() {
+//    console.log("Running Rebelliuz API on Port "+ port);
+//});

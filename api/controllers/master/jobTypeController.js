@@ -1,5 +1,5 @@
 const _ = require('lodash');
-JobType = require('../../models/master/JobTypeModel');
+JobType = require('../../models/master/jobTypeModel');
 const RequestHandler = require('../../../utils/RequestHandler');
 const Logger = require('../../../utils/logger');
 const logger = new Logger();

@@ -4,25 +4,23 @@ require('dotenv').config();
 module.exports = {
 	app: {
 		port: process.env.DEV_APP_PORT || 3000,
-		appName: process.env.APP_NAME || 'iLrn',
+		appName: process.env.APP_NAME || 'Rebelliuz',
 		env: process.env.NODE_ENV || 'development',
 	},
 	db: {
 		port: process.env.DB_PORT || 27016,
 	//	dbPath: process.env.DB_PATH || 'mongodb://localhost/firstrest',
-	//
 		dbPath: process.env.DB_PATH || 'mongodb+srv://test:test123@cluster0.e9yvt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority?authSource=admin&ssl=true' ,
-	//	dbPath: process.env.DB_PATH || 'mongodb://test:test123@cluster0.e9yvt.mongodb.net:27017?authMechanism=DEFAULT&authSource=db&ssl=true"';
 },
 	winiston: {
-		logpath: '/iLrnLogs/logs/',
+		logpath: '/logs/',
 	},
 	auth: {
 		jwt_secret: process.env.JWT_SECRET || 'vasturebelliuzhsepur',
 		jwt_expiresin: process.env.JWT_EXPIRES_IN || '1d',
 		saltRounds: process.env.SALT_ROUND || 10,
 		refresh_token_secret: process.env.REFRESH_TOKEN_SECRET || 'VmVyeVBvd2VyZnVsbFNlY3JldA==',
-		refresh_token_expiresin: process.env.REFRESH_TOKEN_EXPIRES_IN || '2d', // 2 days
+		refresh_token_expiresin: process.env.REFRESH_TOKEN_EXPIRES_IN || '2d', 
 	},
 	smtpOptions: {
 	    host: 'smtp.gmail.com',

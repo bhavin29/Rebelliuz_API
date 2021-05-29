@@ -27,7 +27,7 @@ var userJobRequestController = require('../controllers/userJobRequestController'
 var bussinesJobRequestController = require('../controllers/bussinesJobRequestController');
 
 //Masters
-var jobCategoryController = require('../controllers/master/JobCategoryController');
+var jobCategoryController = require('../controllers/master/jobCategoryController');
 var jobClassificationController = require('../controllers/master/jobClassificationController');
 var jobExperinceController = require('../controllers/master/jobExperinceController');
 var jobTypeController = require('../controllers/master/jobTypeController');

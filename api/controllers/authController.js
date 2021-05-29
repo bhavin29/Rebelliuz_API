@@ -216,6 +216,7 @@ exports.register = (req, res) => {
 
 function mailing(user){
   var template = fs.readFileSync(config.general.content_path + '\\HTML_Template\\Welcome.html',{encoding:'utf-8'});
+ // var template = fs.readFileSync(config.general.content_path + '//HTML_Template//Welcome.html',{encoding:'utf-8'});
   
   template = template.replace(/(\r\n|\n|\r)/gm, "");
   template = template.replace('@username@',user.user[0].last_name + ' ' + user.user[0].first_name);
