@@ -247,7 +247,7 @@ router.route("/payment/order")
 
 //paypal
 router.route("/payment/webhooks")
-  .post(auth.isAuthunticated,PaymentOrderController.webhooks);
+  .post(PaymentOrderController.webhooks);
   
 //Export API routes
 module.exports = router;

@@ -3,6 +3,7 @@ const _ = require('lodash');
 const PaymentOrder = require('../../models/paymentOrderModel');
 const PaymentSubscription = require('../../models/paymentSubscriptionModel');
 const PaymentTransaction = require('../../models/paymentTransactionModel');
+const PaymentPackage = require('../../models/master/paymentPackageModel');
 const RequestHandler = require('../../../utils/RequestHandler');
 const Logger = require('../../../utils/logger');
 const logger = new Logger();
@@ -50,9 +51,8 @@ AddPaymentSubscription = function(req,res,paymentOrder){
      paymentSubscription.business_id = req.body.business_id;
      paymentSubscription.payment_package_id = req.body.payment_package_id;
      paymentSubscription.payment_gateway_id = req.body.payment_gateway_id;
-   //  paymentSubscription.gateway_profile_id = req.body.gateway_profile_id;
-  //   paymentSubscription.payment_date = req.body.payment_date;
-  //   paymentSubscription.expiration_date = ''req.body.expiration_date'';
+     paymentSubscription.payment_order_id = paymentOrder._id;
+     paymentSubscription.payment_date = "";
      paymentSubscription.status = req.body.status;
      paymentSubscription.notes = req.body.notes;
      paymentSubscription.created_by = global.decoded._id;
@@ -67,7 +67,7 @@ AddPaymentSubscription = function(req,res,paymentOrder){
         }
         else
         {
-            AddPaymentTransaction(req,res,paymentOrder,paymentSubscription);
+            GetAmountCurrency(req,res,paymentOrder,paymentSubscription);
         }
     });
     } catch (err) {
@@ -76,7 +76,34 @@ AddPaymentSubscription = function(req,res,paymentOrder){
     }
 }
 
-AddPaymentTransaction = function(req,res,paymentOrder,paymentSubscription){
+GetAmountCurrency = function(req,res,paymentOrder,paymentSubscription){
+    try
+    {
+        //payment_packages
+        PaymentPackage.findById(req.body.payment_package_id, function (err, paymentPackage) {
+            if (err)
+            {
+                errMessage = '{ "Package": { "message" : "Pacagke have problem."} }';
+                requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+            }
+            else
+            {
+                if (paymentPackage){
+                    AddPaymentTransaction(req,res,paymentOrder,paymentSubscription,paymentPackage);
+                }
+                else
+                {
+                    requestHandler.sendError(req,res, 422, 'Somthing went worng: Package not found.','');
+                }
+            }
+        });
+    } catch (err) {
+        errMessage = { "Payment Subscription GET": { "message" : err.message } };
+        requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+    }
+}   
+
+AddPaymentTransaction = function(req,res,paymentOrder,paymentSubscription,paymentPackage){
     try
     {
      var paymentTransaction = new PaymentTransaction();
@@ -86,14 +113,15 @@ AddPaymentTransaction = function(req,res,paymentOrder,paymentSubscription){
      paymentTransaction.payment_package_id = req.body.payment_package_id;
      paymentTransaction.payment_gateway_id = req.body.payment_gateway_id;
      paymentTransaction.payment_order_id = paymentOrder._id;
-   //  paymentTransaction.payment_date = req.body.payment_date;
+     paymentTransaction.payment_date = "";
      paymentTransaction.status = req.body.status;
      paymentTransaction.notes = req.body.notes;
-   //  paymentTransaction.gateway_transaction_id = req.body.gateway_transaction_id;
-     paymentTransaction.amount = 50; // Amount need to save from master as per pacakge_id
-     paymentTransaction.currency = "A$";
-     paymentTransaction.params = req.body.params;
-     paymentTransaction.file_id = req.body.file_id;     
+
+     paymentTransaction.amount = paymentPackage.price;
+     paymentTransaction.currency = paymentPackage.currency;
+     
+     paymentTransaction.params = "";
+     paymentTransaction.file_id = "";     
      paymentTransaction.created_by = global.decoded._id;
      paymentTransaction.isactive = 1;
 
@@ -148,46 +176,124 @@ exports.view = function (req, res) {
     }
 };
 
+//Paypal webhook
 exports.webhooks = function(req, res) {
     try
     {
-     /*   var clientId = 'YOUR APPLICATION CLIENT ID';
-        var secret = 'YOUR APPLICATION SECRET';
 
-        paypal.configure({
-            'mode': 'sandbox', //sandbox or live
-            'client_id': clientId,
-            'client_secret': secret
-        });
-
-
-    gateway.webhookNotification.parse(
-      req.body.bt_signature,
-      req.body.bt_payload,
-      (err, webhookNotification) => {
-
-        if (err)
-        {
-            errMessage = '{ "Paypal": { "message" : "Paypal err"} }';
-            requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
-        }
-        console.log("[Webhook Received " + webhookNotification.timestamp + "] | Kind: " + webhookNotification.kind);
-  
-        // Example values for webhook notification properties
-        this.logger.log(" Paypal Kind:" + webhookNotification.kind, 'push data');
-        this.logger.log(" Paypa timestampa:" + webhookNotification.timestamp, 'push data');
-  
-        console.log(webhookNotification.kind); // "subscriptionWentPastDue"
-        console.log(webhookNotification.timestamp); // Sun Jan 1 00:00:00 UTC 2012
-        requestHandler.sendSuccess(res,'Paypal.',200,webhookNotification);
-        
-
-    });*/
-    console.log(res);
-    requestHandler.sendSuccess(res,'Payment .',200,null);
+    logger.log('STATUS: ' + res.statusCode,'info');
+    logger.log('HEADERS: ' + JSON.stringify(res.headers),'info');
+    logger.log('BODY: ' + JSON.stringify(req.body),'info');
  
-    } catch (err) {
+    var order_id = '60b5eb6c7450b2977006e1ea';
+    var status=0;    
+    if (req.body.event_type == 'PAYMENT.AUTHORIZATION.CREATED')
+    {
+        status=2;
+        UpdatePaymentOrder(req,res,order_id,status)
+    }
+    else if (req.body.event_type == 'PAYMENT.CAPTURE.DENIED'){
+        status=3;
+        UpdatePaymentOrder(req,res,order_id,status)
+    }
+    else{
+        requestHandler.sendError(req,res, 500, 'Somthing went worng: No data found','');
+    }
+  }
+  catch (err) {
     errMessage = { "Payment Order GET": { "message" : err.message } };
     requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
     }
-  };
+};
+
+UpdatePaymentOrder = function(req, res,order_id,status) {
+    PaymentOrder.findById(order_id, function (err, paymentOrder) {
+
+        paymentOrder.status  = status;
+        paymentOrder.save(function (err) {
+            if (err)
+            {
+                errMessage = '{ "Payment Order": { "message" : "paymentOrder is not found"} }';
+                requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+            }
+            else
+            {
+                UpdatePaymentSubscription(req, res,order_id,status,paymentOrder);
+            }
+        });
+    });
+}
+
+UpdatePaymentSubscription = function(req, res,order_id,status,paymentOrder) {
+
+    PaymentSubscription.findOne({ payment_order_id : order_id} , 
+        function (err, paymentSubscription) {
+
+        if(paymentSubscription)
+        {    
+            paymentSubscription.status  = status;
+
+            var myDateString = Date();
+            paymentSubscription.payment_date =new Date();
+
+            paymentSubscription.save(function (err) {
+                if (err)
+                {
+                    errMessage = '{ "Payment Subscription": { "message" : "Payment Subscription is not found"} }';
+                    requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+                }
+                else
+                {
+                    UpdatePaymentTransaction(req, res,order_id,status,paymentOrder,paymentSubscription);
+                }
+            });
+        }
+        else
+        {
+            requestHandler.sendError(req,res, 422, 'Somthing went worng: Subscription not foud' ,'');
+        }    
+    });
+}
+
+UpdatePaymentTransaction = function(req, res,order_id,status,paymentOrder,paymentSubscription) {
+
+    PaymentTransaction.findOne({ payment_order_id : order_id} , function (err, paymentTransaction) {
+        if(paymentSubscription)
+        {    
+            paymentTransaction.params = JSON.stringify(req.body);
+            paymentTransaction.file_id = req.body.id;
+            paymentTransaction.status  = status;
+            paymentTransaction.payment_date =new Date();
+
+            paymentTransaction.save(function (err) {
+            if (err)
+            {
+                errMessage = '{ "Payment Transaction": { "message" : "Payment Transaction is not found"} }';
+                requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+            }
+            else
+            {
+                if (status == 2){
+                    requestHandler.sendSuccess(res,' Payment Created Sucessfully.',200,paymentTransaction);
+                }
+                else if (status == 3){
+                    requestHandler.sendSuccess(res,' Payment is Delcianed .',422,paymentTransaction);
+                }
+                else{
+                    requestHandler.sendError(req,res, 422, 'Somthing went worng: Please Contact Admin.','');
+                }
+            }
+            });
+        }
+        else
+        {
+            requestHandler.sendError(req,res, 422, 'Somthing went worng: Transaction not foud' ,'');
+        }               
+    });
+}
+
+/*
+payment_date
+amount
+currency
+*/
