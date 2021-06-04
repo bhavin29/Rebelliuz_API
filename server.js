@@ -11,6 +11,8 @@ const mongoose = require('mongoose');
 var http = require('http');
 var https = require('https');
 var fs = require('fs');
+const router = express.Router();
+
 //
 var privateKey  = fs.readFileSync(__dirname +'/private.key', 'utf8');
 var certificate = fs.readFileSync(__dirname +'/certificate.crt', 'utf8');
@@ -50,11 +52,11 @@ global.__basedir = __dirname;
 global.rows_per_page = config.general.rows_per_page;
 let app = express();
 
-
-
-
 //Enabled CROS
 app.use(cors());
+
+//To get IP
+app.set('trust proxy', true);
 
 //Import routes
 let apiRoutes = require("./api/routes/routes")
@@ -80,8 +82,14 @@ app.use(bodyParser.json());
 var port = process.env.PORT || config.app.port;
 //
 
+//
+var getIP = require('ipware')().get_ip;
+
 // Welcome message
-app.get('/', (req, res) => res.send('Welcome to Express'));
+app.get('/', (req, res) => {
+   var ipInfo = getIP(req);
+    res.send('Welcome to Express from ip:' + ipInfo['clientIp'] )
+});
 
 //Use API routes in the App
 app.use('/api', apiRoutes)
@@ -104,9 +112,11 @@ next();
     }
 });
 
+
+
 var httpServer = http.createServer(app);
 var httpsServer = https.createServer(credentials, app);
-
+/*
 if(process.env.ENVIRONMENT === "local"){
     httpServer.listen(port);
     console.log("Running Rebelliuz API on Port "+ port);
@@ -114,8 +124,9 @@ if(process.env.ENVIRONMENT === "local"){
     httpsServer.listen(port);
     console.log("Running Rebelliuz API on Port "+ port);
 }
+*/
 
 // Launch app to the specified port
-//app.listen(port, function() {
-//    console.log("Running Rebelliuz API on Port "+ port);
-//});
+app.listen(port, function() {
+    console.log("Running Rebelliuz API on Port "+ port);
+});

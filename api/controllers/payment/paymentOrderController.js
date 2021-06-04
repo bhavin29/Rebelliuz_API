@@ -1,5 +1,6 @@
 //var paypal = require('paypal-rest-sdk');
 const _ = require('lodash');
+const config = require('../../../config/appconfig');
 const PaymentOrder = require('../../models/paymentOrderModel');
 const PaymentSubscription = require('../../models/paymentSubscriptionModel');
 const PaymentTransaction = require('../../models/paymentTransactionModel');
@@ -11,72 +12,6 @@ const requestHandler = new RequestHandler(logger);
 
 //For creating new PaymentPackage
 exports.add = function (req, res) {
-try
-    {
-     var paymentOrder = new PaymentOrder();
-     paymentOrder.module = req.body.module;
-     paymentOrder.user_id = req.body.user_id;
-     paymentOrder.business_id = req.body.business_id;
-     paymentOrder.payment_package_id = req.body.payment_package_id;
-     paymentOrder.payment_gateway_id = req.body.payment_gateway_id;
-     paymentOrder.status = req.body.status;
-     paymentOrder.notes = req.body.notes;
-     paymentOrder.created_by = global.decoded._id;
-     paymentOrder.isactive = req.body.isactive;
-
-    //Save and check error
-    paymentOrder.save(function (err) {
-        if (err)
-        {
-            errMessage = '{ "Payment Order": { "message" : "Payment order is not save"} }';
-            requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
-        }
-        else
-        {
-            AddPaymentSubscription(req,res,paymentOrder);
-        }
-    });
-    } catch (err) {
-    errMessage = { "Payment Order GET": { "message" : err.message } };
-    requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
-    }
-};
-
-AddPaymentSubscription = function(req,res,paymentOrder){
-    try
-    {
-     var paymentSubscription = new PaymentSubscription();
-     paymentSubscription.module = req.body.module;
-     paymentSubscription.user_id = req.body.user_id;
-     paymentSubscription.business_id = req.body.business_id;
-     paymentSubscription.payment_package_id = req.body.payment_package_id;
-     paymentSubscription.payment_gateway_id = req.body.payment_gateway_id;
-     paymentSubscription.payment_order_id = paymentOrder._id;
-     paymentSubscription.payment_date = "";
-     paymentSubscription.status = req.body.status;
-     paymentSubscription.notes = req.body.notes;
-     paymentSubscription.created_by = global.decoded._id;
-     paymentSubscription.isactive = req.body.isactive;
-
-    //Save and check error
-    paymentSubscription.save(function (err) {
-        if (err)
-        {
-            errMessage = '{ "Payment Subscription": { "message" : "Payment subscription is not save"} }';
-            requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
-        }
-        else
-        {
-            GetAmountCurrency(req,res,paymentOrder,paymentSubscription);
-        }
-    });
-    } catch (err) {
-    errMessage = { "Payment Subscription GET": { "message" : err.message } };
-    requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
-    }
-}
-
-GetAmountCurrency = function(req,res,paymentOrder,paymentSubscription){
     try
     {
         //payment_packages
@@ -89,7 +24,7 @@ GetAmountCurrency = function(req,res,paymentOrder,paymentSubscription){
             else
             {
                 if (paymentPackage){
-                    AddPaymentTransaction(req,res,paymentOrder,paymentSubscription,paymentPackage);
+                    AddPaymentOrder(req,res,paymentPackage);
                 }
                 else
                 {
@@ -101,9 +36,84 @@ GetAmountCurrency = function(req,res,paymentOrder,paymentSubscription){
         errMessage = { "Payment Subscription GET": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
     }
-}   
+};
 
-AddPaymentTransaction = function(req,res,paymentOrder,paymentSubscription,paymentPackage){
+AddPaymentOrder = function(req,res,paymentPackage){
+    try
+    {
+    
+    var gateway_id='';
+    if (paymentPackage.currency == "INR"){
+        gateway_id = config.gateway.cc_avenue;
+     }
+     else if (paymentPackage.currency == "AUD"){
+        gateway_id = config.gateway.pay_pal;
+     }
+
+     var paymentOrder = new PaymentOrder();
+     paymentOrder.module = req.body.module;
+     paymentOrder.user_id = req.body.user_id;
+     paymentOrder.business_id = req.body.business_id;
+     paymentOrder.payment_package_id = req.body.payment_package_id;
+     paymentOrder.payment_gateway_id = gateway_id;
+     paymentOrder.status = 1;
+     paymentOrder.notes = req.body.notes;
+     paymentOrder.created_by = global.decoded._id;
+     paymentOrder.isactive = 1;
+
+    //Save and check error
+    paymentOrder.save(function (err) {
+        if (err)
+        {
+            errMessage = '{ "Payment Order": { "message" : "Payment order is not save"} }';
+            requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+        }
+        else
+        {
+            AddPaymentSubscription(req,res,paymentOrder,paymentPackage,gateway_id);
+        }
+    });
+    } catch (err) {
+    errMessage = { "Payment Order GET": { "message" : err.message } };
+    requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+    }
+}
+
+AddPaymentSubscription = function(req,res,paymentOrder,paymentPackage,gateway_id){
+    try
+    {
+     var paymentSubscription = new PaymentSubscription();
+     paymentSubscription.module = req.body.module;
+     paymentSubscription.user_id = req.body.user_id;
+     paymentSubscription.business_id = req.body.business_id;
+     paymentSubscription.payment_package_id = req.body.payment_package_id;
+     paymentSubscription.payment_gateway_id = gateway_id;
+     paymentSubscription.payment_order_id = paymentOrder._id;
+     paymentSubscription.payment_date = "";
+     paymentSubscription.status = 1;
+     paymentSubscription.notes = req.body.notes;
+     paymentSubscription.created_by = global.decoded._id;
+     paymentSubscription.isactive = 1;
+
+    //Save and check error
+    paymentSubscription.save(function (err) {
+        if (err)
+        {
+            errMessage = '{ "Payment Subscription": { "message" : "Payment subscription is not save"} }';
+            requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+        }
+        else
+        {
+            AddPaymentTransaction(req,res,paymentOrder,paymentSubscription,paymentPackage,gateway_id);
+        }
+    });
+    } catch (err) {
+    errMessage = { "Payment Subscription GET": { "message" : err.message } };
+    requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+    }
+}
+
+AddPaymentTransaction = function(req,res,paymentOrder,paymentSubscription,paymentPackage,gateway_id){
     try
     {
      var paymentTransaction = new PaymentTransaction();
@@ -111,10 +121,10 @@ AddPaymentTransaction = function(req,res,paymentOrder,paymentSubscription,paymen
      paymentTransaction.user_id = req.body.user_id;
      paymentTransaction.business_id = req.body.business_id;
      paymentTransaction.payment_package_id = req.body.payment_package_id;
-     paymentTransaction.payment_gateway_id = req.body.payment_gateway_id;
+     paymentTransaction.payment_gateway_id = gateway_id;
      paymentTransaction.payment_order_id = paymentOrder._id;
      paymentTransaction.payment_date = "";
-     paymentTransaction.status = req.body.status;
+     paymentTransaction.status = 1;
      paymentTransaction.notes = req.body.notes;
 
      paymentTransaction.amount = paymentPackage.price;
@@ -135,6 +145,7 @@ AddPaymentTransaction = function(req,res,paymentOrder,paymentSubscription,paymen
         else
         {
             data = { 
+                "paymentPackage" : paymentPackage,
                 "paymentOrder" : paymentOrder,
                 "paymentSubscription" : paymentSubscription,
                 "paymentTransaction" : paymentTransaction

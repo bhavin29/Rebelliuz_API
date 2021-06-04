@@ -48,5 +48,9 @@ module.exports = {
 		ffmpeg_path : process.env.FFMPEG_PATH || 'C:\\FFmpeg\\bin\\',
 		rows_per_page : process.env.ROWS_PER_PAGE || 5,
 		parent_root : process.env.PARENT_ROOT || 'https://www.rebelliuz.com/',
+	},
+	gateway:{
+		pay_pal:'609dff3ac7fc9f26402b6201',
+		cc_avenue:'60b13685bad2596a10bd783b'
 	}
 };

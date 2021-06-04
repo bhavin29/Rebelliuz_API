@@ -1,11 +1,14 @@
+var geoip = require('geoip-lite');
+const http = require('http');
 const _ = require('lodash');
 const PaymentPackage = require('../../models/master/paymentPackageModel');
 const RequestHandler = require('../../../utils/RequestHandler');
 const Logger = require('../../../utils/logger');
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
+var ip ='';
 
-exports.index = async function (req, res) {
+exports.index1 = async function (req, res) {
     let aggregate_options = [];
 
     //PAGINATION
@@ -183,4 +186,85 @@ exports.update = function (req, res) {
     errMessage = { "Payment Package Update": { "message" : err.message } };
     requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
     }
+}
+
+// View Payment Package
+exports.index = function (req, res) {
+    try
+    {
+            var getIP = require('ipware')().get_ip;
+            var ipInfo = getIP(req);
+
+            logger.log('remote ip: '+ipInfo['clientIp'] ,'info');
+            
+            var test='';
+            getValue(test,(result)=>{
+
+            var geo = geoip.lookup(ipInfo['clientIp']);
+            
+            var countryname = '';
+            if ( geo != null){
+                countryname = geo['country'];
+            }
+            logger.log('geo: '+countryname,'info');
+
+            var strFind ='';
+            if(countryname=="AU")
+            {
+                strFind="AUD";
+            }
+            else if(countryname=="IN")
+            {
+                strFind="INR";
+            }
+            else
+            {
+                strFind="AUD";
+            } 
+
+            PaymentPackage.find( {currency:strFind }, function (err, PaymentPackage) {
+                if (err)
+                {
+                    errMessage = '{ "Payment Package": { "message" : "Payment package is not found"} }';
+                    requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+                }
+                else
+                {
+                    if (PaymentPackage != null){
+                        var data = {
+                            "PaymentPackage" : PaymentPackage,
+                            "PaymentCurrency" : strFind
+                       }
+                       requestHandler.sendSuccess(res,'Payment package found successfully.',200,data);
+                    }
+                    else{
+                        requestHandler.sendSuccess(res,'Payment package no data found.',200,PaymentPackage);
+                    }
+                }
+            }).sort( { order: 1 } );
+        });
+   } catch (err) {
+    errMessage = { "Payment Package GET": { "message" : err.message } };
+    requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+    }
+};
+
+function getValue(loc,cb) {
+    let body = ""
+    const options = {
+        host: 'ipv4bot.whatismyipaddress.com',
+        port: 80,
+        method: 'GET',
+        path: '/'
+    };
+
+    http.get(options, (response) => {
+        response.on('data', (chunk) => {
+            body += chunk
+        })
+        response.on('end', () => {
+            data = body
+            cb(data);
+        })
+    })
 }
