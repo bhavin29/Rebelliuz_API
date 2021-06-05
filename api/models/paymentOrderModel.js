@@ -15,6 +15,7 @@ const  PaymentOrderSchema = new  Schema({
     payment_package_id: { type: String, required:  true },
     payment_gateway_id: { type: String, required:  true },
     status: { type: Number, required:  true },
+    secondary_status: { type: Number, default: 0 },
     notes: { type: String },
     created_on: { type: Date, default: Date.now },
     created_by: { type: String, default: 0 },

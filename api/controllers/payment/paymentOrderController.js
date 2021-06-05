@@ -11,6 +11,37 @@ const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
 
 //For creating new PaymentPackage
+exports.update = function (req, res) {
+    try
+    {
+        PaymentOrder.findById(req.body.order_id, function (err, paymentOrder) {
+            if (err)
+            {
+                errMessage = '{ "Payment Order": { "message" : "Payment order is not found"} }';
+                requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+            }
+            else
+            {
+                if (paymentOrder != null){
+    
+                    paymentOrder.secondary_status =    req.body.secondary_status; 
+    
+                    requestHandler.sendSuccess(res,'Payment order update successfully.',200,paymentOrder);
+                }
+                else{
+                    requestHandler.sendSuccess(res,'Payment order no data found.',200,paymentOrder);
+                }
+                
+            }
+        });
+    } catch (err) {
+        errMessage = { "Payment Order GET": { "message" : err.message } };
+        requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+    }
+};
+    
+    
+    //For creating new PaymentPackage
 exports.add = function (req, res) {
     try
     {
@@ -158,7 +189,6 @@ AddPaymentTransaction = function(req,res,paymentOrder,paymentSubscription,paymen
     requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
     }
 }
-
 
 // View Payment Order
 exports.view = function (req, res) {

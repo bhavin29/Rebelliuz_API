@@ -246,7 +246,8 @@ router.route("/payment/order/:paymentOrderId")
   .get(auth.isAuthunticated,PaymentOrderController.view);
 
 router.route("/payment/order")
-  .post(auth.isAuthunticated,PaymentOrderController.add);
+  .post(auth.isAuthunticated,PaymentOrderController.add)
+  .patch(auth.isAuthunticated,PaymentOrderController.update);
 
 //paypal
 router.route("/payment/webhooks")
