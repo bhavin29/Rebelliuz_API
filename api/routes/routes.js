@@ -45,6 +45,9 @@ var PaymentPackageController = require('../controllers/master/paymentPackageCont
 //Payment
 var PaymentOrderController = require('../controllers/payment/paymentOrderController');
 
+//UserFollow
+var userFollowController = require('../controllers/userFollowController');
+
 const auth = require('../../utils/auth');
 
 // Bio routes
@@ -249,5 +252,9 @@ router.route("/payment/order")
 router.route("/payment/webhooks")
   .post(PaymentOrderController.webhooks);
   
+//UserFollow
+router.route("/user/follow")
+   .get(auth.isAuthunticated,userFollowController.view)
+   .post(auth.isAuthunticated,userFollowController.add);
 //Export API routes
 module.exports = router;
