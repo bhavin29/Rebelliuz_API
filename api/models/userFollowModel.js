@@ -12,7 +12,7 @@ const  Schema = mongoose.Schema;
 const  UserFollowSchema = new  Schema({
     user_id: { type: String, trim: true, required:  true },
     follow_user_id: { type: String, trim: true, required:  true },
-    status: { type: Number, trim:true, required:true } ,
+    status: { type: Number, trim:true, required:true } ,  // [ Requested = 1 , Accepted = 2 , Rejected = 3 , Block = 4]
     created_on: { type: Date, default: Date.now },
     created_by: { type: Number, default: 0 }
 });
