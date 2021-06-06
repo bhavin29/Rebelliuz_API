@@ -257,5 +257,9 @@ router.route("/payment/webhooks")
 router.route("/user/follow")
    .get(auth.isAuthunticated,userFollowController.view)
    .post(auth.isAuthunticated,userFollowController.add);
+
+router.route("/user/follow/myrequest")
+   .get(auth.isAuthunticated,userFollowController.myRequestView)
+
 //Export API routes
 module.exports = router;
