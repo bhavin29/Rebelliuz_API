@@ -45,8 +45,11 @@ var PaymentPackageController = require('../controllers/master/paymentPackageCont
 //Payment
 var PaymentOrderController = require('../controllers/payment/paymentOrderController');
 
-//UserFollow
-var userFollowController = require('../controllers/userFollowController');
+//MemberFollow
+var MemberController = require('../controllers/member/memberController');
+
+//Message
+var MessageController = require('../controllers/message/messageController');
 
 const auth = require('../../utils/auth');
 
@@ -253,13 +256,25 @@ router.route("/payment/order")
 router.route("/payment/webhooks")
   .post(PaymentOrderController.webhooks);
   
-//UserFollow
-router.route("/user/follow")
-   .get(auth.isAuthunticated,userFollowController.view)
-   .post(auth.isAuthunticated,userFollowController.add);
+//Member
+router.route("/member")
+   .post(auth.isAuthunticated,MemberController.add);
 
-router.route("/user/follow/myrequest")
-   .get(auth.isAuthunticated,userFollowController.myRequestView)
+router.route("/member/connection")
+   .get(auth.isAuthunticated,MemberController.connection);
+
+router.route("/member/search")
+   .post(auth.isAuthunticated,MemberController.search);
+
+router.route("/member/request")
+   .get(auth.isAuthunticated,MemberController.request);
+
+//Message
+router.route("/message")
+   .post(auth.isAuthunticated,MessageController.add);
+
+router.route("/message/:userid")
+   .get(auth.isAuthunticated,MessageController.view);
 
 //Export API routes
 module.exports = router;
