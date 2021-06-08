@@ -9,15 +9,15 @@ const aggregatePaginate = require('mongoose-aggregate-paginate-v2');
 const  Schema = mongoose.Schema;
 
 // Create Schema Instance for User and add properties
-const  UserFollowSchema = new  Schema({
+const  MemberFollowSchema = new  Schema({
     user_id: { type: String, trim: true, required:  true },
     follow_user_id: { type: String, trim: true, required:  true },
     status: { type: Number, trim:true, required:true } ,  // [ Requested = 1 , Accepted = 2 , Rejected = 3 , Block = 4]
     created_on: { type: Date, default: Date.now },
-    created_by: { type: Number, default: 0 }
+    created_by: { type: String, default: 0 }
 });
 
-UserFollowSchema.plugin(aggregatePaginate);
+MemberFollowSchema.plugin(aggregatePaginate);
 
 // Create and export User model
-module.exports = mongoose.model("user_follow", UserFollowSchema);
+module.exports = mongoose.model("member_follows", MemberFollowSchema);
