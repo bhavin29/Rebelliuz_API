@@ -276,5 +276,8 @@ router.route("/message")
 router.route("/message/:userid")
    .get(auth.isAuthunticated,MessageController.view);
 
+router.route("/message/updatereadcount")
+   .put(auth.isAuthunticated,MessageController.updateReadCount);
+   
 //Export API routes
 module.exports = router;

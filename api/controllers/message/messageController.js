@@ -25,8 +25,13 @@ const add = async (req, res) => {
                 messageModel.filename = global.messageFilename;
                 messageModel.filetype = req.body.filetype;
                 messageModel.resource_type = req.body.resource_type;
+                messageModel.isread = 0;
+                messageModel.device_id = '';
+                messageModel.device_name = '';
+                messageModel.ip_address = '';
                 messageModel.created_by = global.decoded._id;
-    
+                
+
                 //Save and check error
                 messageModel.save(function (err) {
                     if (err)
@@ -65,18 +70,19 @@ const view = function (req, res) {
                 }
             };
 
-            var condition = [];
-                a =  {to_user_id: req.params.userid};
-                condition.push(a);
-                b =  {from_user_id: req.params.userid};
-                condition.push(b);
-          
-            let match = {$or : condition };
+            var condition=[];
+            set1 = { $or: [ { to_user_id: req.params.userid },{ from_user_id: global.decoded._id } ] };
+            condition.push(set1);
+
+            set2 = { $or: [ { to_user_id: global.decoded._id },{ from_user_id: req.params.userid } ] };
+            condition.push(set2);
+
+            let match = {$or: condition };
 
             //SORTING -- THIRD STAGE
             let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? 1 : -1;
 
-            aggregate_options.push({$match: match});
+            aggregate_options.push({ $match: match});
             aggregate_options.push({$sort: {"created_on": sortOrder}});
             const myAggregate = MessageModel.aggregate(aggregate_options);
 
@@ -102,8 +108,34 @@ const view = function (req, res) {
     }
 };
 
+const updateReadCount = function (req, res) {
+    try
+    {
+            //Save and check error
+            MessageModel.updateMany(
+            { _id: { $in: req.body.messageid } },
+            { $set: { isread : true } },
+            {multi: true},
+            function (err) {
+                if (err)
+                {
+                    errMessage = '{ "Message": { "message" : "Message read count not save"} }';
+                    requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+                }
+                else
+                {
+                    requestHandler.sendSuccess(res,'Message read count updated successfully.',200,true);
+                }
+                });
+    } catch (err) {
+    errMessage = { "Message GET": { "message" : err.message } };
+    requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+    }
+};
+
 module.exports = {
     add,
-    view
+    view,
+    updateReadCount
 };
   
