@@ -203,8 +203,8 @@ exports.view = function (req, res) {
         else
         {
             if (PaymentOrder != null){
-                requestHandler.sendSuccess(res,'Payment order found successfully.',200,PaymentOrder);
-            }
+                callPackageView(req,res,PaymentOrder);
+             }
             else{
                 requestHandler.sendSuccess(res,'Payment order no data found.',200,PaymentOrder);
             }
@@ -216,6 +216,37 @@ exports.view = function (req, res) {
     requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
     }
 };
+
+//View + Package
+callPackageView = function (req,res,PaymentOrder){
+    try 
+    {        
+            PaymentPackage.findById(PaymentOrder.payment_package_id, function (err, paymentPackage) {
+            if (err)
+            {
+                errMessage = '{ "Package": { "message" : "Pacagke have problem."} }';
+                requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+            }
+            else
+            {
+                if (paymentPackage){
+                       data = JSON.stringify(PaymentOrder);
+                       data = JSON.parse(data);
+                       data['PaymentPackage'] = paymentPackage;
+ 
+                       requestHandler.sendSuccess(res, 'Payment order found successfully.',200,data);
+                }
+                else
+                {
+                    requestHandler.sendError(req,res, 422, 'Somthing went worng: Package not found.','');
+                }
+            }
+        });
+    } catch (err) {
+        errMessage = { "Payment Order GET": { "message" : err.message } };
+        requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+        }
+    }
 
 //Paypal webhook
 exports.webhooks = function(req, res) {
