@@ -1,13 +1,13 @@
 const config = require('../../../config/appconfig');
 const fs = require('fs');
-const MemberFollow = require('../../models/member/memberModel');
+const Member = require('../../models/member/memberModel');
 const User = require('../../models/userModel');
 const RequestHandler = require('../../../utils/RequestHandler');
 const Logger = require('../../../utils/logger');
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
 
-// View Members Follow My Connection
+// View Member My Connection
 exports.connection = function (req, res) {
     try
     {
@@ -23,8 +23,8 @@ exports.connection = function (req, res) {
                 page, limit,
                 collation: {locale: 'en'},
                 customLabels: {
-                    totalDocs: 'MemberFollows',
-                    docs: 'memberFollows'
+                    totalDocs: 'Members',
+                    docs: 'members'
                 }
             };
 
@@ -67,17 +67,17 @@ exports.connection = function (req, res) {
             aggregate_options.push({ "$unwind": "$usersList" });
             aggregate_options.push({$lookup: photoquery});
             aggregate_options.push({$sort: {"status": sortOrder,"usersList.displayname":sortOrder}});
-            const myAggregate = MemberFollow.aggregate(aggregate_options);
+            const myAggregate = Member.aggregate(aggregate_options);
 
-            MemberFollow.aggregatePaginate(myAggregate,options,function (err, memberFollow) {
+            Member.aggregatePaginate(myAggregate,options,function (err, member) {
                 if (err)
                 {
                     errMessage = '{ "Member": { "message" : "Member user  is not found"} }';
                     requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
                 }
-                else if (memberFollow.MemberFollows >0)
+                else if (member.Members >0)
                 {
-                    requestHandler.sendSuccess(res,'Member user found successfully.',200,memberFollow);
+                    requestHandler.sendSuccess(res,'Member user found successfully.',200,member);
                 }
                 else
                 {
@@ -91,9 +91,7 @@ exports.connection = function (req, res) {
     }
 };
 
-
-
-// View MemberFollow My Request
+// View members My Request
 exports.request = function (req, res) {
     try
     {
@@ -109,8 +107,8 @@ exports.request = function (req, res) {
                 page, limit,
                 collation: {locale: 'en'},
                 customLabels: {
-                    totalDocs: 'MemberFollows',
-                    docs: 'memberFollows'
+                    totalDocs: 'Members',
+                    docs: 'members'
                 }
             };
 
@@ -139,7 +137,7 @@ exports.request = function (req, res) {
                 foreignField: "file_id",
                 as: "userphoto"
             };
-            
+                      
             let path = {  "root_path" :  { $literal: config.general.parent_root }  };
             //SORTING -- THIRD STAGE
             let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? -1 : 1;
@@ -151,17 +149,17 @@ exports.request = function (req, res) {
             aggregate_options.push({ "$unwind": "$usersList" });
             aggregate_options.push({$lookup: photoquery});
             aggregate_options.push({$sort: {"status": sortOrder,"usersList.displayname":sortOrder}});
-            const myAggregate = MemberFollow.aggregate(aggregate_options);
+            const myAggregate = Member.aggregate(aggregate_options);
 
-            MemberFollow.aggregatePaginate(myAggregate,options,function (err, memberFollow) {
+            Member.aggregatePaginate(myAggregate,options,function (err, member) {
                 if (err)
                 {
                     errMessage = '{ "Member": { "message" : "Member user  is not found"} }';
                     requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
                 }
-                else if (memberFollow.MemberFollows >0)
+                else if (member.Members >0)
                 {
-                    requestHandler.sendSuccess(res,'Member user found successfully.',200,memberFollow);
+                    requestHandler.sendSuccess(res,'Member user found successfully.',200,member);
                 }
                 else
                 {
@@ -180,22 +178,25 @@ exports.add = function (req, res) {
     try
         {
 
-            MemberFollow.findOne({ user_id: global.decoded._id,follow_user_id :req.body.follow_user_id},
-            (err,memberFollow)=>{
+            Member.findOne({ user_id: global.decoded._id,follow_user_id :req.body.follow_user_id},
+            (err,member)=>{
             if (err){
                 errMessage = '{ "Member": { "message" : "Member user is not saved!!"} }';
                 requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
             }
-            if (!memberFollow) {
+            if (!member) {
                 //insert
-                var memberFollow = new MemberFollow();
-                memberFollow.user_id =global.decoded._id;
-                memberFollow.follow_user_id = req.body.follow_user_id;
-                memberFollow.status = req.body.status;
-                memberFollow.created_by = global.decoded._id;
+                var member = new Member();
+                member.user_id =global.decoded._id;
+                member.follow_user_id = req.body.follow_user_id;
+                member.status = req.body.status;
+                member.device_id =  '';
+                member.device_name ='';
+                member.ip_address = '';
+                member.created_by = global.decoded._id;
 
                 //Save and check error
-                memberFollow.save(function (err) {
+                member.save(function (err) {
                     if (err)
                     {
                         errMessage = '{ "Member": { "message" : "Member user is not save"} }';
@@ -203,20 +204,20 @@ exports.add = function (req, res) {
                     }
                     else
                     {
-                        requestHandler.sendSuccess(res,'Member user save successfully.',200,memberFollow);
+                        requestHandler.sendSuccess(res,'Member user save successfully.',200,member);
                     }
                     });
                 }
-                else if (memberFollow) {
+                else if (member) {
                     
-                    memberFollow.status = req.body.status;
+                    member.status = req.body.status;
 
-                    memberFollow.save(function (err) {
+                    member.save(function (err) {
                     if (err){
                            errMessage = '{ "Member": { "message" : "Member user is not saved!!"} }';
                                     requestHandler.sendError(req,res, 422, 'Somthing worng with bussines admin user',JSON.parse(errMessage));
                             } else {
-                                    requestHandler.sendSuccess(res,'Member user updated successfully.',200,memberFollow);
+                                    requestHandler.sendSuccess(res,'Member user updated successfully.',200,member);
                             }
                     });
                }
