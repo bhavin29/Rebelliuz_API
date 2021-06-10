@@ -399,7 +399,7 @@ exports.search = function (req, res) {
             aggregate_options.push({$lookup: query});
             aggregate_options.push({$addFields: { "userId": { "$toString": "$_id" }}});
             aggregate_options.push({$lookup: status_query});
-            aggregate_options.push({$unwind:{ path: "$connectionStatus",preserveNullAndEmptyArrays: true}});
+            //aggregate_options.push({$unwind:{ path: "$connectionStatus",preserveNullAndEmptyArrays: false}});
             aggregate_options.push({$sort: {"email": sortOrder}});
             const myAggregate = User.aggregate(aggregate_options);
 

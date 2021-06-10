@@ -13,6 +13,7 @@ const  PostSchema = new  Schema({
     user_id: { type: String, trim: true, required:  true },
     text: { type: String, trim: true },
     theme: { type: Number, trim: true ,default:0},
+    post_type :{type: Number, trim: true ,default:0},//[1 = Text, 2 = Link, 3 = Theme]
     like_counts: { type: Number, trim: true ,default:0},
     post_Counts: { type: Number, trim: true ,default:0},
     device_id: { type: String, trim: true },

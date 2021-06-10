@@ -296,8 +296,11 @@ router.route("/message/updatereadcount")
    .put(auth.isAuthunticated,MessageController.updateReadCount);
    
 //Post
-router.route("/post")
+router.route("/post/")
    .post(auth.isAuthunticated,PostController.addPost);
+
+router.route("/post/:postid")
+   .post(auth.isAuthunticated,PostController.updatePost);
 
 router.route("/post/like")
    .post(auth.isAuthunticated,PostController.addPostLike);

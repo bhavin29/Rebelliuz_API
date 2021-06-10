@@ -18,6 +18,7 @@ const addPost = async (req, res) => {
                 postModel.user_id = global.decoded._id;
                 postModel.text = req.body.text;
                 postModel.theme = req.body.theme;
+                postModel.post_type = req.body.post_type;
                 postModel.device_id = '';
                 postModel.device_name = '';
                 postModel.ip_address = '';
@@ -34,12 +35,45 @@ const addPost = async (req, res) => {
                     {
                         requestHandler.sendSuccess(res,'Post save successfully.',200,postModel);
                     }
-                    });
+                 });
         } catch (err) {
         errMessage = { "Post GET": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
         }
 };
+
+// Update Post
+const updatePost = function (req, res) {
+    try
+    {
+        PostModel.findById(req.params.postid, function (err, postModel) {
+
+            postModel.text = req.body.text;
+            postModel.theme = req.body.theme;
+            postModel.post_type = req.body.post_type;
+            postModel.device_id = '';
+            postModel.device_name = '';
+            postModel.ip_address = '';
+
+        //Save and check error
+        postModel.save(function (err) {
+        if (err)
+        {
+            errMessage = '{ "Post": { "message" : "Post is not updated"} }';
+            requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+        }
+        else
+        {
+            requestHandler.sendSuccess(res,'Post updated successfully.',200,postModel);
+        }
+        });
+    });
+    }
+    catch (err) {
+    errMessage = { "Post Update": { "message" : err.message } };
+    requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+    }
+}
 
 //adding the post like by user and update the post like count
 const addPostLike = async (req, res) => {
@@ -205,6 +239,7 @@ updatePostsCommentsLikeCount  = function (req,res,postCommentLikeModel){
 
 module.exports = {
     addPost,
+    updatePost,
     addPostLike,
     addPostComment,
     addPostCommentLike
