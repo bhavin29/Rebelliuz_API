@@ -12,7 +12,7 @@ const  Schema = mongoose.Schema;
 const  MemberSchema = new  Schema({
     user_id: { type: String, trim: true, required:  true },
     follow_user_id: { type: String, trim: true, required:  true },
-    status: { type: Number, trim:true, required:true } ,  // [ Requested = 1 , Accepted = 2 , Rejected = 3 , Block = 4]
+    status: { type: Number, trim:true, required:true } ,  // [ Requested = 1 , Confirm/Accepted = 2 , Decline/Rejected = 3 , Block = 4]
     device_id: { type: String, trim: true },
     device_name:{ type: String, trim: true },
     ip_address: { type: String, trim: true },

@@ -1,6 +1,7 @@
 //initialize express router
 let router = require('express').Router();
 
+
 //set default API response
 router.get('/', function(req, res) {
     res.json({
@@ -8,6 +9,11 @@ router.get('/', function(req, res) {
         message: 'Welcome to FirstRest API'
     });
 });
+
+//CCAvenue
+ccavReqHandler = require('../controllers/ccav/ccavRequestHandler.js'),
+ccavResHandler = require('../controllers/ccav/ccavResponseHandler.js');
+
 
 //Import Bio Controller
 var bioController = require('../controllers/bioController');
@@ -52,6 +58,13 @@ var MemberController = require('../controllers/member/memberController');
 var MessageController = require('../controllers/message/messageController');
 
 const auth = require('../../utils/auth');
+
+//CCAvenue
+router.route('/ccavRequestHandler')
+   .post(ccavReqHandler.postReq);
+
+router.route('/ccavResponseHandler')
+   .post(ccavResHandler.postRes);
 
 // Bio routes
 router.route('/bio')

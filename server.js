@@ -70,6 +70,15 @@ app.use('/test', express.static(config.general.content_path + '/Users/test'));
 //company-bussines
 app.use('/jobdesc', express.static(config.general.content_path + '/companies/job'));
 
+//ccAvenue
+app.use(express.static('public'));
+app.set('views', __dirname + '/public');
+app.engine('html', require('ejs').renderFile);
+
+app.get('/about', function (req, res){
+    	res.render('dataFrom.html');
+});
+//CCAvenues End
 
 //configure bodyparser to hande the post requests
 app.use(bodyParser.urlencoded({
