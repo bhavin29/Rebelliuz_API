@@ -25,7 +25,7 @@ add = function(req,res){
   }
 
     BussinesJobUserAnswer.findOne({ bussines_id : req.params.bussinesid, job_category_id : req.body.job_category_id,
-    search_user_id : req.body.search_user_id, bussines_user_id :global.decoded._id },(err,bussinesJobUserAnswer)=>{
+    search_user_id : req.body.search_user_id, bussines_user_id :global.decoded._id, job_question_id : req.body.job_question_id },(err,bussinesJobUserAnswer)=>{
     if (err) throw err;
     if (!bussinesJobUserAnswer) {
         //insert
