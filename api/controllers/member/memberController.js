@@ -56,6 +56,32 @@ exports.connection = function (req, res) {
                 as: "userphoto"
             };
             
+            let isread_query={
+                  from: "messages",
+                  let: {
+                    usersIds: '$from_user_id',
+                  },
+                  pipeline: [
+                    {
+                        $match: {
+                          $expr: {
+                            $and: [
+                              { $eq: ['$user_id', '$$usersIds'] },
+                              { $eq: ['$isread', false] },
+                            ],
+                          },
+                        },
+                      },
+                    { $group: {
+                        _id: null,
+                        count: { $sum: 1 }
+                       } 
+                    }
+                ],
+                as: "isReadStatus"
+            };
+            
+
             let path = {  "root_path" :  { $literal: config.general.parent_root }  };
             //SORTING -- THIRD STAGE
             let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? -1 : 1;
@@ -66,6 +92,8 @@ exports.connection = function (req, res) {
             aggregate_options.push({$lookup: query});
             aggregate_options.push({ "$unwind": "$usersList" });
             aggregate_options.push({$lookup: photoquery});
+            aggregate_options.push({$lookup: isread_query});
+            aggregate_options.push({$unwind:{ path: "$isReadStatus",preserveNullAndEmptyArrays: true}});
             aggregate_options.push({$sort: {"status": sortOrder,"usersList.displayname":sortOrder}});
             const myAggregate = Member.aggregate(aggregate_options);
 
@@ -286,7 +314,14 @@ exports.search = function (req, res) {
                     foreignField: "file_id",
                     as: "userphoto"
              };
-            
+
+             let status_query ={
+                from: "members",
+                localField: "userId",
+                foreignField: "follow_user_id",
+                as: "connectionStatus"
+            };
+
             let path = {  "root_path" :  { $literal: config.general.parent_root }  };
             //SORTING -- THIRD STAGE
             let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? -1 : 1;
@@ -294,6 +329,9 @@ exports.search = function (req, res) {
             aggregate_options.push({$match: match});
             aggregate_options.push({$addFields: path});
             aggregate_options.push({$lookup: query});
+            aggregate_options.push({$addFields: { "userId": { "$toString": "$_id" }}});
+            aggregate_options.push({$lookup: status_query});
+            aggregate_options.push({$unwind:{ path: "$connectionStatus",preserveNullAndEmptyArrays: true}});
             aggregate_options.push({$sort: {"email": sortOrder}});
             const myAggregate = User.aggregate(aggregate_options);
 

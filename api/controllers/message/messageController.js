@@ -71,10 +71,10 @@ const view = function (req, res) {
             };
 
             var condition=[];
-            set1 = { $or: [ { to_user_id: req.params.userid },{ from_user_id: global.decoded._id } ] };
+            set1 = { $and: [ { to_user_id: req.params.userid },{ from_user_id: global.decoded._id } ] };
             condition.push(set1);
 
-            set2 = { $or: [ { to_user_id: global.decoded._id },{ from_user_id: req.params.userid } ] };
+            set2 = { $and: [ { to_user_id: global.decoded._id },{ from_user_id: req.params.userid } ] };
             condition.push(set2);
 
             let match = {$or: condition };
