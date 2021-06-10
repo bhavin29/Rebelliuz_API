@@ -24,9 +24,21 @@ exports.update = function (req, res) {
             {
                 if (paymentOrder != null){
     
-                    paymentOrder.secondary_status =    req.body.secondary_status; 
-    
-                    requestHandler.sendSuccess(res,'Payment order update successfully.',200,paymentOrder);
+                    paymentOrder.secondary_status =  req.body.secondary_status; 
+                    paymentOrder.receipt_id =req.body.receipt_id;
+                    paymentOrder.receipt_method=req.body.receipt_method;
+                    paymentOrder.receipt_email=req.body.receipt_email;
+                    paymentOrder.receipt_mobile=req.body.receipt_mobile;
+
+                    paymentOrder.save(function (err) {
+                        if (err){
+                                errMessage = '{ "Payment order": { "message" : "Payment order is not saved!!"} }';
+                                requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
+                        } else 
+                        {
+                            requestHandler.sendSuccess(res,'Payment order update successfully.',200,paymentOrder);
+                        }
+                    });
                 }
                 else{
                     requestHandler.sendSuccess(res,'Payment order no data found.',200,paymentOrder);
@@ -88,6 +100,11 @@ AddPaymentOrder = function(req,res,paymentPackage){
      paymentOrder.payment_package_id = req.body.payment_package_id;
      paymentOrder.payment_gateway_id = gateway_id;
      paymentOrder.status = 1;
+     paymentOrder.secondary_status = 0;
+     paymentOrder.receipt_id ='';
+     paymentOrder.receipt_method='';
+     paymentOrder.receipt_email='';
+     paymentOrder.receipt_mobile='';
      paymentOrder.notes = req.body.notes;
      paymentOrder.created_by = global.decoded._id;
      paymentOrder.isactive = 1;
