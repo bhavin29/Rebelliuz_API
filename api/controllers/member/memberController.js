@@ -31,8 +31,8 @@ exports.connection = function (req, res) {
             var condition = [];
                 a =  {user_id: global.decoded._id};
                 condition.push(a);
-                b =  {follow_user_id: global.decoded._id};
-                condition.push(b);
+                // b =  {follow_user_id: global.decoded._id};
+                // condition.push(b);
                 c = { status : 2};
                // condition.push(c);
 
@@ -207,9 +207,9 @@ exports.request = function (req, res) {
 
 //For add Member
 exports.add = function (req, res) {
-    try
+        try
         {
-            Member.findOne( { user_id: req.body.user_id,follow_user_id :req.body.follow_user_id},
+            Member.findOne( { user_id: global.decoded._id,follow_user_id :req.body.follow_user_id},
             (err,member)=>{
             if (err){
                 errMessage = '{ "Member": { "message" : "Member user is not saved!!"} }';
@@ -227,7 +227,8 @@ exports.add = function (req, res) {
                            errMessage = '{ "Member": { "message" : "Member user is not saved!!"} }';
                                     requestHandler.sendError(req,res, 422, 'Somthing worng with bussines admin user',JSON.parse(errMessage));
                             } else {
-                                    requestHandler.sendSuccess(res,'Member user updated successfully.',200,member);
+                                    callMemberSearch(req, res,member);
+                                    //requestHandler.sendSuccess(res,'Member user updated successfully.',200,member);
                             }
                     });
                }
@@ -238,10 +239,10 @@ exports.add = function (req, res) {
         }
 };
 
-callMemberSearch = function (req, res,memberOne) {
+callMemberSearch = function (req, res,memberUserId) {
     try
         {
-            Member.findOne( { follow_user_id: req.body.user_id, user_id :req.body.follow_user_id},
+            Member.findOne( { follow_user_id: global.decoded._id, user_id :req.body.follow_user_id},
             (err,member)=>{
             if (err){
                 errMessage = '{ "Member": { "message" : "Member user is not saved!!"} }';
@@ -250,13 +251,58 @@ callMemberSearch = function (req, res,memberOne) {
             if (!member) {
                 //insert
                 var member = new Member();
-                member.user_id =req.body.user_id;
+                member.user_id =global.decoded._id;
                 member.follow_user_id = req.body.follow_user_id;
                 member.status = req.body.status;
                 member.device_id =  '';
                 member.device_name ='';
                 member.ip_address = '';
-                member.created_by = req.body.user_id;
+                member.created_by = global.decoded._id;
+
+                //Save and check error
+                member.save(function (err) {
+                    if (err)
+                    {
+                        errMessage = '{ "Member": { "message" : "Member user is not save"} }';
+                        requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+                    }
+                    else
+                    {
+                        addFollowUserMember(req, res,member);
+                        //requestHandler.sendSuccess(res,'Member user save successfully.',200,member);
+                    }
+                    });
+                }
+                else if (member) {
+                    member.status = req.body.status;
+                    member.save(function (err) {
+                    if (err){
+                           errMessage = '{ "Member": { "message" : "Member user is not saved!!"} }';
+                                    requestHandler.sendError(req,res, 422, 'Somthing worng with bussines admin user',JSON.parse(errMessage));
+                            } else {
+                                    requestHandler.sendSuccess(res,'Member user updated successfully.',200,member);
+                            }
+                    });
+               }
+               
+           });
+        } catch (err) {
+        errMessage = { "Member GET": { "message" : err.message } };
+        requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+        }
+};
+
+addFollowUserMember = function (req, res,memberUserId) {
+    try
+        {
+                var member = new Member();
+                member.user_id =req.body.follow_user_id;
+                member.follow_user_id = global.decoded._id;
+                member.status = 0;
+                member.device_id =  '';
+                member.device_name ='';
+                member.ip_address = '';
+                member.created_by = global.decoded._id;
 
                 //Save and check error
                 member.save(function (err) {
@@ -270,21 +316,7 @@ callMemberSearch = function (req, res,memberOne) {
                         requestHandler.sendSuccess(res,'Member user save successfully.',200,member);
                     }
                     });
-                }
-                else if (member) {
-                    
-                    member.status = req.body.status;
 
-                    member.save(function (err) {
-                    if (err){
-                           errMessage = '{ "Member": { "message" : "Member user is not saved!!"} }';
-                                    requestHandler.sendError(req,res, 422, 'Somthing worng with bussines admin user',JSON.parse(errMessage));
-                            } else {
-                                    requestHandler.sendSuccess(res,'Member user updated successfully.',200,member);
-                            }
-                    });
-               }
-           });
         } catch (err) {
         errMessage = { "Member GET": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
