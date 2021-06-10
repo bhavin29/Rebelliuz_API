@@ -17,9 +17,9 @@ const  MessageSchema = new  Schema({
     filename: { type: String, trim: true },
     filetype: { type: String, trim: true },
     resource_type: { type: Number, trim:true, required:true } ,  // [ Text = 1 , Link = 2 , Document = 3 ]
-    device_id: { type: String, trim: true },
-    device_name:{ type: String, trim: true },
-    ip_address: { type: String, trim: true },
+    device_id: { type: String, trim: true, default:'' },
+    device_name:{ type: String, trim: true , default:''},
+    ip_address: { type: String, trim: true , default:''},
     isread: { type: Boolean, trim: true },
     created_on: { type: Date, default: Date.now },
     created_by: { type: String, default: 0 }

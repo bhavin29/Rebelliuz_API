@@ -57,6 +57,9 @@ var MemberController = require('../controllers/member/memberController');
 //Message
 var MessageController = require('../controllers/message/messageController');
 
+//Post
+var PostController = require('../controllers/post/postController');
+
 const auth = require('../../utils/auth');
 
 //CCAvenue
@@ -292,5 +295,17 @@ router.route("/message/:userid")
 router.route("/message/updatereadcount")
    .put(auth.isAuthunticated,MessageController.updateReadCount);
    
+//Post
+router.route("/post")
+   .post(auth.isAuthunticated,PostController.addPost);
+
+router.route("/post/like")
+   .post(auth.isAuthunticated,PostController.addPostLike);
+
+router.route("/post/comment")
+   .post(auth.isAuthunticated,PostController.addPostComment);
+
+router.route("/post/comment/like")
+   .post(auth.isAuthunticated,PostController.addPostCommentLike);
 //Export API routes
 module.exports = router;
