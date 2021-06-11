@@ -12,6 +12,7 @@ const  Schema = mongoose.Schema;
 const  PostLikeSchema = new  Schema({
     post_id: { type: String, trim: true, required:  true },
     user_id: { type: String, trim: true , required:  true},
+    like_type: { type: Number, trim: true , required:  true, default : 0}, //[0 = NoLike , 1 = ThumbLike]
     created_on: { type: Date, default: Date.now },
     created_by: { type: String, default: 0 }
 });
