@@ -4,6 +4,7 @@ const uploadFile = require('../../utils/uploadJobCV.js');
 const UserJob = require('../models/userJobModel');
 const UserJobAnswer = require('../models/userJobAnswerModel');
 const JobQuestion = require('../models/master/jobQuestionModel');
+const JobCategory = require('../models/master/jobCategoryModel');
 const RequestHandler = require('../../utils/RequestHandler');
 const Logger = require('../../utils/logger');
 const logger = new Logger();
@@ -133,15 +134,57 @@ view = function (req, res) {
 };
 
 callvUserJob = function(req,res){
-  UserJob.find( { user_id: global.decoded._id}, function (err, userJob) {
+ /* UserJob.find( { user_id: global.decoded._id}, function (err, userJob) {
     if (err){
       errMessage = '{ "intro": { "message" : "No data found."} }';
       requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));
     } 
     else {
       callvJobQuestion(req,res,userJob);
+      //callvJobCategory(req,res,userJob);
     }
-  });
+  });*/
+
+
+  UserJob.aggregate([
+    {
+      $match: {user_id: global.decoded._id}
+    },
+    {
+      $lookup:
+       {
+         from: "job_categories",
+         let: { id: "$job_category_id" },
+         pipeline: [
+           {$project: {_id: 1, jobcategory_name:1, jid: {"$toObjectId": "$$id"} }  },
+                  {$match: {$expr:
+                       {$and:[ 
+                         { $eq: ["$_id", "$jid"]},
+                       ]}
+                   }
+           }
+         ],
+         as: "job_category"
+       }
+     },
+      {
+        $unwind: {
+            path: "$job_category",
+            preserveNullAndEmptyArrays: true
+        }
+      },
+    ],function(err, data) {
+      if (err)
+       {
+           errMessage = '{ "User job": { "message" : "User job is not found"} }';
+           requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+       }
+       else
+       {
+        callvJobQuestion(req,res,data);
+       }
+    }
+  );
 }
 
 callvJobQuestion = function(req,res,userJob){
