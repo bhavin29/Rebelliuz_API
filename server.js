@@ -21,13 +21,22 @@ var credentials = {key: privateKey, cert: certificate};
 
 //connect to mongoose
 const dbPath = config.db.dbPath;
+// Server Port
+var port = process.env.PORT || config.app.port;
 
-const options = {useNewUrlParser: true, useUnifiedTopology: true}//, keepAlive: true, keepAliveInitialDelay: 300000, useCreateIndex: true}
+const options = {useNewUrlParser: true, 
+                useUnifiedTopology: true,
+                useCreateIndex: true,
+                useFindAndModify: false
+            }//, keepAlive: true, keepAliveInitialDelay: 300000, useCreateIndex: true}
 const mongo = mongoose.connect(dbPath, options);
 
 mongo.then(() => {
     console.log('connected');
     logger.log('DB connected', 'info');
+    app.listen(port, function() {
+        console.log("Running Rebelliuz API on Port "+ port);
+    });
 }, error => {
     console.log(error, 'error');
     logger.log(error, 'error');
@@ -87,8 +96,7 @@ app.use(bodyParser.urlencoded({
 
 app.use(bodyParser.json());
 
-// Server Port
-var port = process.env.PORT || config.app.port;
+
 //
 
 //
@@ -136,6 +144,6 @@ if(process.env.ENVIRONMENT === "local"){
 */
 
 // Launch app to the specified port
-app.listen(port, function() {
+/*app.listen(port, function() {
     console.log("Running Rebelliuz API on Port "+ port);
-});
+});*/
