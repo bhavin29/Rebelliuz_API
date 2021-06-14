@@ -285,6 +285,26 @@ router.route("/member/search")
 router.route("/member/request")
    .get(auth.isAuthunticated,MemberController.request);
 
+router.route("/member/request/:userId/send")
+   .get(auth.isAuthunticated, MemberController.sendConnectionRequest);
+
+router.route("/member/request/:requestId/accept")
+   .get(auth.isAuthunticated, MemberController.acceptConnectionRequest);
+
+router.route("/member/request/:requestId/cancel")
+   .get(auth.isAuthunticated, MemberController.cancelSendedConnectionRequest);
+
+router.route("/member/request/:requestId/decline")
+   .get(auth.isAuthunticated, MemberController.declineFriendConnection);
+
+router.route("/member/recommanded_users")
+   .get(auth.isAuthunticated, MemberController.fetchRecommandedUsers);
+
+router.route("/user/me")
+   .get(auth.isAuthunticated, MemberController.me);
+
+router.route("/user/notifications/clear")
+   .delete(auth.isAuthunticated, MemberController.clearNotification);
 //Message
 router.route("/message")
    .post(auth.isAuthunticated,MessageController.add);

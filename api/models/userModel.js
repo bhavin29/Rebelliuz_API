@@ -70,6 +70,8 @@ const  UserSchema = new  Schema({
     location: { type :  String, default: null },
     rating: { type :  Number , default: null },
     user_verified: { type :  Number  , default: null },
+    connections: [{ type: Schema.Types.ObjectId, ref: 'users' }],
+    socketId: {type: String,default: '',},
     created_on: { type: Date, default: Date.now },
     created_by: { type: Number, default: 0 }
  });
