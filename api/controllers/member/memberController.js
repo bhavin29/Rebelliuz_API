@@ -438,63 +438,65 @@ exports.sendConnectionRequest = async (req, res) => {
         errMessage = '{ "Members": { "message" : "Member is not found"} }';
         requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
       }
-  
-      if (global.decoded._id == req.params.userId) {
+      else if (global.decoded._id == req.params.userId) {
         errMessage = '{ "Members": { "message" : "You cannot send friend request to yourself"} }';
         requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
       }
-  
-      if (user.connections.includes(global.decoded._id)) {
+      else if (user.connections.includes(global.decoded._id)) {
         errMessage = '{ "Members": { "message" : "Already Connections"} }';
         requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
       }
-  
-      const userRequest = await UserRequest.findOne({
-        sender: global.decoded._id,
-        receiver: req.params.userId,
-      })
-  
-      if (userRequest) {
-        errMessage = '{ "Members": { "message" : "Friend Request already send"} }';
-        requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
-      }
-  
-      const newConnectionRequest = new UserRequest({
-        sender: global.decoded._id,
-        receiver: req.params.userId,
-      })
-  
-      const save = await newConnectionRequest.save()
-  
-      const connection = await UserRequest.findById(save.id).populate('receiver')
-  
-      const chunkData = {
-        id: connection.id,
-        user: FilterUserData(connection.receiver),
-      }
-  
-    //   res
-    //     .status(200)
-    //     .json({ message: 'Friend Request Sended', connection: chunkData })
-  
-      const sender = await UserRequest.findById(save.id).populate('sender')
-      let notification = await CreateNotification({
-        user: req.params.userId,
-        body: `${sender.sender.displayname} has send you friend request`,
-      })
-      const senderData = {
-        id: sender.id,
-        user: FilterUserData(sender.sender),
-      }
-  
-      if (user.socketId) {
-        req.io
-          .to(user.socketId)
-          .emit('friend-request-status', { sender: senderData })
-        req.io.to(user.socketId).emit('Notification', { data: notification })
-      }
+      else 
+      {
+          const userRequest = await UserRequest.findOne({
+                    sender: global.decoded._id,
+                    receiver: req.params.userId,
+          });
 
-      requestHandler.sendSuccess(res,'Connection Request Sended.',200, chunkData);
+          if (userRequest) {
+                errMessage = '{ "Members": { "message" : "Friend Request already send"} }';
+                requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
+          }
+          else
+          {
+                const newConnectionRequest = new UserRequest({
+                  sender: global.decoded._id,
+                  receiver: req.params.userId,
+                })
+              
+                const save = await newConnectionRequest.save()
+              
+                const connection = await UserRequest.findById(save.id).populate('receiver')
+              
+                const chunkData = {
+                  id: connection.id,
+                  user: FilterUserData(connection.receiver),
+                }
+              
+                //         res
+                //         .status(200)
+                //         .json({ message: 'Friend Request Sended', connection: chunkData })
+              
+                const sender = await UserRequest.findById(save.id).populate('sender')
+                let notification = await CreateNotification({
+                  user: req.params.userId,
+                  body: `${sender.sender.displayname} has send you friend request`,
+                })
+                const senderData = {
+                  id: sender.id,
+                  user: FilterUserData(sender.sender),
+                }
+              
+                if (user.socketId) {
+                  req.io
+                    .to(user.socketId)
+                    .emit('friend-request-status', { sender: senderData })
+                  req.io.to(user.socketId).emit('Notification', { data: notification })
+                }
+              
+                requestHandler.sendSuccess(res,'Connection Request Sended.',200, chunkData);
+        }
+      }
     } catch (err) {
       errMessage = { "Members SendRequest": { "message" : err.message } };
       requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
@@ -505,50 +507,58 @@ exports.sendConnectionRequest = async (req, res) => {
   exports.acceptConnectionRequest = async (req, res) => {
     try {
       const connectionsRequest = await UserRequest.findById(req.params.requestId)
+      
       if (!connectionsRequest) {
         errMessage = '{ "Members": { "message" : "Request already accepted or not sended yet"} }';
         requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
       }
-  
-      const sender = await User.findById(connectionsRequest.sender)
-      if (sender.connections.includes(connectionsRequest.receiver)) {
-        errMessage = '{ "Members": { "message" : "already in your friend lists"} }';
-        requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
-      }
-      sender.connections.push(global.decoded._id)
-      await sender.save()
-  
-      const currentUser = await User.findById(global.decoded._id)
-      if (currentUser.connections.includes(connectionsRequest.sender)) {
-        errMessage = '{ "Members": { "message" : "already  friend"} }';
-        requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
-      }
+      else
+      {
+            const sender = await User.findById(connectionsRequest.sender)
+            if (sender.connections.includes(connectionsRequest.receiver)) {
+              errMessage = '{ "Members": { "message" : "already in your friend lists"} }';
+              requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
+            }
+            else
+            {
+                sender.connections.push(global.decoded._id)
+                await sender.save()
 
-      currentUser.connections.push(connectionsRequest.sender)
-      await currentUser.save()
-  
-      const chunkData = FilterUserData(sender)
-  
-      await UserRequest.deleteOne({ _id: req.params.requestId })
+                const currentUser = await User.findById(global.decoded._id)
+                if (currentUser.connections.includes(connectionsRequest.sender)) {
+                  errMessage = '{ "Members": { "message" : "already  friend"} }';
+                  requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
+                }
+                else
+                {
+                      currentUser.connections.push(connectionsRequest.sender)
+                      await currentUser.save()
 
-    //   res
-    //     .status(200)
-    //     .json({ message: 'Friend Request Accepted', user: chunkData })
-  
-      let notification = await CreateNotification({
-        user: sender.id,
-        body: `${currentUser.name} has accepted your friend request`,
-      })
-      if (sender.socketId) {
-        let currentUserData = FilterUserData(currentUser)
-        req.io.to(sender.socketId).emit('friend-request-accept-status', {
-          user: currentUserData,
-          request_id: req.params.requestId,
-        })
-        req.io.to(sender.socketId).emit('Notification', { data: notification })
+                      const chunkData = FilterUserData(sender)
+
+                      await UserRequest.deleteOne({ _id: req.params.requestId })
+
+                      //     res
+                      //       .status(200)
+                      //       .json({ message: 'Friend Request Accepted', user: chunkData })
+
+                      let notification = await CreateNotification({
+                        user: sender.id,
+                        body: `${currentUser.displayname} has accepted your friend request`,
+                      })
+                      if (sender.socketId) {
+                        let currentUserData = FilterUserData(currentUser)
+                        req.io.to(sender.socketId).emit('friend-request-accept-status', {
+                          user: currentUserData,
+                          request_id: req.params.requestId,
+                        })
+                        req.io.to(sender.socketId).emit('Notification', { data: notification })
+                      }
+                    
+                      requestHandler.sendSuccess(res,'Connection Request Accepted.',200, chunkData);
+              }
+          }
       }
-
-      requestHandler.sendSuccess(res,'Connection Request Accepted.',200, chunkData);
     } catch (err) {
         errMessage = { "Members AcceptRequest": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
@@ -566,20 +576,22 @@ exports.cancelSendedConnectionRequest = async (req, res) => {
         errMessage = '{ "Members": { "message" : "Request already cenceled or not sended yet"} }';
         requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
       }
-      await UserRequest.deleteOne({ _id: req.params.requestId })
-  
-      //res.status(200).json({ message: 'Friend Request Canceled' })
-      
-      if (connectionsRequest.receiver.socketId) {
-        req.io
-          .to(connectionsRequest.receiver.socketId)
-          .emit('sended-friend-request-cancel', {
-            requestId: req.params.requestId,
-          })
-      }
+      else
+      {     
+            await UserRequest.deleteOne({ _id: req.params.requestId })
 
-      requestHandler.sendSuccess(res,'Friend Request Canceled',200, true);
+            //res.status(200).json({ message: 'Friend Request Canceled' })
 
+            if (connectionsRequest.receiver.socketId) {
+              req.io
+                .to(connectionsRequest.receiver.socketId)
+                .emit('sended-friend-request-cancel', {
+                  requestId: req.params.requestId,
+                })
+            }
+          
+            requestHandler.sendSuccess(res,'Friend Request Canceled',200, true);
+      } 
     } catch (err) {
         errMessage = { "Members CancelRequest": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
@@ -596,20 +608,22 @@ exports.cancelSendedConnectionRequest = async (req, res) => {
         errMessage = '{ "Members": { "message" : "Request already declined or not sended yet"} }';
         requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
       }
-      await UserRequest.deleteOne({ _id: req.params.requestId })
-  
-      //res.status(200).json({ message: 'Friend Request Declined' })
+      else
+      {
+            await UserRequest.deleteOne({ _id: req.params.requestId })
 
-      if (connectionsRequest.sender.socketId) {
-        req.io
-          .to(connectionsRequest.sender.socketId)
-          .emit('received-friend-request-decline', {
-            requestId: req.params.requestId,
-          })
+            //res.status(200).json({ message: 'Friend Request Declined' })
+
+            if (connectionsRequest.sender.socketId) {
+              req.io
+                .to(connectionsRequest.sender.socketId)
+                .emit('received-friend-request-decline', {
+                  requestId: req.params.requestId,
+                })
+            }
+          
+            requestHandler.sendSuccess(res,'Friend Request Declined',200, true);
       }
-
-      requestHandler.sendSuccess(res,'Friend Request Declined',200, true);
-
     } catch (err) {
         errMessage = { "Members DeclineRequest": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
@@ -645,29 +659,31 @@ exports.fetchRecommandedUsers = async (req, res) => {
         errMessage = '{ "Members": { "message" : "user not found"} }';
         requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
       }
-  
-      const userData = FilterUserData(user)
-  
-      const connections = user.connections.map((connection) => {
-        return {
-          ...FilterUserData(connection),
-        }
-      })
-  
-      userData.connections = connections
-      const notifications = await Notification.find({ user: global.decoded._id }).sort({
-        createdAt: -1,
-      })
-      let notifData = notifications.map((notif) => {
-        return {
-          id: notif.id,
-          body: notif.body,
-          createdAt: notif.createdAt,
-        }
-      })
-  
-      //res.status(200).json({ user: userData, notifications: notifData })
-      requestHandler.sendSuccess(res,'users connections list found success',200, { user: userData, notifications: notifData });
+      else
+      {
+            const userData = FilterUserData(user)
+
+            const connections = user.connections.map((connection) => {
+              return {
+                ...FilterUserData(connection),
+              }
+            })
+          
+            userData.connections = connections
+            const notifications = await Notification.find({ user: global.decoded._id }).sort({
+              createdAt: -1,
+            })
+            let notifData = notifications.map((notif) => {
+              return {
+                id: notif.id,
+                body: notif.body,
+                createdAt: notif.createdAt,
+              }
+            })
+          
+            //res.status(200).json({ user: userData, notifications: notifData })
+            requestHandler.sendSuccess(res,'users connections list found success',200, { user: userData, notifications: notifData });
+      }
     } catch (err) {
       errMessage = { "Members Connections": { "message" : err.message } };
       requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
@@ -685,3 +701,60 @@ exports.fetchRecommandedUsers = async (req, res) => {
       requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
     }
   }
+
+  //fetch user by id
+  exports.fetchUserById = async (req, res) => {
+    try {
+      const user = await User.findById(req.params.user_id).populate('connections')
+      const userData = FilterUserData(user)
+  
+      //res.status(200).json({ user: userData })
+      requestHandler.sendSuccess(res,'User found successfully',200, { user: userData });
+    } catch (err) {
+      errMessage = { "User": { "message" : err.message } };
+      requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+    }
+  }
+
+//fetch sended connection request list by login user id
+  exports.fetchSendedConnectionRequest = async (req, res) => {
+    try {
+      const connections = await UserRequest.find({
+        $and: [{ isAccepted: false }, { sender: global.decoded._id }],
+      }).populate('receiver')
+      const connectionsData = connections.map((connection) => {
+        return {
+          id: connection.id,
+          user: FilterUserData(connection.receiver),
+        }
+      })
+  
+      //res.status(200).json({ connections: connectionsData })
+      requestHandler.sendSuccess(res,'Connection sended request list found successfully',200, { connections: connectionsData });
+    } catch (err) {
+      errMessage = { "Connections": { "message" : err.message } };
+      requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+    }
+  };
+
+  //fetch incomming connection request list
+  exports.fetchIncommingConnectionRequest = async (req, res) => {
+    try {
+      const connections = await UserRequest.find({
+        $and: [{ isAccepted: false }, { receiver: global.decoded._id }],
+      }).populate('sender')
+  
+      const connectionsData = connections.map((connection) => {
+        return {
+          id: connection.id,
+          user: FilterUserData(connection.sender),
+        }
+      })
+  
+      //res.status(200).json({ connections: connectionsData })
+      requestHandler.sendSuccess(res,'Connection request list found successfully',200, { connections: connectionsData });
+    } catch (err) {
+      errMessage = { "Connections": { "message" : err.message } };
+      requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+    }
+  };
