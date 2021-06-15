@@ -268,6 +268,11 @@ router.route("/payment/order")
   .post(auth.isAuthunticated,PaymentOrderController.add)
   .patch(auth.isAuthunticated,PaymentOrderController.update);
 
+//Payment
+router.route("/payment/validate")
+  .get(auth.isAuthunticated,PaymentOrderController.validate);
+
+
 //paypal
 router.route("/payment/webhooks")
   .post(PaymentOrderController.webhooks);

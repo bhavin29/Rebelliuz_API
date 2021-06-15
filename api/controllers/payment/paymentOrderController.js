@@ -5,6 +5,9 @@ const PaymentOrder = require('../../models/paymentOrderModel');
 const PaymentSubscription = require('../../models/paymentSubscriptionModel');
 const PaymentTransaction = require('../../models/paymentTransactionModel');
 const PaymentPackage = require('../../models/master/paymentPackageModel');
+const UserPackageLimit = require('../../models/userPackageLimitModel');
+const UserJob = require('../../models/userJobModel');
+
 const RequestHandler = require('../../../utils/RequestHandler');
 const Logger = require('../../../utils/logger');
 const logger = new Logger();
@@ -36,14 +39,13 @@ exports.update = function (req, res) {
                                 requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
                         } else 
                         {
-                            requestHandler.sendSuccess(res,'Payment order update successfully.',200,paymentOrder);
+                            callPackageforLimit(req, res,paymentOrder)
                         }
                     });
                 }
                 else{
                     requestHandler.sendSuccess(res,'Payment order no data found.',200,paymentOrder);
                 }
-                
             }
         });
     } catch (err) {
@@ -51,9 +53,89 @@ exports.update = function (req, res) {
         requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
     }
 };
+
+callPackageforLimit = function (req, res,paymentOrder) {
+    try
+    {
+        //payment_packages
+        PaymentPackage.findById(paymentOrder.payment_package_id, function (err, paymentPackage) {
+            if (err)
+            {
+                errMessage = '{ "Package": { "message" : "Pacagke have problem."} }';
+                requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+            }
+            else
+            {
+                if (paymentPackage){
+                    callUserPackageLimit (req, res,paymentOrder,paymentPackage)
+                }
+                else
+                {
+                    requestHandler.sendError(req,res, 422, 'Somthing went worng: Package not found.','');
+                }
+            }
+        });
+    } catch (err) {
+        errMessage = { "Payment Subscription GET": { "message" : err.message } };
+        requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+    }
+};
+
+
+callUserPackageLimit = function (req, res,paymentOrder,paymentPackage) {
+    try
+    {
+        UserPackageLimit.findOne({ user_id : global.decoded._id, module : paymentOrder.module   }
+            , function (err, userPackageLimit) {
+        if (err)
+        {
+            errMessage = '{ "Package Limit": { "message" : "Package limit order is not found"} }';
+            requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+        }
+        else
+        {
+            if (userPackageLimit == null){
     
+                var userpackageLimit = new UserPackageLimit();
+                userpackageLimit.user_id =  global.decoded._id; 
+                userpackageLimit.module =paymentOrder.module;
+                userpackageLimit.limit=paymentPackage.item_count;
+
+                userpackageLimit.save(function (err) {
+                    if (err){
+                            errMessage = '{ "Package Limit": { "message" : "Package limit is not saved!!"} }';
+                            requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
+                    } else 
+                    {
+                        requestHandler.sendSuccess(res,'Payment order update successfully.',200,paymentOrder);
+                    }
+                }
+                );
+            }
+            else{
+                userPackageLimit.limit +=paymentPackage.item_count;
+
+                userPackageLimit.save(function (err) {
+                    if (err){
+                            errMessage = '{ "Package Limit": { "message" : "Package limit is not saved!!"} }';
+                            requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
+                    } else 
+                    {
+                        requestHandler.sendSuccess(res,'Payment order update successfully.',200,paymentOrder);
+                    }
+                }
+                );
+            }
+        }
+    });
+    } catch (err) {
+    errMessage = { "Payment Order GET": { "message" : err.message } };
+    requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+    }
+};
+
     
-    //For creating new PaymentPackage
+//For creating new PaymentPackage
 exports.add = function (req, res) {
     try
     {
@@ -379,6 +461,100 @@ UpdatePaymentTransaction = function(req, res,order_id,status,paymentOrder,paymen
             requestHandler.sendError(req,res, 422, 'Somthing went worng: Transaction not foud' ,'');
         }               
     });
+}
+
+// Payment validate
+exports.validate = function (req, res) {
+    try
+    {
+        UserPackageLimit.findOne({ user_id : global.decoded._id, module : req.body.module   }
+            , function (err, userPackageLimit) {
+        if (err)
+        {
+            errMessage = '{ "Package Limit": { "message" : "Package limit order is not found"} }';
+            requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+        }
+        else
+        {
+            if (userPackageLimit == null){
+    
+                var userpackageLimit = new UserPackageLimit();
+                userpackageLimit.user_id =  global.decoded._id; 
+                userpackageLimit.module =req.body.module;
+                userpackageLimit.limit=1;
+
+                userpackageLimit.save(function (err) {
+                    if (err){
+                            errMessage = '{ "Package Limit": { "message" : "Package limit is not saved!!"} }';
+                            requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
+                    } else 
+                    {
+                        callFindJobCount(req, res,userpackageLimit);                    }
+                    }
+                );
+            }
+            else{
+                callFindJobCount(req, res,userPackageLimit);
+            }
+        }
+    });
+    } catch (err) {
+    errMessage = { "Payment Order GET": { "message" : err.message } };
+    requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+    }
+};
+
+callFindJobCount = function(req, res,userpackageLimit) {
+
+    var jobCount=0;
+    UserJob.aggregate(
+        [
+          { "$match": {"user_id" : global.decoded._id  } },
+         {
+            $group:
+              {
+                _id : null,
+                count: { $sum: 1 }
+              }
+          }
+        ],function(err, data) {
+          if (err)
+         {
+             errMessage = '{ "User Test": { "message" : "User test is not found"} }';
+             requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+         }
+         else
+         {
+          jobCount = data[0];
+          if (jobCount === undefined) jobCount=0;
+          callfinal (req, res,userpackageLimit,jobCount);
+          }
+        });
+}
+
+callfinal = function(req, res,userpackageLimit,jobCount){
+    if (jobCount.count < userpackageLimit.limit ){
+        
+        const data =[{ 
+            'Payment' : false,
+            'jobCount' : jobCount,
+            'Limit': userpackageLimit.limit,
+            'desc' : 'Payment:false= No need to do payment; Payment:true=Do payment'
+            }]
+
+        requestHandler.sendSuccess(res,' Package Validate Sucessfully.',200,data);
+    }
+    else{
+        const data =[{ 
+                        'Payment' : true,
+                        'jobCount' : jobCount,
+                        'Limit': userpackageLimit.limit,
+                        'desc' : 'Payment:false= No need to do payment; Payment:true=Do payment'
+                    }]
+
+        requestHandler.sendSuccess(res,' Package Validate Sucessfully.',200,data);
+
+    }
 }
 
 /*
