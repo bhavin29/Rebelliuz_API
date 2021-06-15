@@ -9,6 +9,7 @@ const Logger = require('../../../utils/logger');
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
 
+/*
 //For creating new Message
 const add = async (req, res) => {
         try
@@ -138,4 +139,4 @@ module.exports = {
     view,
     updateReadCount
 };
-  
+  */

@@ -310,6 +310,17 @@ router.route("/user/me")
 
 router.route("/user/notifications/clear")
    .delete(auth.isAuthunticated, MemberController.clearNotification);
+
+router.route("/user/:user_id")
+   .get(auth.isAuthunticated, MemberController.fetchUserById);
+
+router.route("/member/request/sended")
+   .get(auth.isAuthunticated, MemberController.fetchSendedConnectionRequest);
+
+router.route("/member/request/received")
+   .get(auth.isAuthunticated, MemberController.fetchIncommingConnectionRequest);
+
+   /*
 //Message
 router.route("/message")
    .post(auth.isAuthunticated,MessageController.add);
@@ -319,7 +330,8 @@ router.route("/message/:userid")
 
 router.route("/message/updatereadcount")
    .put(auth.isAuthunticated,MessageController.updateReadCount);
-   
+   */
+
 //Post
 router.route("/post/")
    .post(auth.isAuthunticated,PostController.addPost);
