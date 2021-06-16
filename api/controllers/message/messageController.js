@@ -8,6 +8,7 @@ const RequestHandler = require('../../../utils/RequestHandler');
 const Logger = require('../../../utils/logger');
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
+const FilterUserData = require('../../../utils/FilterUserData')
 
 /*
 //For creating new Message
@@ -140,3 +141,100 @@ module.exports = {
     updateReadCount
 };
   */
+
+
+exports.sendMessageToConnection = async (req, res) => {
+    try {
+
+            const { text, image } = req.body
+
+            if (!text && !image) {
+                errMessage = '{ "Messages": { "message" : "Don`t send empty message type something"} }';
+                requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
+            }
+            else
+            {
+                try {
+                        const connection = await User.findById(req.params.connectionId)
+
+                        if (!connection) {
+                          errMessage = '{ "Messages": { "message" : "Connection Not Found"} }';
+                          requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
+                        }
+                        else
+                        {
+                                const messageModel = new MessageModel({
+                                  sender: global.decoded._id,
+                                  receiver: req.params.connectionId,
+                                  body: {
+                                    text: text || '',
+                                    image: image || '',
+                                  },
+                                })
+                            
+                                const saveMessage = await messageModel.save()
+                            
+                                const getMessage = await MessageModel.findById(saveMessage.id)
+                                  .populate('sender')
+                                  .populate('receiver')
+                                const messagedata = {
+                                  id: saveMessage.id,
+                                  sender: FilterUserData(getMessage.sender),
+                                  receiver: FilterUserData(getMessage.receiver),
+                                  body: getMessage.body,
+                                  createdAt: getMessage.createdAt,
+                                }
+                            
+                                //res.status(201).json({ data: chatdata })
+
+                                if (getMessage.receiver.socketId) {
+                                  req.io
+                                    .to(getMessage.receiver.socketId)
+                                    .emit('new-message', { data: messagedata })
+                                }
+                            
+                                requestHandler.sendSuccess(res,'Message sended successfully.',200, { data: messagedata });
+                        }
+                } catch (err) {
+                    errMessage = { "Messages": { "message" : err.message } };
+                    requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+                }
+            }
+    } catch (err) {
+        errMessage = { "Messages": { "message" : err.message } };
+        requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+    }
+};
+
+//get messages list
+exports.getConnectionMessages = async (req, res) => {
+    try {
+      const messages = await MessageModel.find({
+        $or: [
+          { sender: global.decoded._id, receiver: req.params.connectionId },
+          { receiver: global.decoded._id, sender: req.params.connectionId },
+        ],
+      })
+        .populate('sender')
+        .populate('receiver')
+  
+      const messagesData = messages.map((message) => {
+        return {
+          id: message.id,
+          sender: FilterUserData(message.sender),
+          receiver: FilterUserData(message.receiver),
+          body:message.body,
+          createdAt: message.createdAt,
+  
+        }
+      })
+  
+      //res.status(200).json({ data: messagesData })
+      requestHandler.sendSuccess(res,'Messages found successfully.',200, { data: messagesData });
+
+    } catch (err) {
+        errMessage = { "Messages": { "message" : err.message } };
+        requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
+    }
+  };
+  

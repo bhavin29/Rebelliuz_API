@@ -10,323 +10,7 @@ const requestHandler = new RequestHandler(logger);
 const CreateNotification = require('../../../utils/CreateNotification')
 const FilterUserData = require('../../../utils/FilterUserData')
 const Notification = require('../../models/notification/notificationModel')
-
-// View Member My Connection
-exports.connection = function (req, res) {
-    try
-    {
-           var errMessage = '';
-            let aggregate_options = [];
-
-            //PAGINATION
-            let page = parseInt(req.query.page) || 1;
-            let limit = parseInt(req.query.rowsPerPage) || global.rows_per_page;
-        
-            //set the options for pagination
-            const options = {
-                page, limit,
-                collation: {locale: 'en'},
-                customLabels: {
-                    totalDocs: 'Members',
-                    docs: 'members'
-                }
-            };
-
-            var condition = [];
-                a =  {user_id: global.decoded._id};
-                condition.push(a);
-                // b =  {follow_user_id: global.decoded._id};
-                // condition.push(b);
-                c = { status : 2};
-               // condition.push(c);
-
-            let match ={ $and: [ {$or : condition } , { status : 2 } ] };
-             
-            let queryConvertUserId = {
-                follow_user_id:{
-                    $toObjectId:"$follow_user_id"
-                },status:1,user_id:1,root_path:1
-            };
-
-            let query ={
-                    from: "users",
-                    localField: "follow_user_id",
-                    foreignField: "_id",
-                    as: "usersList"
-             };
-
-             let photoquery ={
-                from: "storage_files",
-                localField: "usersList.photo_id",
-                foreignField: "file_id",
-                as: "userphoto"
-            };
-            
-            let isread_query={
-                  from: "messages",
-                  let: {
-                    usersIds: '$from_user_id',
-                  },
-                  pipeline: [
-                    {
-                        $match: {
-                          $expr: {
-                            $and: [
-                              { $eq: ['$user_id', '$$usersIds'] },
-                              { $eq: ['$isread', false] },
-                            ],
-                          },
-                        },
-                      },
-                    { $group: {
-                        _id: null,
-                        count: { $sum: 1 }
-                       } 
-                    }
-                ],
-                as: "isReadStatus"
-            };
-            
-
-            let path = {  "root_path" :  { $literal: config.general.parent_root }  };
-            //SORTING -- THIRD STAGE
-            let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? -1 : 1;
-
-            aggregate_options.push({$match: match});
-            aggregate_options.push({$addFields: path});
-            aggregate_options.push({$project: queryConvertUserId});
-            aggregate_options.push({$lookup: query});
-            aggregate_options.push({ "$unwind": "$usersList" });
-            aggregate_options.push({$lookup: photoquery});
-            aggregate_options.push({$lookup: isread_query});
-            aggregate_options.push({$unwind:{ path: "$isReadStatus",preserveNullAndEmptyArrays: true}});
-            aggregate_options.push({$sort: {"status": sortOrder,"usersList.displayname":sortOrder}});
-            const myAggregate = Member.aggregate(aggregate_options);
-
-            Member.aggregatePaginate(myAggregate,options,function (err, member) {
-                if (err)
-                {
-                    errMessage = '{ "Member": { "message" : "Member user  is not found"} }';
-                    requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
-                }
-                else if (member.Members >0)
-                {
-                    requestHandler.sendSuccess(res,'Member user found successfully.',200,member);
-                }
-                else
-                {
-                    errMessage = '{ "Member": { "message" : "Member user is not found"} }';
-                    requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
-                }
-        });
-    } catch (err) {
-    errMessage = { "Member GET": { "message" : err.message } };
-    requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
-    }
-};
-
-// View members My Request
-exports.request = function (req, res) {
-    try
-    {
-           var errMessage = '';
-            let aggregate_options = [];
-
-            //PAGINATION
-            let page = parseInt(req.query.page) || 1;
-            let limit = parseInt(req.query.rowsPerPage) || global.rows_per_page;
-        
-            //set the options for pagination
-            const options = {
-                page, limit,
-                collation: {locale: 'en'},
-                customLabels: {
-                    totalDocs: 'Members',
-                    docs: 'members'
-                }
-            };
-
-            var condition = [];
-                b =  {follow_user_id: global.decoded._id};
-                condition.push(b);
-                c = { status : 1};
-                condition.push(c);
-
-            let match = {$and : condition };
-
-            let queryConvertUserId = {
-                user_id:{
-                    $toObjectId:"$user_id"
-                },status:1,follow_user_id:1,root_path:1
-            };
-
-            let query ={
-                    from: "users",
-                    localField: "user_id",
-                    foreignField: "_id",
-                    as: "usersList"
-             };
-
-             let photoquery ={
-                from: "storage_files",
-                localField: "usersList.photo_id",
-                foreignField: "file_id",
-                as: "userphoto"
-            };
-                      
-            let path = {  "root_path" :  { $literal: config.general.parent_root }  };
-            //SORTING -- THIRD STAGE
-            let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? -1 : 1;
-
-            aggregate_options.push({$match: match});
-            aggregate_options.push({$addFields: path});
-            aggregate_options.push({$project: queryConvertUserId});
-            aggregate_options.push({$lookup: query});
-            aggregate_options.push({ "$unwind": "$usersList" });
-            aggregate_options.push({$lookup: photoquery});
-            aggregate_options.push({$sort: {"status": sortOrder,"usersList.displayname":sortOrder}});
-            const myAggregate = Member.aggregate(aggregate_options);
-
-            Member.aggregatePaginate(myAggregate,options,function (err, member) {
-                if (err)
-                {
-                    errMessage = '{ "Member": { "message" : "Member user  is not found"} }';
-                    requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
-                }
-                else if (member.Members >0)
-                {
-                    requestHandler.sendSuccess(res,'Member user found successfully.',200,member);
-                }
-                else
-                {
-                    errMessage = '{ "Member": { "message" : "Member user is not found"} }';
-                    requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
-                }
-        });
-    } catch (err) {
-    errMessage = { "Member GET": { "message" : err.message } };
-    requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
-    }
-};
-
-//For add Member
-exports.add = function (req, res) {
-        try
-        {
-            Member.findOne( { user_id: global.decoded._id,follow_user_id :req.body.follow_user_id},
-            (err,member)=>{
-            if (err){
-                errMessage = '{ "Member": { "message" : "Member user is not saved!!"} }';
-                requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
-            }
-            if (!member) {
-                callMemberSearch(req, res,member);
-            }
-            else if (member) {
-                    
-                    member.status = req.body.status;
-
-                    member.save(function (err) {
-                    if (err){
-                           errMessage = '{ "Member": { "message" : "Member user is not saved!!"} }';
-                                    requestHandler.sendError(req,res, 422, 'Somthing worng with bussines admin user',JSON.parse(errMessage));
-                            } else {
-                                    callMemberSearch(req, res,member);
-                                    //requestHandler.sendSuccess(res,'Member user updated successfully.',200,member);
-                            }
-                    });
-               }
-           });
-        } catch (err) {
-        errMessage = { "Member GET": { "message" : err.message } };
-        requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
-        }
-};
-
-callMemberSearch = function (req, res,memberUserId) {
-    try
-        {
-            Member.findOne( { follow_user_id: global.decoded._id, user_id :req.body.follow_user_id},
-            (err,member)=>{
-            if (err){
-                errMessage = '{ "Member": { "message" : "Member user is not saved!!"} }';
-                requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
-            }
-            if (!member) {
-                //insert
-                var member = new Member();
-                member.user_id =global.decoded._id;
-                member.follow_user_id = req.body.follow_user_id;
-                member.status = req.body.status;
-                member.device_id =  '';
-                member.device_name ='';
-                member.ip_address = '';
-                member.created_by = global.decoded._id;
-
-                //Save and check error
-                member.save(function (err) {
-                    if (err)
-                    {
-                        errMessage = '{ "Member": { "message" : "Member user is not save"} }';
-                        requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
-                    }
-                    else
-                    {
-                        addFollowUserMember(req, res,member);
-                        //requestHandler.sendSuccess(res,'Member user save successfully.',200,member);
-                    }
-                    });
-                }
-                else if (member) {
-                    member.status = req.body.status;
-                    member.save(function (err) {
-                    if (err){
-                           errMessage = '{ "Member": { "message" : "Member user is not saved!!"} }';
-                                    requestHandler.sendError(req,res, 422, 'Somthing worng with bussines admin user',JSON.parse(errMessage));
-                            } else {
-                                    requestHandler.sendSuccess(res,'Member user updated successfully.',200,member);
-                            }
-                    });
-               }
-               
-           });
-        } catch (err) {
-        errMessage = { "Member GET": { "message" : err.message } };
-        requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
-        }
-};
-
-addFollowUserMember = function (req, res,memberUserId) {
-    try
-        {
-                var member = new Member();
-                member.user_id =req.body.follow_user_id;
-                member.follow_user_id = global.decoded._id;
-                member.status = 0;
-                member.device_id =  '';
-                member.device_name ='';
-                member.ip_address = '';
-                member.created_by = global.decoded._id;
-
-                //Save and check error
-                member.save(function (err) {
-                    if (err)
-                    {
-                        errMessage = '{ "Member": { "message" : "Member user is not save"} }';
-                        requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
-                    }
-                    else
-                    {
-                        requestHandler.sendSuccess(res,'Member user save successfully.',200,member);
-                    }
-                    });
-
-        } catch (err) {
-        errMessage = { "Member GET": { "message" : err.message } };
-        requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
-        }
-};
-
+const UserPhoto = require('../../models/storageFileModel');
 
 // search member
 exports.search = function (req, res) {
@@ -633,18 +317,84 @@ exports.cancelSendedConnectionRequest = async (req, res) => {
 //recommanded connection user list  
 exports.fetchRecommandedUsers = async (req, res) => {
     try {
+
+          let aggregate_options = [];
+
+            //PAGINATION
+            let page = parseInt(req.query.page) || 1;
+            let limit = parseInt(req.query.rowsPerPage) || global.rows_per_page;
+        
+            //set the options for pagination
+            const options = {
+                page, limit,
+                collation: {locale: 'en'},
+                customLabels: {
+                    totalDocs: 'RecommandedUsers',
+                    docs: 'recommandedUsers'
+                }
+            };
+
+            let query ={
+                    from: "storage_files",
+                    localField: "photo_id",
+                    foreignField: "file_id",
+                    as: "userphoto"
+             };
+
+            let path = {  "root_path" :  { $literal: config.general.parent_root }  };
+            //SORTING -- THIRD STAGE
+            let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? 1 : -1;
+
+            aggregate_options.push({$addFields: path});
+            aggregate_options.push({$lookup: query});
+            aggregate_options.push({$sort: {"created_on": sortOrder}});
+            const myAggregate = User.aggregate(aggregate_options);
+
+            User.aggregatePaginate(myAggregate,options,function (err, user) {
+                if (err)
+                {
+                    errMessage = '{ "Members": { "message" : "Member is not found"} }';
+                    requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+                }
+                else if (user.RecommandedUsers >0)
+                {
+                    requestHandler.sendSuccess(res,'Member found successfully.',200,user);
+                }
+                else
+                {
+                    errMessage = '{ "Members": { "message" : "Member is not found"} }';
+                    requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
+                }
+        });
+
+      /*
+      let page = parseInt(req.query.page || 0)
+      //let limit = 3
+      let limit = parseInt(req.query.rowsPerPage) || global.rows_per_page;
+
       const users = await User.find()
+        .sort({ created_on: -1 })
+        .limit(limit)
+        .skip(page * limit)
         .where('_id')
         .ne(global.decoded._id)
         .populate('connections')
-  
+        
       const usersData = users.map((user) => {
         return FilterUserData(user)
       })
       
-      //res.status(200).json({ users: usersData })
-      requestHandler.sendSuccess(res,'Recommanded users list found success',200, { users: usersData });
+      const totalCount = await User.estimatedDocumentCount().exec()
+      const paginationData = {
+        totalUsers:totalCount,
+        limit:limit,
+        page:page,
+        totalPages:Math.ceil(totalCount/limit),
+      }
 
+      //res.status(200).json({ users: usersData })
+      requestHandler.sendSuccess(res,'Recommanded users list found success',200, { users: usersData,pagination:paginationData });
+      */
     } catch (err) {
         errMessage = { "Members RecommandedRequest": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
@@ -740,6 +490,77 @@ exports.fetchRecommandedUsers = async (req, res) => {
   //fetch incomming connection request list
   exports.fetchIncommingConnectionRequest = async (req, res) => {
     try {
+
+          let aggregate_options = [];
+
+            //PAGINATION
+            let page = parseInt(req.query.page) || 1;
+            let limit = parseInt(req.query.rowsPerPage) || global.rows_per_page;
+        
+            //set the options for pagination
+            const options = {
+                page, limit,
+                collation: {locale: 'en'},
+                customLabels: {
+                    totalDocs: 'Connections',
+                    docs: 'connections'
+                }
+            };
+
+            //$and: [{ isAccepted: false }, { receiver: global.decoded._id }],
+            var condition = [];
+            a = {isAccepted: false };
+            condition.push(a);
+            b = {receiver: global.decoded._id };
+            condition.push(b);
+          
+            let match = {$and : condition };
+
+            let querySender ={
+              from: "users",
+              localField: "sender",
+              foreignField: "_id",
+              as: "sender"
+            };
+
+            let query ={
+                    from: "storage_files",
+                    localField: "sender.photo_id",
+                    foreignField: "file_id",
+                    as: "userphoto"
+             };
+
+             
+            let path = {  "root_path" :  { $literal: config.general.parent_root }  };
+            //SORTING -- THIRD STAGE
+            let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? 1 : -1;
+
+            aggregate_options.push({$addFields: { "receiverId": { "$toString": "$receiver" }}});
+            aggregate_options.push({$match: {$and: [{ isAccepted: false }, { receiverId: global.decoded._id}]}});
+            aggregate_options.push({$addFields: path});
+            aggregate_options.push({$lookup: querySender});
+            aggregate_options.push({$lookup: query});
+            aggregate_options.push({$sort: {"createdAt": sortOrder}});
+            const myAggregate = UserRequest.aggregate(aggregate_options);
+
+            UserRequest.aggregatePaginate(myAggregate,options,function (err, userRequest) {
+                if (err)
+                {
+                    errMessage = '{ "Members": { "message" : "Connection request is not found"} }';
+                    requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+                }
+                else if (userRequest.Connections >0)
+                {
+                    requestHandler.sendSuccess(res,'Connection request list found successfully.',200,userRequest);
+                }
+                else
+                {
+                    errMessage = '{ "Members": { "message" : "Connection request is not found"} }';
+                    requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
+                }
+        });
+
+      /*
       const connections = await UserRequest.find({
         $and: [{ isAccepted: false }, { receiver: global.decoded._id }],
       }).populate('sender')
@@ -753,6 +574,8 @@ exports.fetchRecommandedUsers = async (req, res) => {
   
       //res.status(200).json({ connections: connectionsData })
       requestHandler.sendSuccess(res,'Connection request list found successfully',200, { connections: connectionsData });
+
+      */
     } catch (err) {
       errMessage = { "Connections": { "message" : err.message } };
       requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
