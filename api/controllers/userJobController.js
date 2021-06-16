@@ -38,7 +38,7 @@ const upload = async (req, res) => {
           userjob.job_category_id=req.body.job_category_id;
           userjob.job_classification_id=req.body.job_classification_id;
           userjob.job_experience_id=req.body.job_experience_id;
-          userjob.Job_type_ids=req.body.Job_type_ids;
+          userjob.job_type_ids=req.body.job_type_ids;
           userjob.job_skill_ids=req.body.job_skill_ids;
           userjob.short_description=req.body.short_description;
           userjob.expected_salary_start=req.body.expected_salary_start;
@@ -74,10 +74,10 @@ const upload = async (req, res) => {
            if( req.body.job_experience_id != undefined) 
              userJob.job_experience_id=req.body.job_experience_id;
 
-           if(req.body.Job_type_ids != undefined) 
-            userJob.Job_type_ids=req.body.Job_type_ids;
+           if(req.body.job_type_ids != undefined) 
+            userJob.job_type_ids=req.body.job_type_ids;
 
-           if( req.body.job_skills_ids != undefined) 
+           if( req.body.job_skill_ids != undefined) 
             userJob.job_skill_ids=req.body.job_skill_ids;
 
            if( req.body.short_description != undefined) 
@@ -116,7 +116,7 @@ jobValidation = function (req){
 
     var result = 0;
     if (req.body.job_id == undefined || req.body.job_category_id == undefined ||  req.body.job_classification_id == undefined ||  
-        req.body.job_experience_id == undefined || req.body.Job_type_ids == undefined ||  req.body.job_skills_ids == undefined ||  
+        req.body.job_experience_id == undefined || req.body.job_type_ids == undefined ||  req.body.job_skills_ids == undefined ||  
         req.body.short_description == undefined ||  req.body.expected_salary_start == undefined || req.body.expected_salary_end == undefined )
          {
         result = 1;

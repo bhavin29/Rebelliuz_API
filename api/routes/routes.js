@@ -270,8 +270,7 @@ router.route("/payment/order")
 
 //Payment
 router.route("/payment/validate")
-  .get(auth.isAuthunticated,PaymentOrderController.validate);
-
+  .post(auth.isAuthunticated,PaymentOrderController.validate);
 
 //paypal
 router.route("/payment/webhooks")
