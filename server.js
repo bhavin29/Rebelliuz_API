@@ -104,6 +104,12 @@ var getIP = require('ipware')().get_ip;
 
 // Welcome message
 app.get('/', (req, res) => {
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE'); // If needed
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,contenttype'); // If needed
+    res.setHeader('Access-Control-Allow-Credentials', true); // If needed
+     
    var ipInfo = getIP(req);
     res.send('Welcome to Express from ip:' + ipInfo['clientIp'] )
 });
