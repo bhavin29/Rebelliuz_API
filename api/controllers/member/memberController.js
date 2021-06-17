@@ -1,6 +1,5 @@
 const config = require('../../../config/appconfig');
 const fs = require('fs');
-const Member = require('../../models/member/memberModel');
 const UserRequest = require('../../models/member/userRequestModel');
 const User = require('../../models/userModel');
 const RequestHandler = require('../../../utils/RequestHandler');
@@ -71,13 +70,6 @@ exports.search = function (req, res) {
                     as: "userphoto"
              };
 
-             let status_query ={
-                from: "members",
-                localField: "userId",
-                foreignField: "follow_user_id",
-                as: "connectionStatus"
-            };
-
             let path = {  "root_path" :  { $literal: config.general.parent_root }  };
             //SORTING -- THIRD STAGE
             let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? -1 : 1;
@@ -85,9 +77,6 @@ exports.search = function (req, res) {
             aggregate_options.push({$match: match});
             aggregate_options.push({$addFields: path});
             aggregate_options.push({$lookup: query});
-            aggregate_options.push({$addFields: { "userId": { "$toString": "$_id" }}});
-            aggregate_options.push({$lookup: status_query});
-            //aggregate_options.push({$unwind:{ path: "$connectionStatus",preserveNullAndEmptyArrays: false}});
             aggregate_options.push({$sort: {"email": sortOrder}});
             const myAggregate = User.aggregate(aggregate_options);
 
@@ -318,6 +307,20 @@ exports.cancelSendedConnectionRequest = async (req, res) => {
 exports.fetchRecommandedUsers = async (req, res) => {
     try {
 
+      //Get Connection User Request
+      const user_connections = await User.findById(global.decoded._id).populate(
+        'user',
+        'connections',
+      );
+
+      //Get Sended User Request
+      const user_sendrequest = await UserRequest.find({$and: [{ isAccepted: false }, { sender: global.decoded._id }]}).populate(
+        'receiver','receiver'
+      );
+      const userData = user_sendrequest.map((connection) => {
+        return connection.receiver._id
+      });
+
           let aggregate_options = [];
 
             //PAGINATION
@@ -341,10 +344,24 @@ exports.fetchRecommandedUsers = async (req, res) => {
                     as: "userphoto"
              };
 
+             var condition = [];
+             a = {userId: {$ne: global.decoded._id }};
+             condition.push(a);
+             b = { loginId : {$nin: user_connections.connections }};
+             condition.push(b);
+             c = { loginId : {$nin: userData }};
+             condition.push(c);
+           
+             let match = {$and :condition};
+
             let path = {  "root_path" :  { $literal: config.general.parent_root }  };
             //SORTING -- THIRD STAGE
             let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? 1 : -1;
 
+            aggregate_options.push({$addFields: { "userId": { "$toString": "$_id" }}});
+            aggregate_options.push({$addFields: { "loginId": { "$toObjectId": "$_id" }}});
+            aggregate_options.push({$match: match});
+            aggregate_options.push({$addFields: path});
             aggregate_options.push({$addFields: path});
             aggregate_options.push({$lookup: query});
             aggregate_options.push({$sort: {"created_on": sortOrder}});
@@ -469,6 +486,66 @@ exports.fetchRecommandedUsers = async (req, res) => {
 //fetch sended connection request list by login user id
   exports.fetchSendedConnectionRequest = async (req, res) => {
     try {
+      let aggregate_options = [];
+
+            //PAGINATION
+            let page = parseInt(req.query.page) || 1;
+            let limit = parseInt(req.query.rowsPerPage) || global.rows_per_page;
+        
+            //set the options for pagination
+            const options = {
+                page, limit,
+                collation: {locale: 'en'},
+                customLabels: {
+                    totalDocs: 'Connections',
+                    docs: 'connections'
+                }
+            };
+
+            let querySender ={
+              from: "users",
+              localField: "receiver",
+              foreignField: "_id",
+              as: "receiver"
+            };
+
+            let query ={
+                    from: "storage_files",
+                    localField: "receiver.photo_id",
+                    foreignField: "file_id",
+                    as: "userphoto"
+             };
+
+             
+            let path = {  "root_path" :  { $literal: config.general.parent_root }  };
+            //SORTING -- THIRD STAGE
+            let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? 1 : -1;
+
+            aggregate_options.push({$addFields: { "senderId": { "$toString": "$sender" }}});
+            aggregate_options.push({$match: {$and: [{ isAccepted: false }, { senderId: global.decoded._id}]}});
+            aggregate_options.push({$addFields: path});
+            aggregate_options.push({$lookup: querySender});
+            aggregate_options.push({$lookup: query});
+            aggregate_options.push({$sort: {"createdAt": sortOrder}});
+            const myAggregate = UserRequest.aggregate(aggregate_options);
+
+            UserRequest.aggregatePaginate(myAggregate,options,function (err, userRequest) {
+                if (err)
+                {
+                    errMessage = '{ "Members": { "message" : "Connection request is not found"} }';
+                    requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+                }
+                else if (userRequest.Connections >0)
+                {
+                    requestHandler.sendSuccess(res,'Connection request list found successfully.',200,userRequest);
+                }
+                else
+                {
+                    errMessage = '{ "Members": { "message" : "Connection request is not found"} }';
+                    requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
+                }
+        });
+      /*
       const connections = await UserRequest.find({
         $and: [{ isAccepted: false }, { sender: global.decoded._id }],
       }).populate('receiver')
@@ -481,6 +558,7 @@ exports.fetchRecommandedUsers = async (req, res) => {
   
       //res.status(200).json({ connections: connectionsData })
       requestHandler.sendSuccess(res,'Connection sended request list found successfully',200, { connections: connectionsData });
+      */
     } catch (err) {
       errMessage = { "Connections": { "message" : err.message } };
       requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
@@ -506,15 +584,6 @@ exports.fetchRecommandedUsers = async (req, res) => {
                     docs: 'connections'
                 }
             };
-
-            //$and: [{ isAccepted: false }, { receiver: global.decoded._id }],
-            var condition = [];
-            a = {isAccepted: false };
-            condition.push(a);
-            b = {receiver: global.decoded._id };
-            condition.push(b);
-          
-            let match = {$and : condition };
 
             let querySender ={
               from: "users",

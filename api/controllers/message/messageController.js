@@ -10,139 +10,7 @@ const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
 const FilterUserData = require('../../../utils/FilterUserData')
 
-/*
-//For creating new Message
-const add = async (req, res) => {
-        try
-        {
-                global.messageFilename = '';
-                await new uploadFile(req, res);
-             
-                //insert
-                var messageModel = new MessageModel();
-                messageModel.to_user_id =req.body.to_user_id;
-                messageModel.from_user_id = req.body.from_user_id;
-                messageModel.message = req.body.message;
-                messageModel.link = req.body.link;
-                messageModel.filename = global.messageFilename;
-                messageModel.filetype = req.body.filetype;
-                messageModel.resource_type = req.body.resource_type;
-                messageModel.isread = 0;
-                messageModel.device_id = '';
-                messageModel.device_name = '';
-                messageModel.ip_address = '';
-                messageModel.created_by = global.decoded._id;
-                
-
-                //Save and check error
-                messageModel.save(function (err) {
-                    if (err)
-                    {
-                        errMessage = '{ "Message": { "message" : "Message is not save"} }';
-                        requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
-                    }
-                    else
-                    {
-                        requestHandler.sendSuccess(res,'Message save successfully.',200,messageModel);
-                    }
-                    });
-        } catch (err) {
-        errMessage = { "Message GET": { "message" : err.message } };
-        requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
-        }
-};
-
-const view = function (req, res) {
-    try
-    {
-           var errMessage = '';
-            let aggregate_options = [];
-
-            //PAGINATION
-            let page = parseInt(req.query.page) || 1;
-            let limit = parseInt(req.query.rowsPerPage) || global.rows_per_page;
-        
-            //set the options for pagination
-            const options = {
-                page, limit,
-                collation: {locale: 'en'},
-                customLabels: {
-                    totalDocs: 'Messages',
-                    docs: 'messages'
-                }
-            };
-
-            var condition=[];
-            set1 = { $and: [ { to_user_id: req.params.userid },{ from_user_id: global.decoded._id } ] };
-            condition.push(set1);
-
-            set2 = { $and: [ { to_user_id: global.decoded._id },{ from_user_id: req.params.userid } ] };
-            condition.push(set2);
-
-            let match = {$or: condition };
-
-            //SORTING -- THIRD STAGE
-            let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? 1 : -1;
-
-            aggregate_options.push({ $match: match});
-            aggregate_options.push({$sort: {"created_on": sortOrder}});
-            const myAggregate = MessageModel.aggregate(aggregate_options);
-
-            MessageModel.aggregatePaginate(myAggregate,options,function (err, messageModel) {
-                if (err)
-                {
-                    errMessage = '{ "Message": { "message" : "Message is not found"} }';
-                    requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
-                }
-                else if (messageModel.Messages >0)
-                {
-                    requestHandler.sendSuccess(res,'Message found successfully.',200,messageModel);
-                }
-                else
-                {
-                    errMessage = '{ "Message": { "message" : "Message is not found"} }';
-                    requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
-                }
-        });
-    } catch (err) {
-    errMessage = { "Message GET": { "message" : err.message } };
-    requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
-    }
-};
-
-const updateReadCount = function (req, res) {
-    try
-    {
-            //Save and check error
-            MessageModel.updateMany(
-            { _id: { $in: req.body.messageid } },
-            { $set: { isread : true } },
-            {multi: true},
-            function (err) {
-                if (err)
-                {
-                    errMessage = '{ "Message": { "message" : "Message read count not save"} }';
-                    requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
-                }
-                else
-                {
-                    requestHandler.sendSuccess(res,'Message read count updated successfully.',200,true);
-                }
-                });
-    } catch (err) {
-    errMessage = { "Message GET": { "message" : err.message } };
-    requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
-    }
-};
-
-module.exports = {
-    add,
-    view,
-    updateReadCount
-};
-  */
-
-
+//send message
 exports.sendMessageToConnection = async (req, res) => {
     try {
 
@@ -209,6 +77,89 @@ exports.sendMessageToConnection = async (req, res) => {
 //get messages list
 exports.getConnectionMessages = async (req, res) => {
     try {
+
+            let aggregate_options = [];
+
+            //PAGINATION
+            let page = parseInt(req.query.page) || 1;
+            let limit = parseInt(req.query.rowsPerPage) || global.rows_per_page;
+        
+            //set the options for pagination
+            const options = {
+                page, limit,
+                collation: {locale: 'en'},
+                customLabels: {
+                    totalDocs: 'Messages',
+                    docs: 'messages'
+                }
+            };
+
+            let querySender ={
+              from: "users",
+              localField: "sender",
+              foreignField: "_id",
+              as: "sender"
+            };
+
+            let queryReceiver ={
+              from: "users",
+              localField: "receiver",
+              foreignField: "_id",
+              as: "receiver"
+            };
+
+            let querySenderPhoto ={
+                    from: "storage_files",
+                    localField: "sender.photo_id",
+                    foreignField: "file_id",
+                    as: "senderphoto"
+             };
+
+             let queryReceiverPhoto ={
+                  from: "storage_files",
+                  localField: "receiver.photo_id",
+                  foreignField: "file_id",
+                  as: "receiverphoto"
+              };
+             
+            let path = {  "root_path" :  { $literal: config.general.parent_root }  };
+            //SORTING -- THIRD STAGE
+            let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? 1 : -1;
+
+            aggregate_options.push({$addFields: { "senderId": { "$toString": "$sender" }}});
+            aggregate_options.push({$addFields: { "receiverId": { "$toString": "$receiver" }}});
+            aggregate_options.push({$match: {
+                $or: [
+                        { senderId: global.decoded._id, receiverId: req.params.connectionId },
+                        { receiverId: global.decoded._id, senderId: req.params.connectionId },
+                    ],
+              }});
+            aggregate_options.push({$addFields: path});
+            aggregate_options.push({$lookup: querySender});
+            aggregate_options.push({$lookup: querySenderPhoto});
+            aggregate_options.push({$lookup: queryReceiver});
+            aggregate_options.push({$lookup: queryReceiverPhoto});
+            aggregate_options.push({$sort: {"createdAt": sortOrder}});
+            const myAggregate = MessageModel.aggregate(aggregate_options);
+
+            MessageModel.aggregatePaginate(myAggregate,options,function (err, messageModel) {
+                if (err)
+                {
+                    errMessage = '{ "Messages": { "message" : "Messages is not found"} }';
+                    requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+                }
+                else if (messageModel.Messages >0)
+                {
+                    requestHandler.sendSuccess(res,'Messages found successfully.',200,messageModel);
+                }
+                else
+                {
+                    errMessage = '{ "Messages": { "message" : "Messages is not found"} }';
+                    requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
+                }
+        });
+
+      /*
       const messages = await MessageModel.find({
         $or: [
           { sender: global.decoded._id, receiver: req.params.connectionId },
@@ -231,7 +182,7 @@ exports.getConnectionMessages = async (req, res) => {
   
       //res.status(200).json({ data: messagesData })
       requestHandler.sendSuccess(res,'Messages found successfully.',200, { data: messagesData });
-
+*/
     } catch (err) {
         errMessage = { "Messages": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
