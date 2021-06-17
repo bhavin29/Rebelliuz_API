@@ -277,18 +277,10 @@ router.route("/payment/webhooks")
   .post(PaymentOrderController.webhooks);
   
 //Member
-router.route("/member")
-   .post(auth.isAuthunticated,MemberController.add);
-
-router.route("/member/connection")
-   .get(auth.isAuthunticated,MemberController.connection);
-
 router.route("/member/search")
    .post(auth.isAuthunticated,MemberController.search);
 
-router.route("/member/request")
-   .get(auth.isAuthunticated,MemberController.request);
-
+//New APIS of connection modules
 router.route("/member/request/:userId/send")
    .get(auth.isAuthunticated, MemberController.sendConnectionRequest);
 
@@ -319,32 +311,25 @@ router.route("/member/request/sended")
 router.route("/member/request/received")
    .get(auth.isAuthunticated, MemberController.fetchIncommingConnectionRequest);
 
-   /*
 //Message
-router.route("/message")
-   .post(auth.isAuthunticated,MessageController.add);
+router.route("/message/:connectionId/send")
+   .post(auth.isAuthunticated,MessageController.sendMessageToConnection);
 
-router.route("/message/:userid")
-   .get(auth.isAuthunticated,MessageController.view);
-
-router.route("/message/updatereadcount")
-   .put(auth.isAuthunticated,MessageController.updateReadCount);
-   */
+router.route("/message/:connectionId/get_messages")
+   .get(auth.isAuthunticated,MessageController.getConnectionMessages);
 
 //Post
-router.route("/post/")
-   .post(auth.isAuthunticated,PostController.addPost);
+router.route("/post")
+   .post(auth.isAuthunticated,PostController.createPost);
 
-router.route("/post/:postid")
-   .post(auth.isAuthunticated,PostController.updatePost);
+router.route("/post/:postId/like_dislike")
+   .get(auth.isAuthunticated,PostController.likeDislikePost);
+   
+router.route("/post")
+   .get(auth.isAuthunticated,PostController.fetchAllPosts);
 
-router.route("/post/like")
-   .post(auth.isAuthunticated,PostController.addPostLike);
+router.route("/post/:postId")
+   .get(auth.isAuthunticated,PostController.fetchPostById);
 
-router.route("/post/comment")
-   .post(auth.isAuthunticated,PostController.addPostComment);
-
-router.route("/post/comment/like")
-   .post(auth.isAuthunticated,PostController.addPostCommentLike);
 //Export API routes
 module.exports = router;
