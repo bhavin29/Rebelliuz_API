@@ -362,7 +362,6 @@ exports.fetchRecommandedUsers = async (req, res) => {
             aggregate_options.push({$addFields: { "loginId": { "$toObjectId": "$_id" }}});
             aggregate_options.push({$match: match});
             aggregate_options.push({$addFields: path});
-            aggregate_options.push({$addFields: path});
             aggregate_options.push({$lookup: query});
             aggregate_options.push({$sort: {"created_on": sortOrder}});
             const myAggregate = User.aggregate(aggregate_options);
@@ -421,6 +420,133 @@ exports.fetchRecommandedUsers = async (req, res) => {
   //get login users notification and connection list
   exports.me = async (req, res) => {
     try {
+
+      let match = { userId: global.decoded._id }
+  
+      let lookupvalue_1 = 
+                {
+                         from: "storage_files",
+                         let: { photo_id: "$photo_id" , cover_photo: "$coverphoto" },
+                         pipeline: [
+                           {$project: { storage_path :1, _id: 1,file_id:1 , email:1, displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
+                           {$match: {$expr:
+                                 { $or : 
+                                   [
+                                     {$eq: ["$file_id", "$$photo_id"]}, 
+                                   ]
+                                 }
+                           } 
+                           }
+                         ],
+                         as: "user_photo"
+                };
+      let lookupvalue_2 = 
+                       {
+                            from: "user_experiences",
+                            let: { user_id: "$user_id" },
+                             pipeline: [
+                              {$match: {$expr:
+                                { $or : 
+                                  [
+                                    {$eq: ["$owner_id", "$$user_id"]}, ,
+                                  ]
+                                }
+                              } 
+                            }
+                         ],
+                          as: "user_experience"
+                  };
+                     
+        let lookupvalue_3 ={
+                             from: "users",
+                             let: { userids: "$connections" },
+                              pipeline: [
+                               {$match: {$expr:
+                                 { $in : 
+                                   ["$_id", "$$userids"] 
+                                 }
+                               } 
+                             },
+                             {  
+                              $lookup:{
+                                from: "storage_files",
+                                let: { photo_id: "$photo_id" , cover_photo: "$coverphoto" },
+                                pipeline: [
+                                  {$project: { storage_path :1, _id: 1,file_id:1 , email:1, displayname:1 , "root_path" :  { $literal: config.general.parent_root }  }  },
+                                  {$match: {$expr:
+                                        { $or : 
+                                          [
+                                            {$eq: ["$file_id", "$$photo_id"]}, 
+                                          ]
+                                        }
+                                  } 
+                                  }
+                                ],
+                                as: "user_photo"
+                              }
+                              },
+                              {  
+                                $lookup:{
+                                    from: "user_experiences",
+                                    let: { user_id: "$user_id" },
+                                     pipeline: [
+                                      {$match: {$expr:
+                                        { $or : 
+                                          [
+                                            {$eq: ["$owner_id", "$$user_id"]}, ,
+                                          ]
+                                        }
+                                  } 
+                                  }
+                                 ],
+                                  as: "user_experience"
+                                }
+                                },
+                          ],
+                           as: "connections"
+        }; 
+
+    let aggregate_options = [];
+   
+    //PAGINATION
+    let page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.rowsPerPage) || global.rows_per_page;
+   
+    //set the options for pagination
+    const options = {
+        page, limit,
+        collation: {locale: 'en'},
+        customLabels: {
+            totalDocs: 'totalResults',
+            docs: 'profile'
+        }
+    };
+    
+    aggregate_options.push({$addFields: { "userId": { "$toString": "$_id" }}});
+    aggregate_options.push({$match : match});
+    aggregate_options.push({$lookup : lookupvalue_1});
+    aggregate_options.push({$lookup : lookupvalue_2});
+    aggregate_options.push({$lookup : lookupvalue_3});
+    
+  
+      const myAggregate = User.aggregate(aggregate_options);
+   
+      User.aggregatePaginate(myAggregate,options,function (err, user) {
+            if (err)
+            {
+                errMessage = '{ "Members": { "message" : "Members result not found!!"} }';
+                requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
+            }
+            else if (user.totalResults > 0)
+            {
+              requestHandler.sendSuccess(res,'Members result found successfully',200,user);
+            }
+            else
+            {
+                requestHandler.sendSuccess(res,'Members no data found',200,user);
+            }
+        });
+      /*
       const user = await User.findById(global.decoded._id).populate('connections')
       if (!user) {
         errMessage = '{ "Members": { "message" : "user not found"} }';
@@ -450,7 +576,9 @@ exports.fetchRecommandedUsers = async (req, res) => {
           
             //res.status(200).json({ user: userData, notifications: notifData })
             requestHandler.sendSuccess(res,'users connections list found success',200, { user: userData, notifications: notifData });
-      }
+
+            */
+      
     } catch (err) {
       errMessage = { "Members Connections": { "message" : err.message } };
       requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
