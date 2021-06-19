@@ -365,7 +365,7 @@ callSearchData = function(req,res,bJobUser,jobCount){
               {
                 from: "user_jobs",
                 let: { bj_user_id : "user_id", user_job_category_id: "$job_category_id", user_job_classification_id : "$job_classification_id", 
-                        user_job_experience_id : "$job_experience_id",user_Job_type_ids : "$Job_type_ids",user_job_skill_ids : "$job_skill_ids"},
+                        user_job_experience_id : "$job_experience_id",user_job_type_ids : "$job_type_ids",user_job_skill_ids : "$job_skill_ids"},
                 pipeline: [
                    { $match: { $expr:{ $and:  [
                               { $eq: [ "$job_category_id",  "$$user_job_category_id" ] },

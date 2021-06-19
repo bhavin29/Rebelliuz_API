@@ -10,11 +10,6 @@ router.get('/', function(req, res) {
     });
 });
 
-//CCAvenue
-ccavReqHandler = require('../controllers/ccav/ccavRequestHandler.js'),
-ccavResHandler = require('../controllers/ccav/ccavResponseHandler.js');
-
-
 //Import Bio Controller
 var bioController = require('../controllers/bioController');
 var authController = require('../controllers/authController');
@@ -61,13 +56,6 @@ var MessageController = require('../controllers/message/messageController');
 var PostController = require('../controllers/post/postController');
 
 const auth = require('../../utils/auth');
-
-//CCAvenue
-router.route('/ccavRequestHandler')
-   .post(ccavReqHandler.postReq);
-
-router.route('/ccavResponseHandler')
-   .post(ccavResHandler.postRes);
 
 // Bio routes
 router.route('/bio')

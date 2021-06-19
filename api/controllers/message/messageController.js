@@ -90,7 +90,7 @@ exports.getConnectionMessages = async (req, res) => {
                 collation: {locale: 'en'},
                 customLabels: {
                     totalDocs: 'Messages',
-                    docs: 'messages'
+                    docs: 'chat_messages'
                 }
             };
 
@@ -142,8 +142,8 @@ exports.getConnectionMessages = async (req, res) => {
             aggregate_options.push({$sort: {"createdAt": sortOrder}});
             const myAggregate = MessageModel.aggregate(aggregate_options);
 
-            MessageModel.aggregatePaginate(myAggregate,options,function (err, messageModel) {
-                if (err)
+           MessageModel.aggregatePaginate(myAggregate,options,function (err, messageModel) {
+           if (err)
                 {
                     errMessage = '{ "Messages": { "message" : "Messages is not found"} }';
                     requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));

@@ -12,7 +12,7 @@ const  UserJobSchema = new  Schema({
     job_category_id: { type: String,  required:  true },
     job_classification_id: { type: String,  required:  true },
     job_experience_id: { type: String, required:  true },
-    Job_type_ids: { type: String,  required:  true },
+    job_type_ids: { type: String,  required:  true },
     job_skill_ids: { type: String, required:  true },
     culture_values_id: { type: String },    
     short_description: { type: String, required:  true },

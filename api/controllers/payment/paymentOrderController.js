@@ -169,7 +169,7 @@ AddPaymentOrder = function(req,res,paymentPackage){
     
     var gateway_id='';
     if (paymentPackage.currency == "INR"){
-        gateway_id = config.gateway.cc_avenue;
+        gateway_id = config.gateway.pay_pal;
      }
      else if (paymentPackage.currency == "AUD"){
         gateway_id = config.gateway.pay_pal;
