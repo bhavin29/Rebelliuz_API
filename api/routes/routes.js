@@ -55,6 +55,9 @@ var MessageController = require('../controllers/message/messageController');
 //Post
 var PostController = require('../controllers/post/postController');
 
+//Post Comment
+var PostCommentController = require('../controllers/post/postCommentController');
+
 const auth = require('../../utils/auth');
 
 // Bio routes
@@ -319,5 +322,15 @@ router.route("/post")
 router.route("/post/:postId")
    .get(auth.isAuthunticated,PostController.fetchPostById);
 
+//Comment
+router.route("/post/comment/:commentId/like_dislike")
+   .get(auth.isAuthunticated,PostCommentController.likeDislikeComment);
+
+router.route("/post/:postId/comment")
+   .get(auth.isAuthunticated,PostCommentController.fetchComments);
+   
+router.route("/post/:postId/comment")
+   .post(auth.isAuthunticated,PostCommentController.createComment);
+   
 //Export API routes
 module.exports = router;

@@ -112,7 +112,7 @@ exports.sendConnectionRequest = async (req, res) => {
         requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
       }
       else if (global.decoded._id == req.params.userId) {
-        errMessage = '{ "Members": { "message" : "You cannot send friend request to yourself"} }';
+        errMessage = '{ "Members": { "message" : "You cannot send connection request to yourself"} }';
         requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
       }
       else if (user.connections.includes(global.decoded._id)) {
@@ -127,7 +127,7 @@ exports.sendConnectionRequest = async (req, res) => {
           });
 
           if (userRequest) {
-                errMessage = '{ "Members": { "message" : "Friend Request already send"} }';
+                errMessage = '{ "Members": { "message" : "Connection Request already send"} }';
                 requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
           }
           else
@@ -153,7 +153,7 @@ exports.sendConnectionRequest = async (req, res) => {
                 const sender = await UserRequest.findById(save.id).populate('sender')
                 let notification = await CreateNotification({
                   user: req.params.userId,
-                  body: `${sender.sender.displayname} has send you friend request`,
+                  body: `${sender.sender.displayname} has send you connection request`,
                 })
                 const senderData = {
                   id: sender.id,
@@ -189,7 +189,7 @@ exports.sendConnectionRequest = async (req, res) => {
       {
             const sender = await User.findById(connectionsRequest.sender)
             if (sender.connections.includes(connectionsRequest.receiver)) {
-              errMessage = '{ "Members": { "message" : "already in your friend lists"} }';
+              errMessage = '{ "Members": { "message" : "already in your connection lists"} }';
               requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
             }
             else
@@ -199,7 +199,7 @@ exports.sendConnectionRequest = async (req, res) => {
 
                 const currentUser = await User.findById(global.decoded._id)
                 if (currentUser.connections.includes(connectionsRequest.sender)) {
-                  errMessage = '{ "Members": { "message" : "already  friend"} }';
+                  errMessage = '{ "Members": { "message" : "already  connection"} }';
                   requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
                 }
                 else
@@ -217,7 +217,7 @@ exports.sendConnectionRequest = async (req, res) => {
 
                       let notification = await CreateNotification({
                         user: sender.id,
-                        body: `${currentUser.displayname} has accepted your friend request`,
+                        body: `${currentUser.displayname} has accepted your connection request`,
                       })
                       if (sender.socketId) {
                         let currentUserData = FilterUserData(currentUser)
@@ -263,7 +263,7 @@ exports.cancelSendedConnectionRequest = async (req, res) => {
                 })
             }
           
-            requestHandler.sendSuccess(res,'Friend Request Canceled',200, true);
+            requestHandler.sendSuccess(res,'Connection Request Canceled',200, true);
       } 
     } catch (err) {
         errMessage = { "Members CancelRequest": { "message" : err.message } };
@@ -295,7 +295,7 @@ exports.cancelSendedConnectionRequest = async (req, res) => {
                 })
             }
           
-            requestHandler.sendSuccess(res,'Friend Request Declined',200, true);
+            requestHandler.sendSuccess(res,'Connection Request Declined',200, true);
       }
     } catch (err) {
         errMessage = { "Members DeclineRequest": { "message" : err.message } };
@@ -382,35 +382,6 @@ exports.fetchRecommandedUsers = async (req, res) => {
                     requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
                 }
         });
-
-      /*
-      let page = parseInt(req.query.page || 0)
-      //let limit = 3
-      let limit = parseInt(req.query.rowsPerPage) || global.rows_per_page;
-
-      const users = await User.find()
-        .sort({ created_on: -1 })
-        .limit(limit)
-        .skip(page * limit)
-        .where('_id')
-        .ne(global.decoded._id)
-        .populate('connections')
-        
-      const usersData = users.map((user) => {
-        return FilterUserData(user)
-      })
-      
-      const totalCount = await User.estimatedDocumentCount().exec()
-      const paginationData = {
-        totalUsers:totalCount,
-        limit:limit,
-        page:page,
-        totalPages:Math.ceil(totalCount/limit),
-      }
-
-      //res.status(200).json({ users: usersData })
-      requestHandler.sendSuccess(res,'Recommanded users list found success',200, { users: usersData,pagination:paginationData });
-      */
     } catch (err) {
         errMessage = { "Members RecommandedRequest": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
@@ -546,38 +517,6 @@ exports.fetchRecommandedUsers = async (req, res) => {
                 requestHandler.sendSuccess(res,'Members no data found',200,user);
             }
         });
-      /*
-      const user = await User.findById(global.decoded._id).populate('connections')
-      if (!user) {
-        errMessage = '{ "Members": { "message" : "user not found"} }';
-        requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
-      }
-      else
-      {
-            const userData = FilterUserData(user)
-
-            const connections = user.connections.map((connection) => {
-              return {
-                ...FilterUserData(connection),
-              }
-            })
-          
-            userData.connections = connections
-            const notifications = await Notification.find({ user: global.decoded._id }).sort({
-              createdAt: -1,
-            })
-            let notifData = notifications.map((notif) => {
-              return {
-                id: notif.id,
-                body: notif.body,
-                createdAt: notif.createdAt,
-              }
-            })
-          
-            //res.status(200).json({ user: userData, notifications: notifData })
-            requestHandler.sendSuccess(res,'users connections list found success',200, { user: userData, notifications: notifData });
-
-            */
       
     } catch (err) {
       errMessage = { "Members Connections": { "message" : err.message } };
@@ -673,20 +612,6 @@ exports.fetchRecommandedUsers = async (req, res) => {
                     requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
                 }
         });
-      /*
-      const connections = await UserRequest.find({
-        $and: [{ isAccepted: false }, { sender: global.decoded._id }],
-      }).populate('receiver')
-      const connectionsData = connections.map((connection) => {
-        return {
-          id: connection.id,
-          user: FilterUserData(connection.receiver),
-        }
-      })
-  
-      //res.status(200).json({ connections: connectionsData })
-      requestHandler.sendSuccess(res,'Connection sended request list found successfully',200, { connections: connectionsData });
-      */
     } catch (err) {
       errMessage = { "Connections": { "message" : err.message } };
       requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
@@ -756,23 +681,7 @@ exports.fetchRecommandedUsers = async (req, res) => {
                     requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
                 }
         });
-
-      /*
-      const connections = await UserRequest.find({
-        $and: [{ isAccepted: false }, { receiver: global.decoded._id }],
-      }).populate('sender')
-  
-      const connectionsData = connections.map((connection) => {
-        return {
-          id: connection.id,
-          user: FilterUserData(connection.sender),
-        }
-      })
-  
-      //res.status(200).json({ connections: connectionsData })
-      requestHandler.sendSuccess(res,'Connection request list found successfully',200, { connections: connectionsData });
-
-      */
+     
     } catch (err) {
       errMessage = { "Connections": { "message" : err.message } };
       requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));
