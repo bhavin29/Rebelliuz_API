@@ -188,7 +188,7 @@ callvUserJob = function(req,res){
 }
 
 callvJobQuestion = function(req,res,userJob){
-        JobQuestion.find(function (err, jobQuestion) {
+        JobQuestion.find({isactive : 1},function (err, jobQuestion) {
           if (err){
             errMessage = '{ "intro": { "message" : "No data found."} }';
             requestHandler.sendError(req,res, 422, 'No data for user job',JSON.parse(errMessage));

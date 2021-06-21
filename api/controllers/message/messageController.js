@@ -38,7 +38,7 @@ exports.sendMessageToConnection = async (req, res) => {
                                     text: text || '',
                                     image: image || '',
                                   },
-                                })
+                                 })
                             
                                 const saveMessage = await messageModel.save()
                             
@@ -46,9 +46,9 @@ exports.sendMessageToConnection = async (req, res) => {
                                   .populate('sender')
                                   .populate('receiver')
                                 const messagedata = {
-                                  id: saveMessage.id,
-                                  sender: FilterUserData(getMessage.sender),
-                                  receiver: FilterUserData(getMessage.receiver),
+                                  _id: saveMessage.id,
+                                  senderId: FilterUserData(getMessage.sender)._id,
+                                  receiverId: FilterUserData(getMessage.receiver)._id,
                                   body: getMessage.body,
                                   createdAt: getMessage.createdAt,
                                 }
@@ -58,10 +58,10 @@ exports.sendMessageToConnection = async (req, res) => {
                                 if (getMessage.receiver.socketId) {
                                   req.io
                                     .to(getMessage.receiver.socketId)
-                                    .emit('new-message', { data: messagedata })
+                                    .emit('new-message', { chat_messages: messagedata })
                                 }
                             
-                                requestHandler.sendSuccess(res,'Message sended successfully.',200, { data: messagedata });
+                                requestHandler.sendSuccess(res,'Message sended successfully.',200, { chat_messages: messagedata });
                         }
                 } catch (err) {
                     errMessage = { "Messages": { "message" : err.message } };
@@ -124,7 +124,7 @@ exports.getConnectionMessages = async (req, res) => {
              
             let path = {  "root_path" :  { $literal: config.general.parent_root }  };
             //SORTING -- THIRD STAGE
-            let sortOrder = req.query.sortDir && req.query.sortDir === 'desc' ? 1 : -1;
+            let sortOrder = req.query.sortDir && req.query.sortDir === 'asc' ? -1 : 1;
 
             aggregate_options.push({$addFields: { "senderId": { "$toString": "$sender" }}});
             aggregate_options.push({$addFields: { "receiverId": { "$toString": "$receiver" }}});
@@ -135,10 +135,10 @@ exports.getConnectionMessages = async (req, res) => {
                     ],
               }});
             aggregate_options.push({$addFields: path});
-            aggregate_options.push({$lookup: querySender});
-            aggregate_options.push({$lookup: querySenderPhoto});
-            aggregate_options.push({$lookup: queryReceiver});
-            aggregate_options.push({$lookup: queryReceiverPhoto});
+          //  aggregate_options.push({$lookup: querySender});
+          //  aggregate_options.push({$lookup: querySenderPhoto});
+          //  aggregate_options.push({$lookup: queryReceiver});
+          //  aggregate_options.push({$lookup: queryReceiverPhoto});
             aggregate_options.push({$sort: {"createdAt": sortOrder}});
             const myAggregate = MessageModel.aggregate(aggregate_options);
 
@@ -146,43 +146,13 @@ exports.getConnectionMessages = async (req, res) => {
            if (err)
                 {
                     errMessage = '{ "Messages": { "message" : "Messages is not found"} }';
-                    requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
-                }
-                else if (messageModel.Messages >0)
-                {
-                    requestHandler.sendSuccess(res,'Messages found successfully.',200,messageModel);
+                    requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err,JSON.parse(errMessage));
                 }
                 else
                 {
-                    errMessage = '{ "Messages": { "message" : "Messages is not found"} }';
-                    requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
+                    requestHandler.sendSuccess(res,'Messages found successfully.',200,messageModel);
                 }
         });
-
-      /*
-      const messages = await MessageModel.find({
-        $or: [
-          { sender: global.decoded._id, receiver: req.params.connectionId },
-          { receiver: global.decoded._id, sender: req.params.connectionId },
-        ],
-      })
-        .populate('sender')
-        .populate('receiver')
-  
-      const messagesData = messages.map((message) => {
-        return {
-          id: message.id,
-          sender: FilterUserData(message.sender),
-          receiver: FilterUserData(message.receiver),
-          body:message.body,
-          createdAt: message.createdAt,
-  
-        }
-      })
-  
-      //res.status(200).json({ data: messagesData })
-      requestHandler.sendSuccess(res,'Messages found successfully.',200, { data: messagesData });
-*/
     } catch (err) {
         errMessage = { "Messages": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'Somthing went worng.',(errMessage));

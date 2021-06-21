@@ -46,7 +46,7 @@ module.exports = {
 		content_path : process.env.CONTENT_PATH || 'D:\\Bhavin\\MyProject\\Rebelliuz\\Publish\\Content',
 		log_path : process.env.LOG_PATH || 'D:\\Bhavin\\MyProject\\Rebelliuz\\Publish\\',
 		ffmpeg_path : process.env.FFMPEG_PATH || 'C:\\FFmpeg\\bin\\',
-		rows_per_page : process.env.ROWS_PER_PAGE || 5,
+		rows_per_page : process.env.ROWS_PER_PAGE || 50,
 		parent_root : process.env.PARENT_ROOT || 'https://www.rebelliuz.com/',
 	},
 	gateway:{

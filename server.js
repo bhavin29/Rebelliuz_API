@@ -8,8 +8,6 @@ const bodyParser = require('body-parser');
 const serveIndex = require('serve-index');
 const cors = require('cors');
 const mongoose = require('mongoose');
-var http = require('http');
-var https = require('https');
 var fs = require('fs');
 const router = express.Router();
 
@@ -18,6 +16,13 @@ var privateKey  = fs.readFileSync(__dirname +'/private.key', 'utf8');
 var certificate = fs.readFileSync(__dirname +'/certificate.crt', 'utf8');
 
 var credentials = {key: privateKey, cert: certificate};
+
+// IO
+let app = express();
+const http = require('http')
+const https = require('https');
+const server = http.createServer(app)
+const io = require('socket.io')(server)
 
 //connect to mongoose
 const dbPath = config.db.dbPath;
@@ -59,7 +64,6 @@ else
 //directory page as global
 global.__basedir = __dirname;
 global.rows_per_page = config.general.rows_per_page;
-let app = express();
 
 //Enabled CROS
 app.use(cors());
@@ -79,25 +83,12 @@ app.use('/test', express.static(config.general.content_path + '/Users/test'));
 //company-bussines
 app.use('/jobdesc', express.static(config.general.content_path + '/companies/job'));
 
-//ccAvenue
-app.use(express.static('public'));
-app.set('views', __dirname + '/public');
-app.engine('html', require('ejs').renderFile);
-
-app.get('/about', function (req, res){
-    	res.render('dataFrom.html');
-});
-//CCAvenues End
-
 //configure bodyparser to hande the post requests
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 
 app.use(bodyParser.json());
-
-
-//
 
 //
 var getIP = require('ipware')().get_ip;
@@ -135,6 +126,13 @@ next();
     }
 });
 
+app.use((req, res, next) => {
+    io.req = req
+    req.io = ioF
+    next()
+})
+
+require('./socket')(io)
 
 
 var httpServer = http.createServer(app);

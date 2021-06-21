@@ -3,7 +3,7 @@ const UserPhoto = require('../api/models/storageFileModel');
 let path =  config.general.parent_root;
 module.exports = (user) => {
     return {
-      id: user.id,
+      _id: user.id,
       user_id : user.user_id,
       username : user.username,
       displayname: user.displayname,
