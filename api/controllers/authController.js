@@ -196,22 +196,130 @@ exports.authenticateJWT = (req, res, next) => {
 
 // NOT IN USE
 // User Register function
-exports.register = (req, res) => {
+exports.register =async (req, res) => {
     try{
-        let newUser = new User(req.body);
-            newUser.hash_password =   bcrypt.hashSync(req.body.password, 10); // req.body.password;
-        newUser.save((err, user) => {
-        if (err) {
-            errMessage = '{ "register": { "message" : "Smothing went worng."} }';
-            requestHandler.sendError(req,res, 422, err.message,JSON.parse(errMessage));
+        let { profile_type, first_name, last_name, email,company_name,company_phone,password } = req.body
+
+        if(!profile_type)
+        {
+          errMessage = '{ "Register": { "register" : "Please select profile type"} }';
+          requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
         }
-        requestHandler.sendSuccess(res,'User register sucessfully in.',200,(user));
-        });
+        else if(profile_type == 1 )
+        {
+          if (userRegisterValidation(req,profile_type) ) {
+            errMessage = '{ "Register": { "register" : "Please add mandatory fields value."} }';
+            requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
+          }
+          else
+          {
+            const user_id =await User.find().sort({user_id:-1}).limit(1);
+            var newUser = new User();
+            newUser.user_id = user_id[0].user_id + 1;
+            newUser.username = email;
+            newUser.displayname = first_name +' '+last_name;
+            newUser.password =  password;
+            newUser.hash_password =  bcrypt.hashSync(password, 10);
+            newUser.profile_type = profile_type;
+            newUser.first_name = first_name;
+            newUser.last_name = last_name;
+            newUser.email = email;
+
+            newUser.save((err, user) => {
+              if (err) {
+                  errMessage = '{ "register": { "message" : "Smothing went worng."} }';
+                  requestHandler.sendError(req,res, 422, err.message,JSON.parse(errMessage));
+              }
+              requestHandler.sendSuccess(res,'User register sucessfully in.',200,(user));
+              });
+          }
+        }
+        else if(profile_type == 2 )
+        {
+          if (userRegisterValidation(req,profile_type)){
+            errMessage = '{ "Register": { "register" : "Please add mandatory fields value."} }';
+            requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
+          }
+          else
+          {
+            const user_id = await User.find().sort({user_id:-1}).limit(1);
+            var newUser = new User();
+            newUser.user_id = user_id[0].user_id + 1;
+            newUser.username = email;
+            newUser.displayname = first_name +' '+last_name;
+            newUser.password =  password;
+            newUser.hash_password =  bcrypt.hashSync(password, 10);
+            newUser.profile_type = profile_type;
+            newUser.first_name = first_name;
+            newUser.last_name = last_name;
+            newUser.email = email;
+
+            newUser.save((err, user) => {
+                if (err) {
+                    errMessage = '{ "register": { "message" : "Smothing went worng."} }';
+                    requestHandler.sendError(req,res, 422, err.message,JSON.parse(errMessage));
+                }
+                else
+                {
+                    //requestHandler.sendSuccess(res,'User register sucessfully in.',200,(user));
+                    
+                    var newBussines = new Bussines();
+                    newBussines.owner_id = user.user_id;
+                    newBussines.title = company_name;
+                    newBussines.page_contact_name = company_name;
+                    newBussines.page_contact_phone = company_phone;
+
+                    newBussines.save((err, bussines) => {
+                      if (err) {
+                          errMessage = '{ "register": { "message" : "Smothing went worng."} }';
+                          requestHandler.sendError(req,res, 422, err.message,JSON.parse(errMessage));
+                      }
+                      else
+                      {
+                          requestHandler.sendSuccess(res,'User register sucessfully in.',200,({user : user,bussines:bussines}));
+                      }
+                    });
+                }
+              });
+          }
+        }
+        // let newUser = new User(req.body);
+        //     newUser.hash_password =   bcrypt.hashSync(req.body.password, 10); // req.body.password;
+        
     
     } catch (err) {
         errMessage = { "Register": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'User Registration',(errMessage));
       }
+};
+
+userRegisterValidation = function (req,type){
+    var result = 0;
+    if ( req.body.first_name == undefined ||  req.body.first_name.trim().length === 0 )
+    {
+      result = 1;
+    }
+    else if ( req.body.last_name == undefined ||  req.body.last_name.trim().length === 0 )
+    {
+      result = 1;
+    }
+    else if ( req.body.email == undefined ||  req.body.email.trim().length === 0 )
+    {
+      result = 1;
+    }
+    else if ( req.body.password == undefined ||  req.body.password.trim().length === 0 )
+    {
+      result = 1;
+    }
+    else if ( (req.body.company_name == undefined ||  req.body.company_name.trim().length === 0) && type == 2 )
+    {
+      result = 1;
+    }
+    else if ( (req.body.company_phone == undefined ||  req.body.company_phone.trim().length === 0) && type == 2 )
+    {
+      result = 1;
+    }
+    return result;
 };
 
 function mailing(user){
