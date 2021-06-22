@@ -73,10 +73,15 @@ const  UserSchema = new  Schema({
     connections: [{ type: Schema.Types.ObjectId, ref: 'users' }],
     socketId: {type: String,default: '',},
     item_id:{ type :  Number  , default: 0 },
-    profile_type:{ type :  Number  , default: 0 },//[1 = Employee, 2 = Employer]
+    profile_type:{ type :  Number  , default: 0 },
+    user_type:{ type :  Number  , default: 0 },//[1 = Employee, 2 = Employer]
     first_name:{ type :  String, default: '' },
     last_name:{ type :  String, default: '' },
     gender:{ type :  Number  , default: 0 },//[1 = Male, 2 = FeMale, 3 =]
+    facebook_id:{ type :  String, default: '' },
+    linkedin_id:{ type :  String, default: '' },
+    google_id :{ type :  String, default: '' },
+    profile_status:{ type :  Number  , default: 0 },
     birthdate: { type: Date, default: Date.now },
     created_on: { type: Date, default: Date.now },
     created_by: { type: Number, default: 0 }

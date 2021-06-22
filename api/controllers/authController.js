@@ -198,95 +198,199 @@ exports.authenticateJWT = (req, res, next) => {
 // User Register function
 exports.register =async (req, res) => {
     try{
-        let { profile_type, first_name, last_name, email,company_name,company_phone,password } = req.body
+        let { user_type, first_name, last_name, email,company_name,company_phone,password } = req.body
 
-        if(!profile_type)
+        if(!user_type)
         {
           errMessage = '{ "Register": { "register" : "Please select profile type"} }';
           requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
         }
-        else if(profile_type == 1 )
+        else if(user_type == 1 )
         {
-          if (userRegisterValidation(req,profile_type) ) {
+          if (userRegisterValidation(req,user_type) ) {
             errMessage = '{ "Register": { "register" : "Please add mandatory fields value."} }';
             requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
           }
           else
           {
-            const user_id =await User.find().sort({user_id:-1}).limit(1);
-            var newUser = new User();
-            newUser.user_id = user_id[0].user_id + 1;
-            newUser.username = email;
-            newUser.displayname = first_name +' '+last_name;
-            newUser.password =  password;
-            newUser.hash_password =  bcrypt.hashSync(password, 10);
-            newUser.profile_type = profile_type;
-            newUser.first_name = first_name;
-            newUser.last_name = last_name;
-            newUser.email = email;
 
-            newUser.save((err, user) => {
-              if (err) {
-                  errMessage = '{ "register": { "message" : "Smothing went worng."} }';
-                  requestHandler.sendError(req,res, 422, err.message,JSON.parse(errMessage));
-              }
-              requestHandler.sendSuccess(res,'User register sucessfully in.',200,(user));
-              });
-          }
-        }
-        else if(profile_type == 2 )
-        {
-          if (userRegisterValidation(req,profile_type)){
-            errMessage = '{ "Register": { "register" : "Please add mandatory fields value."} }';
-            requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
-          }
-          else
-          {
-            const user_id = await User.find().sort({user_id:-1}).limit(1);
-            var newUser = new User();
-            newUser.user_id = user_id[0].user_id + 1;
-            newUser.username = email;
-            newUser.displayname = first_name +' '+last_name;
-            newUser.password =  password;
-            newUser.hash_password =  bcrypt.hashSync(password, 10);
-            newUser.profile_type = profile_type;
-            newUser.first_name = first_name;
-            newUser.last_name = last_name;
-            newUser.email = email;
+            const checkDuplecateEmail = await User.findOne({email : email});
+            if (checkDuplecateEmail) {
+              errMessage = '{ "Register": { "message" : "'+ email +' is already registerd."} }';
+              requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
+            }
+            else
+            {
+                  const user_id =await User.find().sort({user_id:-1}).limit(1);
+                  var newUser = new User();
+                  newUser.user_id = user_id[0].user_id + 1;
+                  newUser.username = email;
+                  newUser.displayname = first_name +' '+last_name;
+                  newUser.password =  password;
+                  newUser.hash_password =  bcrypt.hashSync(password, 10);
+                  newUser.user_type = user_type;
+                  newUser.first_name = first_name;
+                  newUser.last_name = last_name;
+                  newUser.email = email;
 
-            newUser.save((err, user) => {
-                if (err) {
-                    errMessage = '{ "register": { "message" : "Smothing went worng."} }';
-                    requestHandler.sendError(req,res, 422, err.message,JSON.parse(errMessage));
-                }
-                else
-                {
-                    //requestHandler.sendSuccess(res,'User register sucessfully in.',200,(user));
-                    
-                    var newBussines = new Bussines();
-                    newBussines.owner_id = user.user_id;
-                    newBussines.title = company_name;
-                    newBussines.page_contact_name = company_name;
-                    newBussines.page_contact_phone = company_phone;
+                  newUser.save((err, user) => {
+                    if (err) {
+                        errMessage = '{ "register": { "message" : "Smothing went worng."} }';
+                        requestHandler.sendError(req,res, 422, err.message,JSON.parse(errMessage));
+                    }
 
-                    newBussines.save((err, bussines) => {
-                      if (err) {
-                          errMessage = '{ "register": { "message" : "Smothing went worng."} }';
-                          requestHandler.sendError(req,res, 422, err.message,JSON.parse(errMessage));
-                      }
-                      else
-                      {
-                          requestHandler.sendSuccess(res,'User register sucessfully in.',200,({user : user,bussines:bussines}));
-                      }
+                        sign =  jwt.sign({ email: user.email, displayname : user.displayname, _id: user._id }, accessTokenSecret);
+                        
+                        var newUserResponse = {
+                          _id : user._id,
+                          user_id : user.user_id,
+                          username : user.username,
+                          displayname : user.displayname,
+                          connections : user.connections,
+                          socketId : user.socketId,
+                          item_id : user.item_id,
+                          user_type : user.user_type,
+                          first_name : user.first_name,
+                          last_name : user.last_name,
+                          gender : user.gender,
+                          facebook_id : user.facebook_id,
+                          linkedin_id : user.linkedin_id,
+                          google_id : user.google_id,
+                          profile_status : user.profile_status,
+                          email : user.email,
+                          birthdate : user.birthdate
+                        };
+
+                        data = { 
+                          "access_token" : sign ,
+                          "user" : newUserResponse,
+                          "bussines" : {},
+                        }; 
+                        requestHandler.sendSuccess(res,'User successfully register.',200,(data));
+
                     });
-                }
-              });
+            }
           }
         }
-        // let newUser = new User(req.body);
-        //     newUser.hash_password =   bcrypt.hashSync(req.body.password, 10); // req.body.password;
-        
+        else if(user_type == 2 )
+        {
+          if (userRegisterValidation(req,user_type)){
+            errMessage = '{ "Register": { "register" : "Please add mandatory fields value."} }';
+            requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
+          }
+          else
+          {
+            const checkDuplecateEmail = await User.findOne({email : email});
+            const checkDuplecateCompanyName = await Bussines.findOne({title : company_name});
+            const checkDuplecateCompanyPhone = await Bussines.findOne({page_contact_phone : company_phone});
+
+            if (checkDuplecateEmail) {
+              errMessage = '{ "Register": { "message" : "'+ email +' is already registerd."} }';
+              requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
+            }
+            else if(checkDuplecateCompanyName)
+            {
+              errMessage = '{ "Register": { "message" : "'+ company_name +' is already registerd."} }';
+              requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
+            }
+            else if(checkDuplecateCompanyPhone)
+            {
+              errMessage = '{ "Register": { "message" : "'+ company_phone +' is already registerd."} }';
+              requestHandler.sendError(req,res, 422, 'Somthing went worng.',JSON.parse(errMessage));
+            }
+            else
+            {
+                const user_id = await User.find().sort({user_id:-1}).limit(1);
+                var newUser = new User();
+                newUser.user_id = user_id[0].user_id + 1;
+                newUser.username = email;
+                newUser.displayname = first_name +' '+last_name;
+                newUser.password =  password;
+                newUser.hash_password =  bcrypt.hashSync(password, 10);
+                newUser.user_type = user_type;
+                newUser.first_name = first_name;
+                newUser.last_name = last_name;
+                newUser.email = email;
+              
+                newUser.save((err, user) => {
+                    if (err) {
+                        errMessage = '{ "register": { "message" : "Smothing went worng."} }';
+                        requestHandler.sendError(req,res, 422, err.message,JSON.parse(errMessage));
+                    }
+                    else
+                    {
+                        var newBussines = new Bussines();
+                        newBussines.owner_id = user.user_id;
+                        newBussines.title = company_name;
+                        newBussines.page_contact_name = company_name;
+                        newBussines.page_contact_phone = company_phone;
+                    
+                        newBussines.save((err, bussines) => {
+                          if (err) {
+                              errMessage = '{ "register": { "message" : "Smothing went worng."} }';
+                              requestHandler.sendError(req,res, 422, err.message,JSON.parse(errMessage));
+                          }
+                          else
+                          {
+
+                            sign =  jwt.sign({ email: user.email, displayname : user.displayname, _id: user._id }, accessTokenSecret);
+
+                            var newUserResponse = {
+                              _id : user._id,
+                              user_id : user.user_id,
+                              username : user.username,
+                              displayname : user.displayname,
+                              connections : user.connections,
+                              socketId : user.socketId,
+                              item_id : user.item_id,
+                              user_type : user.user_type,
+                              first_name : user.first_name,
+                              last_name : user.last_name,
+                              gender : user.gender,
+                              facebook_id : user.facebook_id,
+                              linkedin_id : user.linkedin_id,
+                              google_id : user.google_id,
+                              profile_status : user.profile_status,
+                              email : user.email,
+                              birthdate : user.birthdate
+                            };
     
+                            var newBussinesResponse = {
+                              page_id : bussines.page_id,
+                              owner_id : bussines.owner_id,
+                              title : bussines.title,
+                              description : bussines.description,
+                              custom_url : bussines.custom_url,
+                              category_id : bussines.category_id,
+                              photo_id : bussines.photo_id,
+                              cover : bussines.cover,
+                              page_contact_name : bussines.page_contact_name,
+                              page_contact_phone : bussines.page_contact_phone,
+                              seo_keywords : bussines.seo_keywords,
+                              business_location : bussines.business_location,
+                              business_city : bussines.business_city,
+                              business_state : bussines.business_state,
+                              business_zipcode : bussines.business_zipcode,
+                              business_country : bussines.business_country,
+                              business_latitude : bussines.business_latitude,
+                              business_longitude : bussines.business_longitude,
+                              _id : bussines._id,
+                            };
+
+                            data = { 
+                              "access_token" : sign ,
+                              "user" : newUserResponse,
+                              "bussines" : newBussinesResponse,
+                            }; 
+
+                              requestHandler.sendSuccess(res,'User successfully register.',200,(data));
+                          }
+                        });
+                    }
+                  });
+            }
+          }
+        }
     } catch (err) {
         errMessage = { "Register": { "message" : err.message } };
         requestHandler.sendError(req,res, 500, 'User Registration',(errMessage));
