@@ -72,8 +72,8 @@ router.route('/bio/:bio_id')
     .delete(bioController.delete);
 
  // post request for user registration
-// router.route("/auth/register")
-//       .post(authController.register);
+router.route("/auth/register")
+      .post(authController.register);
 
 // post request for user log in  
 router.route("/auth/sign_in")
