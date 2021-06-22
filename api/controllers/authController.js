@@ -300,7 +300,8 @@ exports.register =async (req, res) => {
             }
             else
             {
-                const user_id = await User.find().sort({user_id:-1}).limit(1);
+              const page_id = await Bussines.find().sort({page_id:-1}).limit(1);
+              const user_id = await User.find().sort({user_id:-1}).limit(1);
                 var newUser = new User();
                 newUser.user_id = user_id[0].user_id + 1;
                 newUser.username = email;
@@ -319,7 +320,9 @@ exports.register =async (req, res) => {
                     }
                     else
                     {
-                        var newBussines = new Bussines();
+
+                      var newBussines = new Bussines();
+                        newBussines.page_id = page_id[0].page_id + 1;
                         newBussines.owner_id = user.user_id;
                         newBussines.title = company_name;
                         newBussines.page_contact_name = company_name;
