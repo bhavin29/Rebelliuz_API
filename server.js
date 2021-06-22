@@ -22,8 +22,16 @@ let app = express();
 const http = require('http')
 const https = require('https');
 const server = http.createServer(app)
-const io = require('socket.io')(server)
+var io = require('socket.io')(server); 
 
+
+/*const io = require('socket.io')(server, {
+    cors: {
+      origin: "http://localhost:5000",
+      credentials: true
+    }
+  });
+*/
 //connect to mongoose
 const dbPath = config.db.dbPath;
 // Server Port
@@ -35,6 +43,24 @@ const options = {useNewUrlParser: true,
                 useFindAndModify: false
             }//, keepAlive: true, keepAliveInitialDelay: 300000, useCreateIndex: true}
 const mongo = mongoose.connect(dbPath, options);
+
+//Enabled CROS
+app.use(cors());
+
+//To get IP
+app.set('trust proxy', true);
+
+app.use((req, res, next) => {
+    io.req = req
+    req.io = io
+    next()
+})
+
+require('./socket')(io)
+
+io.on('connection', (socket) => {
+    console.log('Sokcet 1connection')
+})
 
 mongo.then(() => {
     console.log('connected');
@@ -61,15 +87,16 @@ else
     logger.log('DB connected Successfully', 'info');
 }
 
+
+
+//app.origins('*:*');
+app.set('transports', ['websocket']);
+
 //directory page as global
 global.__basedir = __dirname;
 global.rows_per_page = config.general.rows_per_page;
 
-//Enabled CROS
-app.use(cors());
 
-//To get IP
-app.set('trust proxy', true);
 
 //Import routes
 let apiRoutes = require("./api/routes/routes")
@@ -112,7 +139,7 @@ app.use('/api', apiRoutes)
 app.use((req, res, next) => {
     req.identifier = uuid();
     const logString = `a request has been made with the following uuid [${req.identifier}] ${req.url} ${req.headers['user-agent']} ${JSON.stringify(req.body)}`;
-    logger.log(logString, 'info');
+ //   logger.log(logString, 'info');
 
     if (req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'JWT') {
     jwt.verify(req.headers.authorization.split(' ')[1], 'vasturebelliuzhsepur', (err, decode) => {
@@ -126,13 +153,7 @@ next();
     }
 });
 
-app.use((req, res, next) => {
-    io.req = req
-    req.io = ioF
-    next()
-})
 
-require('./socket')(io)
 
 
 var httpServer = http.createServer(app);

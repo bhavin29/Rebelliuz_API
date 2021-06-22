@@ -2,7 +2,7 @@ const User = require('./api/models/userModel')
 const jwt = require('jsonwebtoken')
 
 module.exports = (io) => {
-  console.log('io')
+  console.log('io' + io.req)
   io.on('connection', (socket) => {
     console.log('Sokcet 1connection')
     if (io.req) {
@@ -10,6 +10,11 @@ module.exports = (io) => {
       socket.broadcast.emit('friend-login-status', { user_id: io.req.userId })
       addSocketIdInDB(socket.id, io.req.userId)
       console.log('Sokcet 3')
+
+      socket.on("connect_error", (err) => {
+        console.log(`connect_error due to ${err.message}`);
+      });
+
 
       socket.on('disconnect', () => {
         console.log('Sokcet 4 disconnect')

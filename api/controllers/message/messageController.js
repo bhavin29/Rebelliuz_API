@@ -45,6 +45,7 @@ exports.sendMessageToConnection = async (req, res) => {
                                 const getMessage = await MessageModel.findById(saveMessage.id)
                                   .populate('sender')
                                   .populate('receiver')
+
                                 const messagedata = {
                                   _id: saveMessage.id,
                                   senderId: FilterUserData(getMessage.sender)._id,
@@ -54,7 +55,7 @@ exports.sendMessageToConnection = async (req, res) => {
                                 }
                             
                                 //res.status(201).json({ data: chatdata })
-
+                          console.log('reciver: ' + getMessage.receiver.socketId)      
                                 if (getMessage.receiver.socketId) {
                                   req.io
                                     .to(getMessage.receiver.socketId)

@@ -11,6 +11,7 @@ const Logger = require('../../utils/logger');
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
 
+
 //add/update bussines job for user
 const add = async (req, res) => {
 try {
@@ -36,7 +37,7 @@ try {
         errMessage = '{ "Search status": { "message" : "Bussines user job is not saved!!"} }';
         requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
     }
-    if (!bussinesJobUser) {
+    else if (!bussinesJobUser) {
         //insert
         var bussinesjobuser = new BussinesJobUser();
         
@@ -46,23 +47,30 @@ try {
         bussinesjobuser.search_user_id = req.body.search_user_id;
         bussinesjobuser.search_status = req.body.search_status;
 
-        bussinesjobuser.save(function (err) {
-        if (err){
-                errMessage = '{ "intro": { "message" : "Bussines use job  is not saved!!"} }';
-                requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
-        } else 
-        {
-          if (req.body.search_status == 10)
-              mailing(req.body.search_user_id,req.params.bussinesid);
+        if (req.body.search_status == 10)
+            bussinesjobuser.approval_status = 10;
 
-          requestHandler.sendSuccess(res,'Bussines use job save successfully.',200,bussinesjobuser);
-        }
-        });
-        }
-        else if (bussinesJobUser) {
+            bussinesjobuser.save(function (err) {
+            if (err){
+                    errMessage = '{ "intro": { "message" : "Bussines use job  is not saved!!"} }';
+                    requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
+            } else 
+            {
+              if (req.body.search_status == 10)
+                  mailing(req.body.search_user_id,req.params.bussinesid);
+
+              requestHandler.sendSuccess(res,'Bussines use job save successfully.',200,bussinesjobuser);
+            }
+            });
+      }
+      else if (bussinesJobUser) {
         
                 bussinesJobUser.search_status = req.body.search_status;
-        
+
+                if (req.body.search_status == 10 || req.body.search_status == 20 || req.body.search_status == 30){
+                  bussinesJobUser.approval_status = req.body.search_status;
+                }
+            
         bussinesJobUser.save(function (err) {
         if (err){
                 errMessage = '{ "Search": { "message" : "Bussines user job is not saved!!"} }';
@@ -221,8 +229,12 @@ let lookupvalue_2_1 =
               as: "culture_values"
             };
 
-
-let lookupvalue_2_unwind = {   $unwind:"$userdata" };
+let lookupvalue_2_unwind = {
+                $unwind: {
+                    path: "$userdata",
+                    preserveNullAndEmptyArrays: true
+                }
+                };
 
 let lookupvalue_3 =
   {
@@ -268,11 +280,13 @@ let lookupvalue_3 =
         ],
         as: "search_status"
      };
- 
 
-
-
-let lookupvalue_3_unwind = {   $unwind:"$userphoto" };
+let lookupvalue_3_unwind = {
+              $unwind: {
+                  path: "$userphoto",
+                  preserveNullAndEmptyArrays: true
+              }
+            };
 
 let lookupvalue_4 =
 {
