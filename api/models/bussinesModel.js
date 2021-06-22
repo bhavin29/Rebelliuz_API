@@ -80,6 +80,13 @@ const BussinesSchema = new Schema({
     funny_count: { type: Number, default: 0 },
     useful_count: { type: Number, default: 0 },
     review_count: { type: Number, default: 0 },
+    business_location :{ type: String , default: ''},
+    business_city :{ type: String , default: ''},
+    business_state :{ type: String , default: ''},
+    business_zipcode :{ type: String , default: ''},
+    business_country :{ type: Schema.Types.ObjectId,ref: 'countries'},
+    business_latitude :{ type: String , default: ''},
+    business_longitude :{ type: String , default: ''},
     created_on: { type: Date, default: Date.now },
     created_by: { type: Number, default: 0 }
 });
