@@ -18,72 +18,75 @@ try {
   if (jobValidation(req))
   {
       errMessage = '{ "Search status": { "message" : "Please enter mandatory field."} }';
-      return requestHandler.sendError(req,res, 422, 'Please enter mandatory field.',JSON.parse(errMessage));
+      requestHandler.sendError(req,res, 422, 'Please enter mandatory field.',JSON.parse(errMessage));
   }
-      
-  if (!(req.body.search_status == 0 || req.body.search_status == 10 || req.body.search_status == 20 ||
+  else if (!(req.body.search_status == 0 || req.body.search_status == 10 || req.body.search_status == 20 ||
         req.body.search_status == 30 || req.body.search_status == 40 ||
         req.body.search_status == 50 || req.body.search_status == 60 ||
         req.body.search_status == 70  ))
   {
         errMessage = '{ "Search status": { "message" : "Status is out of range"} }';
-        return requestHandler.sendError(req,res, 422, 'Please enter correct status.',JSON.parse(errMessage));
+        requestHandler.sendError(req,res, 422, 'Please enter correct status.',JSON.parse(errMessage));
   }
-
-  BussinesJobUser.findOne({ bussines_id: req.params.bussinesid, 
-    job_category_id : req.body.job_category_id,search_user_id: req.body.search_user_id},
-    (err,bussinesJobUser)=>{
-    if (err){
-        errMessage = '{ "Search status": { "message" : "Bussines user job is not saved!!"} }';
-        requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
-    }
-    else if (!bussinesJobUser) {
-        //insert
-        var bussinesjobuser = new BussinesJobUser();
-        
-        bussinesjobuser.bussines_id=req.params.bussinesid;
-        bussinesjobuser.bussines_job_id=req.body.bussines_job_id;
-        bussinesjobuser.job_category_id=req.body.job_category_id;
-        bussinesjobuser.search_user_id = req.body.search_user_id;
-        bussinesjobuser.search_status = req.body.search_status;
-
-        if (req.body.search_status == 10)
-            bussinesjobuser.approval_status = 10;
-
-            bussinesjobuser.save(function (err) {
-            if (err){
-                    errMessage = '{ "intro": { "message" : "Bussines use job  is not saved!!"} }';
-                    requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
-            } else 
-            {
-              if (req.body.search_status == 10)
-                  mailing(req.body.search_user_id,req.params.bussinesid);
-
-              requestHandler.sendSuccess(res,'Bussines use job save successfully.',200,bussinesjobuser);
-            }
-            });
-      }
-      else if (bussinesJobUser) {
-        
-                bussinesJobUser.search_status = req.body.search_status;
-
-                if (req.body.search_status == 10 || req.body.search_status == 20 || req.body.search_status == 30){
-                  bussinesJobUser.approval_status = req.body.search_status;
-                }
-            
-        bussinesJobUser.save(function (err) {
+  else{ 
+      BussinesJobUser.findOne({ bussines_id: req.params.bussinesid, 
+        job_category_id : req.body.job_category_id,search_user_id: req.body.search_user_id},
+        (err,bussinesJobUser)=>{
         if (err){
-                errMessage = '{ "Search": { "message" : "Bussines user job is not saved!!"} }';
-                requestHandler.sendError(req,res, 422, 'Somthing worng with bussines user job',JSON.parse(errMessage));
-        } else {
-            if (req.body.search_status == 10)
-                mailing(req.body.search_user_id,req.params.bussinesid);
-
-              requestHandler.sendSuccess(res,'Bussines user job updated successfully.',200,bussinesJobUser);
+            errMessage = '{ "Search status": { "message" : "Bussines user job is not saved!!"} }';
+            requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
         }
-        });
-   }
-   });
+        else if (!bussinesJobUser) {
+            //insert
+            var bussinesjobuser = new BussinesJobUser();
+            
+            bussinesjobuser.bussines_id=req.params.bussinesid;
+            bussinesjobuser.bussines_job_id=req.body.bussines_job_id;
+            bussinesjobuser.job_category_id=req.body.job_category_id;
+            bussinesjobuser.search_user_id = req.body.search_user_id;
+            bussinesjobuser.search_status = req.body.search_status;
+
+              if (req.body.search_status == 10){
+                  bussinesjobuser.approval_status = 10;
+              }
+
+                bussinesjobuser.save(function (err) {
+                if (err){
+                        errMessage = '{ "intro": { "message" : "Bussines use job  is not saved!!"} }';
+                        requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
+                } else 
+                {
+                  requestHandler.sendSuccess(res,'Bussines use job save successfully.',200,bussinesjobuser);
+                  //if (req.body.search_status == 10)
+                  //    mailing(req.body.search_user_id,req.params.bussinesid);
+                }
+                });
+          }
+          else if (bussinesJobUser) {
+            
+                    if (req.body.search_status == 10 || req.body.search_status == 20 || req.body.search_status == 30)
+                    {
+                      bussinesJobUser.search_status = req.body.search_status;
+                      bussinesJobUser.approval_status = req.body.search_status;
+                    }
+                    else{
+                      bussinesJobUser.search_status = req.body.search_status;
+                    }
+
+                    bussinesJobUser.save(function (err) {
+                    if (err){
+                            errMessage = '{ "Search": { "message" : "Bussines user job is not saved!!"} }';
+                            requestHandler.sendError(req,res, 422, 'Somthing worng with bussines user job',JSON.parse(errMessage));
+                    } else {
+                       // if (req.body.search_status == 10)
+                       //     mailing(req.body.search_user_id,req.params.bussinesid);
+
+                          requestHandler.sendSuccess(res,'Bussines user job updated successfully.',200,bussinesJobUser);
+                    }
+                    });
+        }
+      });
+  }
 } catch (err) {
   errMessage = { "Search": { "message" : err.message } };
   requestHandler.sendError(req,res, 500, 'Smothing went wrong.',(errMessage));

@@ -7,6 +7,7 @@ const BussinesJobUserComments = require('../models/bussinesJobUserCommentsModel'
 const BussinesJobUser = require('../models/bussinesJobUserModel');
 const UserJobAnswer = require('../models/userJobAnswerModel');
 const JobQuestion = require('../models/master/jobQuestionModel');
+const JobCategory = require('../models/master/jobCategoryModel');
 const User = require('../models/userModel');
 const RequestHandler = require('../../utils/RequestHandler');
 const Logger = require('../../utils/logger');
@@ -327,7 +328,23 @@ view = function (req, res) {
         requestHandler.sendError(req,res, 422, 'No data for bussines job',JSON.parse(errMessage));
       } 
       else {
-        callBussinesJobQuestion(req,res,newUser,bussinesJob);
+        callBussinesJobCategory(req,res,newUser,bussinesJob);
+      }
+    });
+  }
+
+  callBussinesJobCategory = function(req,res,newUser,bussinesJob){
+    JobCategory.findOne( {  _id : mongoose.Types.ObjectId(req.query.job_category_id) }, function (err, jobCategory) {
+      if (err){
+        errMessage = '{ "intro": { "message" : "No data found."} }';
+        requestHandler.sendError(req,res, 422, 'No data for bussines job category',JSON.parse(errMessage));
+      } 
+      else {
+        var a = JSON.stringify(bussinesJob)
+        a = JSON.parse(a)
+        a[0]['job_category_name'] = jobCategory.jobcategory_name
+
+        callBussinesJobQuestion(req,res,newUser,a);
       }
     });
   }
@@ -368,7 +385,6 @@ view = function (req, res) {
 });  
 }
 
-
 Callcomments = function(req,res,newUser,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer){
   BussinesJobUserComments.find( { bussines_id: req.params.bussinesid, 
     job_category_id : req.query.job_category_id, search_user_id : req.query.search_user_id }, 
@@ -382,61 +398,6 @@ Callcomments = function(req,res,newUser,bussinesJob,jobQuestion,bussinesJobUserA
     }
   }).sort({created_on : -1});
 }
-
-
-
-Callcomments123 = function(req,res,newUser,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer){
-  try{
-     
-    BussinesJobUserComments.aggregate([
-      {
-        $match: { bussines_id: req.params.bussinesid, job_category_id : req.query.job_category_id, 
-                  search_user_id : req.query.search_user_id 
-                }  
-      },
-      {
-        $lookup:
-         {
-          from: "users",
-          let: { b_id: "$bussines_user_id" },
-          pipeline: [
-            {$project: {_id: 1, displayname:1 }  },
-                  {$match: {$expr:
-                        {$and:[ 
-                          { $eq: [ "$_id",{"$toObjectId" : "$b_id" } ,  ]},
-                        ]}
-                    }
-            }
-          ],
-          as: "comment_user"
-         }
-      }],function(err, data) {
-        if (err)
-         {
-             errMessage = '{ "User": { "message" : "User  is not found"} }';
-             requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
-         }
-         else
-         {
-            if(data)
-            {
-              CallBussinesJobUser(req,res,newUser,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer,data);
-            }
-            else
-            {
-              errMessage = '{ "User": { "message" : "User  is not found"} }';
-              requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
-             }
-         }
-      }
-  );
-} catch (err) {
-      errMessage = { "View": { "message" : err.message } };
-      requestHandler.sendError(req,res, 500, 'View user job detail',(errMessage));
-    }
-}
-
-
 
 CallBussinesJobUser = function(req,res,newUser,bussinesJob,jobQuestion,bussinesJobUserAnswer,userJobAnswer,bussinesJobUserComments){
   BussinesJobUser.find( { bussines_id: req.params.bussinesid, 

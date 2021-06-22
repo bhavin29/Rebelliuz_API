@@ -287,15 +287,20 @@ const view = function (req, res) {
         as: "projects"
             }
         },
-],function(err, data) {
+        ],function(err, data) {
                 if (err)
                  {
                      errMessage = '{ "User profile": { "message" : "User profile is not found"} }';
                      requestHandler.sendError(req,res, 422, 'Somthing went worng: ' + err.message,JSON.parse(errMessage));
                  }
-                 else
+                 else if (data.length > 0)
                  {
                   requestHandler.sendSuccess(res,'User profile found successfully.',200,data);
+                }
+                else
+                {
+                  errMessage = '{ "User profile": { "message" : "User profile is not found"} }';
+                  requestHandler.sendError(req,res, 422, 'Somthing went worng',JSON.parse(errMessage));
                 }
               }
     )} catch (err) {
