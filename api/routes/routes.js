@@ -42,6 +42,7 @@ var LocationController = require('../controllers/master/locationController');
 var ReferenceRelationshipController = require('../controllers/master/referenceRelationshipController');
 var PaymentGatewayController = require('../controllers/master/paymentGatewayController');
 var PaymentPackageController = require('../controllers/master/paymentPackageController');
+var BusinessCategoryController = require('../controllers/master/businessCategoryController');
 
 //Payment
 var PaymentOrderController = require('../controllers/payment/paymentOrderController');
@@ -57,6 +58,9 @@ var PostController = require('../controllers/post/postController');
 
 //Post Comment
 var PostCommentController = require('../controllers/post/postCommentController');
+
+//Business
+var BusinessController = require('../controllers/business/businessController');
 
 const auth = require('../../utils/auth');
 
@@ -187,6 +191,9 @@ router.route("/masters/PaymentPackage")
 
 router.route("/masters/PaymentPackage/:paymentPackageId")
    .get(auth.isAuthunticated,PaymentPackageController.view)
+
+router.route("/masters/businesscategory")
+   .get(auth.isAuthunticated,BusinessCategoryController.index)
 
 //user   
 router.route("/user/intro")
@@ -332,5 +339,9 @@ router.route("/post/:postId/comment")
 router.route("/post/:postId/comment")
    .post(auth.isAuthunticated,PostCommentController.createComment);
    
+//Business
+router.route("/business/:business_id")
+   .post(auth.isAuthunticated,BusinessController.updateBusiness);
+
 //Export API routes
 module.exports = router;
