@@ -8,22 +8,22 @@ const  Schema = mongoose.Schema;
 
 // Create Schema Instance for User and add properties
 const  StorageFileSchema = new  Schema({
-    file_id : { type: String , unique: true, trim: true},
-    parent_file_id : { type: String },
-    type : { type: String },
-    parent_type : { type: String },
-    parent_id : { type: String },
-    user_id : { type: String },
-    creation_date : { type: String },
-    modified_date : { type: String },
-    service_id : { type: String },
-    storage_path : { type: String },
-    extension : { type: String },
-    name : { type: String },
-    mime_major : { type: String },
-    mime_minor : { type: String },
-    size : { type: String },
-    hash : { type: String }
+    file_id : { type: Number , unique: true, trim: true},
+    parent_file_id : { type: Number, default :0 },
+    type : { type: String ,default :''},
+    parent_type : { type: String,default :''},
+    parent_id : { type: Number , default :0 },
+    user_id : { type: Number, default :0  },
+    creation_date : { type: Date, default: Date.now },
+    modified_date : { type: Date, default: Date.now },
+    service_id : { type: Number, default :0 },
+    storage_path : { type: String,default :'' },
+    extension : { type: String ,default :''},
+    name : { type: String,default :'' },
+    mime_major : { type: String ,default :''},
+    mime_minor : { type: String ,default :''},
+    size : { type: Number, default :0 },
+    hash : { type: String,default :'' }
 });
 
 // Create and export User model
