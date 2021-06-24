@@ -24,7 +24,7 @@ try{
     
       var myquery = {_id : req.body.id  };
     
-      var newvalues = { $set: {search_status: req.body.status } };
+      var newvalues = { $set: {search_status: req.body.status , approval_status : req.body.status } };
     
       BussinesJobUser.updateOne(myquery,newvalues,(err,bussinesJobUser)=>{
         if (err){
