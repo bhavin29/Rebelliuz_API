@@ -52,7 +52,8 @@ const upload = async (req, res) => {
               console.error(err)
           }
           userIntro.vFilename = global.vFilename;
-
+          userIntro.created_by = 0;
+          
           userIntro.save(function (err) {
             if (err){
               errMessage = '{ "intro": { "message" : "User introdcution is not saved!!"} }';
