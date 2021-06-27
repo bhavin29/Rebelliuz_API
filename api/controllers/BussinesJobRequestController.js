@@ -10,8 +10,8 @@ const requestHandler = new RequestHandler(logger);
 // View 
 view = function (req, res) {
     
-  //  let match = { "bussines_id": req.params.bussinesid,  "search_status" : {$in : [20,30]}  }
-    let match = { "bussines_id": req.params.bussinesid }
+    let match = { "bussines_id": req.params.bussinesid,  "approval_status" : {$in : [10,20,30]}  }
+  //  let match = { "bussines_id": req.params.bussinesid }
   
     let lookupvalue_1 = 
                 {

@@ -7,7 +7,7 @@ const Logger = require('../../utils/logger');
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
 
-// View 
+// add 
 add = function (req, res) {
 try{
     if (req.body.id == undefined || req.body.id =='')
@@ -47,7 +47,7 @@ try{
 // View 
 view = function (req, res) {
     
- let match = { "search_user_id": global.decoded._id }
+ let match = { "search_user_id": global.decoded._id ,  "approval_status" : {$in : [10,20,30]} }
   
  let lookupvalue_1 = 
              {
