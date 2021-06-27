@@ -4,6 +4,7 @@ const fs = require('fs');
 const uploadFile = require('../../utils/uploadBussinesJob.js');
 const BussinesJob = require('../models/bussinesJobModel');
 const RequestHandler = require('../../utils/RequestHandler');
+const JobCategory = require('../models/master/jobCategoryModel');
 const Logger = require('../../utils/logger');
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
@@ -12,6 +13,7 @@ const requestHandler = new RequestHandler(logger);
 const upload = async (req, res) => {
   try {
     await new uploadFile(req, res);
+    const jobCategoryName =await JobCategory.find({_id : mongoose.Types.ObjectId(req.body.job_category_id)}).limit(1);
 
    /* if (req.file == undefined) {
         errMessage = '{ "intro": { "message" : "Please upload a file!"} }';
@@ -80,7 +82,12 @@ const upload = async (req, res) => {
               errMessage = '{ "intro": { "message" : "Bussines job is not saved!!"} }';
               requestHandler.sendError(req,res, 422,err.message ,JSON.parse(errMessage));
             } else {
-              requestHandler.sendSuccess(res,'Bussines job save successfully.',200,bussinesjob);
+
+              var result = JSON.stringify(bussinesjob)
+              result = JSON.parse(result)
+              result['job_category_name'] = jobCategoryName[0].jobcategory_name
+              
+              requestHandler.sendSuccess(res,'Bussines job save successfully.',200,result);
             }
         });
       }
@@ -145,7 +152,13 @@ const upload = async (req, res) => {
               errMessage = '{ "intro": { "message" : "Bussines job is not saved!!"} }';
               requestHandler.sendError(req,res, 422, 'Somthing worng with bussines job: ' + err.message,JSON.parse(errMessage));
             } else {
-              requestHandler.sendSuccess(res,'Bussines job updated successfully.',200,bussinesJob);
+
+
+              var result = JSON.stringify(bussinesJob)
+              result = JSON.parse(result)
+              result['job_category_name'] = jobCategoryName[0].jobcategory_name
+
+              requestHandler.sendSuccess(res,'Bussines job updated successfully.',200,result);
             }
           });
      }
