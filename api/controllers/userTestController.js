@@ -5,11 +5,12 @@ const UserTest = require('../models/userTestModel');
 const Test = require('../models/master/testModel');
 const config = require('../../config/appconfig');
 const fs = require('fs');
-const uploadTest = require('../../utils/uploadTest.js');
+const uploadTest = require('../../utils/uploadTest');
 const RequestHandler = require('../../utils/RequestHandler');
 const Logger = require('../../utils/logger');
 const logger = new Logger();
 const requestHandler = new RequestHandler(logger);
+const auth = require('../../utils/auth');
 
 var resources = {
     test_title: "$test_title"
@@ -71,62 +72,67 @@ exports.indexupload = async function (req, res) {
 };
 
 //upload and save/update user intro
-exports.addupload = async (req, res) => {
+exports.addupload = async  (req, res) => {
   try {
-    await new uploadTest(req, res);
-
-    if (req.file == undefined) {
-      return res.status(400).send({ message: "Please upload a file!" });
-    }
-
-    UserTestUpload.findOne({ user_id: global.decoded._id, test_title : req.body.test_title},(err,userTestUpload)=>{
+    await new uploadTest(req, res, function (err) {
       if (err) {
-        errMessage = '{ "test": { "message" : "User test file is not saved!!"} }';
-        requestHandler.sendError(req,res, 422, 'Somthing worng with user introduction',JSON.parse(errMessage));
       }
-      if (!userTestUpload) {
-          //insert
-          var usertestUpload = new UserTestUpload();
-         
-          usertestUpload.user_id = global.decoded._id;
-          usertestUpload.test_title = req.body.test_title;
-          usertestUpload.test_filename = global.test_filename;
-
-          usertestUpload.save(function (err) {
-            if (err){
-              errMessage = '{ "test": { "message" : "User test file is not saved!!"} }';
-              requestHandler.sendError(req,res, 422, 'Somthing worng with user test:' + err.message,JSON.parse(errMessage));
-            } else {
-              requestHandler.sendSuccess(res,'User test file save successfully.',200,usertestUpload);
-            }
-        });
+      
+      if (req.file == undefined) {
+        return res.status(400).send({ message: "Please upload a file!" });
       }
-      else if (userTestUpload) {
-          //save and check errors
-          var oldvFilename = userTestUpload.test_filename;
- 
-          try {
-            fs.unlinkSync(config.general.content_path + "/users/test/" + oldvFilename)
-            //file removed
-            } catch(err) {
-              console.error(err)
-          }
-          userTestUpload.test_filename = global.test_filename;
 
-          if (req.body.test_title !=undefined)
-          userTestUpload.test_title = req.body.test_title;
+      const tokenFromHeader = auth.getJwtToken(req);
+      const user = jwt.decode(tokenFromHeader);
 
-          userTestUpload.save(function (err) {
-            if (err){
-              errMessage = '{ "intro": { "message" : "User test file is not saved!!"} }';
-              requestHandler.sendError(req,res, 422, 'Somthing worng with user introduction',JSON.parse(errMessage));
-            } else {
-              requestHandler.sendSuccess(res,'User test file update successfully.',200,userTestUpload);
-            }
+      UserTestUpload.findOne({ user_id: user._id, test_title : req.body.test_title},(err,userTestUpload)=>{
+          if (err) {
+          errMessage = '{ "test": { "message" : "User test file is not saved!!"} }';
+          requestHandler.sendError(req,res, 422, 'Somthing worng with user introduction',JSON.parse(errMessage));
+        }
+        if (!userTestUpload) {
+            //insert
+            var usertestUpload = new UserTestUpload();
+          
+            usertestUpload.user_id = user._id;
+            usertestUpload.test_title = req.body.test_title;
+            usertestUpload.test_filename = req.file.filename;//global.test_filename;
+
+            usertestUpload.save(function (err) {
+              if (err){
+                errMessage = '{ "test": { "message" : "User test file is not saved!!"} }';
+                requestHandler.sendError(req,res, 422, 'Somthing worng with user test:' + err.message,JSON.parse(errMessage));
+              } else {
+                requestHandler.sendSuccess(res,'User test file save successfully.',200,usertestUpload);
+              }
           });
-     }
-  });
+        }
+        else if (userTestUpload) {
+            //save and check errors
+            var oldvFilename = userTestUpload.test_filename;
   
+            try {
+              fs.unlinkSync(config.general.content_path + "/users/test/" + oldvFilename)
+              //file removed
+              } catch(err) {
+                console.error(err)
+            }
+            userTestUpload.test_filename = req.file.filename;//global.test_filename;
+
+            if (req.body.test_title !=undefined)
+            userTestUpload.test_title = req.body.test_title;
+
+            userTestUpload.save(function (err) {
+              if (err){
+                errMessage = '{ "intro": { "message" : "User test file is not saved!!"} }';
+                requestHandler.sendError(req,res, 422, 'Somthing worng with user introduction',JSON.parse(errMessage));
+              } else {
+                requestHandler.sendSuccess(res,'User test file update successfully.',200,userTestUpload);
+              }
+            });
+      }
+    });
+  })
   } catch (err) {
     errMessage = { "Fileupload": { "message" : err.message } };
     requestHandler.sendError(req,res, 500, 'Could not upload the file',(errMessage));
