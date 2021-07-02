@@ -11,7 +11,6 @@ let storage = multer.diskStorage({
     },
   filename: (req, file, cb) => {
     global.test_filename = stringCode.generateString() + "_" + Date.now() + '.' + mime.extension(file.mimetype);
-    console.log(global.test_filename);
     cb(null, global.test_filename);
   },
 });
